@@ -1,7 +1,7 @@
 'use client';
 
 import { authenticate } from '@/app/lib/actions';
-import { lusitana } from '@/app/ui/fonts';
+import { lusitana } from '@/app/components/fonts';
 import {
   AtSymbolIcon,
   KeyIcon,

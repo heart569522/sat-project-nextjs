@@ -1,10 +1,10 @@
 import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
-import { lusitana } from '@/app/ui/fonts';
+import { lusitana } from '@/app/components/fonts';
 import { fetchRevenue } from '@/app/lib/data';
 
 // This component is representational only.
-// For data visualization UI, check out:
+// For data visualization components, check out:
 // https://www.tremor.so/
 // https://www.chartjs.org/
 // https://airbnb.io/visx/
