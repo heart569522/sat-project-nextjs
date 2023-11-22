@@ -12,6 +12,14 @@ export default function PN01Form() {
         { id: 1, objective: '', indicator: '', value: '', tool: '' }, // Initial row
     ]);
 
+    const [expectedResultRows, setExpectedResultRows] = useState([
+        { id: 1, expected_result: '' }, // Initial row
+    ]);
+
+    const [operationDurationRows, setOperationDurationRows] = useState([
+        { id: 1, operation_duration: '' }, // Initial row
+    ]);
+
     const addResponsibleRow = () => {
         setResponsibleRows((prevRows) => [
             ...prevRows,
@@ -25,6 +33,20 @@ export default function PN01Form() {
             { id: prevRows.length + 1, objective: '', indicator: '', value: '', tool: '' },
         ]);
     };
+
+    const addExpectedResultRow = () => {
+        setExpectedResultRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, expected_result: '' },
+        ]);
+    };
+
+    const addOperationDurationRow = () => {
+        setOperationDurationRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, operation_duration: ''}
+        ])
+    }
 
     const deleteResponsibleRow = (id: number) => {
         setResponsibleRows((prevRows) => {
@@ -42,6 +64,34 @@ export default function PN01Form() {
 
     const deleteOIVTRow = (id: number) => {
         setOIVTRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+            // Update IDs to maintain a sequential order
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
+    };
+
+    const deleteExpectedResultRow = (id: number) => {
+        setExpectedResultRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+            // Update IDs to maintain a sequential order
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
+    };
+
+    const deleteOperationDurationRow = (id: number) => {
+        setOperationDurationRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
             // Update IDs to maintain a sequential order
@@ -78,8 +128,24 @@ export default function PN01Form() {
         );
     };
 
-    console.log(OIVTRows);
-    
+    const handleExpectedResultChange = (id: number, value: string) => {
+        setExpectedResultRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, expected_result: value } : row
+            )
+        );
+    };
+
+    const handleOperationDurationChange = (id: number, value: string) => {
+        setOperationDurationRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, operation_duration: value } : row
+            )
+        );
+    };
+
+    console.log(operationDurationRows);
+
 
 
     return (
@@ -904,7 +970,120 @@ export default function PN01Form() {
             <h3 className="mb-2 block text-base font-medium text-gray-900 ">
                 9.ประโยชน์ที่คาดว่าจะได้รับ
             </h3>
-            asdasd
+            <div className='mb-6'>
+                <div className="grid gap-6 md:grid-cols-1">
+                    <table className="w-full rounded border text-left text-sm text-gray-500">
+                        <tbody>
+                            {expectedResultRows.map((row) => (
+                                <tr className="border-b bg-white">
+                                    <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
+                                        {row.id}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="expected_result"
+                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.expected_result}
+                                                onChange={(e) =>
+                                                    handleExpectedResultChange(row.id, e.target.value)
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="w-[10%] px-6 py-4 bg-gray-50">
+                                        <div className='flex items-center justify-center'>
+                                            <Tooltip title="เพิ่มแถว">
+                                                <IconButton
+                                                    aria-label="add_row"
+                                                    size="small"
+                                                    onClick={addExpectedResultRow}
+                                                >
+                                                    <PlusCircleIcon className="h-9 w-9" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {expectedResultRows.length > 1 && (
+                                                <Tooltip title="ลบแถว">
+                                                    <IconButton
+                                                        aria-label="delete_row"
+                                                        size="small"
+                                                        onClick={() => deleteExpectedResultRow(row.id)}
+                                                    >
+                                                        <XCircleIcon className="h-9 w-9" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ
+            </h3>
+            <div className='mb-6'>
+                <div className="grid gap-6 md:grid-cols-1">
+                    <table className="w-full rounded border text-left text-sm text-gray-500">
+                        <tbody>
+                            {operationDurationRows.map((row) => (
+                                <tr className="border-b bg-white">
+                                    <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
+                                        {row.id}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="operation_duration"
+                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.operation_duration}
+                                                onChange={(e) =>
+                                                    handleOperationDurationChange(row.id, e.target.value)
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="w-[10%] px-6 py-4 bg-gray-50">
+                                        <div className='flex items-center justify-center'>
+                                            <Tooltip title="เพิ่มแถว">
+                                                <IconButton
+                                                    aria-label="add_row"
+                                                    size="small"
+                                                    onClick={addOperationDurationRow}
+                                                >
+                                                    <PlusCircleIcon className="h-9 w-9" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {operationDurationRows.length > 1 && (
+                                                <Tooltip title="ลบแถว">
+                                                    <IconButton
+                                                        aria-label="delete_row"
+                                                        size="small"
+                                                        onClick={() => deleteOperationDurationRow(row.id)}
+                                                    >
+                                                        <XCircleIcon className="h-9 w-9" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            
+            </div>
+
 
             <button
                 type="submit"
