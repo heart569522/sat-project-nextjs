@@ -44,7 +44,7 @@ export default function PN01Form() {
     const addOperationDurationRow = () => {
         setOperationDurationRows((prevRows) => [
             ...prevRows,
-            { id: prevRows.length + 1, operation_duration: ''}
+            { id: prevRows.length + 1, operation_duration: '' }
         ])
     }
 
@@ -1081,9 +1081,62 @@ export default function PN01Form() {
                         </tbody>
                     </table>
                 </div>
-            
+
             </div>
 
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                11.สถานที่จัดโครงการและกำหนดการ
+            </h3>
+            <div className="mb-6">
+                <div className="grid gap-6 mb-3 md:grid-cols-2">
+                    <div>
+                        <label
+                            htmlFor="project_location"
+                            className="mb-2 block text-base font-medium text-gray-900"
+                        >
+                            11.1 สถานที่จัดโครงการ  
+                        </label>
+                        <input
+                            type="text"
+                            id="project_location"
+                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            placeholder=""
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="project_datetime"
+                            className="mb-2 block text-base font-medium text-gray-900"
+                        >
+                            11.2 วัน/เวลา ที่จัดโครงการ 
+                        </label>
+                        <input
+                            type="text"
+                            id="project_datetime"
+                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            placeholder=""
+                            required
+                        />
+                    </div>
+                </div>
+                <div className="grid gap-6 md:grid-cols-1">
+                    <div>
+                        <label
+                            htmlFor="countries"
+                            className="mb-2 block text-base font-medium text-gray-900"
+                        >
+                            11.3 กำหนดการ (โดยละเอียด)
+                        </label>
+                        <textarea
+                            id="message"
+                            rows={4}
+                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            placeholder=""
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
 
             <button
                 type="submit"
