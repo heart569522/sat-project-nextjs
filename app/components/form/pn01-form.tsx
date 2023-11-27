@@ -3,9 +3,15 @@ import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { IconButton, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker, TimeField, TimePicker } from '@mui/x-date-pickers';
+
+
 export default function PN01Form() {
     const [responsibleRows, setResponsibleRows] = useState([
-        { id: 1, firstname: '', lastname: '' }, // Initial row
+        { id: 1, firstname: '', lastname: '', position: '', work: '' }, // Initial row
     ]);
 
     const [OIVTRows, setOIVTRows] = useState([
@@ -20,10 +26,14 @@ export default function PN01Form() {
         { id: 1, operation_duration: '' }, // Initial row
     ]);
 
+    const [projectScheduleRows, setProjectScheduleRows] = useState([
+        { id: 1, date: '', time: '', detail: '' }, // Initial row
+    ]);
+
     const addResponsibleRow = () => {
         setResponsibleRows((prevRows) => [
             ...prevRows,
-            { id: prevRows.length + 1, firstname: '', lastname: '' },
+            { id: prevRows.length + 1, firstname: '', lastname: '', position: '', work: '' },
         ]);
     };
 
@@ -45,6 +55,13 @@ export default function PN01Form() {
         setOperationDurationRows((prevRows) => [
             ...prevRows,
             { id: prevRows.length + 1, operation_duration: '' }
+        ])
+    }
+
+    const addProjectScheduleRow = () => {
+        setProjectScheduleRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, date: '', time: '', detail: '' }
         ])
     }
 
@@ -104,18 +121,24 @@ export default function PN01Form() {
         });
     };
 
-    const handleFirstNameChange = (id: number, value: string) => {
-        setResponsibleRows((prevRows) =>
-            prevRows.map((row) =>
-                row.id === id ? { ...row, firstname: value } : row,
-            ),
-        );
+    const deleteProjectScheduleRow = (id: number) => {
+        setProjectScheduleRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+            // Update IDs to maintain a sequential order
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
     };
 
-    const handleLastNameChange = (id: number, value: string) => {
+    const handleResponsibleChange = (id: number, field: string, value: string) => {
         setResponsibleRows((prevRows) =>
             prevRows.map((row) =>
-                row.id === id ? { ...row, lastname: value } : row,
+                row.id === id ? { ...row, [field]: value } : row,
             ),
         );
     };
@@ -144,8 +167,15 @@ export default function PN01Form() {
         );
     };
 
-    console.log(operationDurationRows);
+    const handleProjectScheduleChange = (id: number, field: string, value: Date | string | null) => {
+        setProjectScheduleRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, [field]: field == 'detail' || 'time' ? value : new Date(value as string) } : row
+            )
+        );
+    };
 
+    console.log(projectScheduleRows);
 
 
     return (
@@ -162,7 +192,7 @@ export default function PN01Form() {
                         type="text"
                         id="first_name"
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="John"
+                        placeholder=""
                         required
                     />
                 </div>
@@ -177,7 +207,7 @@ export default function PN01Form() {
                         type="text"
                         id="last_name"
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="Doe"
+                        placeholder=""
                         required
                     />
                 </div>
@@ -192,7 +222,7 @@ export default function PN01Form() {
                         type="text"
                         id="company"
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="Flowbite"
+                        placeholder="ชื่อ - สกุล"
                         required
                     />
                 </div>
@@ -225,7 +255,13 @@ export default function PN01Form() {
                                 <th scope="col" className="px-6 py-3">
                                     ชื่อ - สกุล
                                 </th>
-                                <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                                <th scope="col" className="w-[15%] px-6 py-3 bg-gray-300">
+                                    ตำแหน่งโครงการ
+                                </th>
+                                <th scope="col" className="w-[15%] px-6 py-3">
+                                    ภาระงาน (ภารกิจ/สัปดาห์)
+                                </th>
+                                <th scope="col" className="w-[10%] px-6 py-3 bg-gray-300">
                                     เพิ่ม/ลบแถว
                                 </th>
                             </tr>
@@ -248,7 +284,7 @@ export default function PN01Form() {
                                                 placeholder="ชื่อจริง"
                                                 value={row.firstname}
                                                 onChange={(e) =>
-                                                    handleFirstNameChange(row.id, e.target.value)
+                                                    handleResponsibleChange(row.id, 'firstname', e.target.value)
                                                 }
                                                 required
                                             />
@@ -259,9 +295,39 @@ export default function PN01Form() {
                                                 placeholder="นามสกุล"
                                                 value={row.lastname}
                                                 onChange={(e) =>
-                                                    handleLastNameChange(row.id, e.target.value)
+                                                    handleResponsibleChange(row.id, 'lastname', e.target.value)
                                                 }
                                                 required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 bg-gray-50">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="res_position"
+                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.position}
+                                                onChange={(e) =>
+                                                    handleResponsibleChange(row.id, 'position', e.target.value)
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="res_work"
+                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.work}
+                                                onChange={(e) =>
+                                                    handleResponsibleChange(row.id, 'work', e.target.value)
+                                                }
+
                                             />
                                         </div>
                                     </td>
@@ -1094,7 +1160,7 @@ export default function PN01Form() {
                             htmlFor="project_location"
                             className="mb-2 block text-base font-medium text-gray-900"
                         >
-                            11.1 สถานที่จัดโครงการ  
+                            11.1 สถานที่จัดโครงการ
                         </label>
                         <input
                             type="text"
@@ -1109,15 +1175,16 @@ export default function PN01Form() {
                             htmlFor="project_datetime"
                             className="mb-2 block text-base font-medium text-gray-900"
                         >
-                            11.2 วัน/เวลา ที่จัดโครงการ 
+                            11.2 วัน/เวลา ที่จัดโครงการ
                         </label>
-                        <input
-                            type="text"
-                            id="project_datetime"
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                            placeholder=""
-                            required
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DateTimePicker
+                                ampm={false}
+                                className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                            />
+                        </LocalizationProvider>
+
+
                     </div>
                 </div>
                 <div className="grid gap-6 md:grid-cols-1">
@@ -1128,12 +1195,98 @@ export default function PN01Form() {
                         >
                             11.3 กำหนดการ (โดยละเอียด)
                         </label>
-                        <textarea
-                            id="message"
-                            rows={4}
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                            placeholder=""
-                        ></textarea>
+                        <div className="mb-6">
+                            <div className="grid gap-6 md:grid-cols-1">
+                                <div className="relative overflow-x-auto">
+                                    <table className="w-full rounded border text-left text-sm text-gray-500">
+                                        <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                                            <tr>
+                                                <th scope="col" className="px-6 py-3 w-[15%]">
+                                                    วันที่
+                                                </th>
+                                                <th scope="col" className="bg-gray-300 px-6 py-3 w-[15%]">
+                                                    เวลา
+                                                </th>
+                                                <th scope="col" className="px-6 py-3">
+                                                    รายการกิจกรรม
+                                                </th>
+                                                <th scope="col" className="bg-gray-300 w-[10%] px-6 py-3">
+                                                    เพิ่ม/ลบแถว
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {projectScheduleRows.map((row) => (
+                                                <tr className="border-b bg-white">
+                                                    <td className="px-6 py-4">
+                                                        <div className={`grid grid-cols-1 gap-6`}>
+                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                <DatePicker
+                                                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                                    value={row.date}
+                                                                    onChange={(date) => handleProjectScheduleChange(row.id, 'date', date || '')}
+                                                                />
+                                                            </LocalizationProvider>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 bg-gray-50">
+                                                        <div className={`grid grid-cols-1 gap-6`}>
+                                                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                                <TimeField
+                                                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                                    value={row.time}
+                                                                    onChange={(time) =>
+                                                                        handleProjectScheduleChange(row.id, 'time', time)
+                                                                    }
+                                                                    format="HH:mm"
+                                                                />
+                                                            </LocalizationProvider>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className={`grid grid-cols-1 gap-6`}>
+                                                            <input
+                                                                type="text"
+                                                                id="oivt_tool"
+                                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                                placeholder=""
+                                                                value={row.detail}
+                                                                onChange={(e) =>
+                                                                    handleProjectScheduleChange(row.id, 'detail', e.target.value as string)
+                                                                }
+                                                                required
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td className="flex items-center justify-center px-6 py-4 bg-gray-50">
+                                                        <Tooltip title="เพิ่มแถว">
+                                                            <IconButton
+                                                                aria-label="add_row"
+                                                                size="small"
+                                                                onClick={addProjectScheduleRow}
+                                                            >
+                                                                <PlusCircleIcon className="h-9 w-9" />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        {projectScheduleRows.length > 1 && (
+                                                            <Tooltip title="ลบแถว">
+                                                                <IconButton
+                                                                    aria-label="delete_row"
+                                                                    size="small"
+                                                                    onClick={() => deleteProjectScheduleRow(row.id)}
+                                                                >
+                                                                    <XCircleIcon className="h-9 w-9" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
