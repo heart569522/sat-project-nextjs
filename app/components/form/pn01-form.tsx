@@ -1,6 +1,6 @@
 'use client';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { IconButton, TextField, Tooltip } from '@mui/material';
+import { IconButton, InputAdornment, OutlinedInput, TextField, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -11,29 +11,40 @@ import { DatePicker, TimeField, TimePicker } from '@mui/x-date-pickers';
 
 export default function PN01Form() {
     const [responsibleRows, setResponsibleRows] = useState([
-        { id: 1, firstname: '', lastname: '', position: '', work: '' }, // Initial row
+        { id: 1, firstname: '', lastname: '', position: '', work: '' }, 
     ]);
 
     const [OIVTRows, setOIVTRows] = useState([
-        { id: 1, objective: '', indicator: '', value: '', tool: '' }, // Initial row
+        { id: 1, objective: '', indicator: '', value: '', tool: '' }, 
     ]);
 
     const [expectedResultRows, setExpectedResultRows] = useState([
-        { id: 1, expected_result: '' }, // Initial row
+        { id: 1, expected_result: '' }, 
     ]);
 
     const [operationDurationRows, setOperationDurationRows] = useState([
-        { id: 1, operation_duration: '' }, // Initial row
+        { id: 1, operation_duration: '' }, 
     ]);
 
     const [projectScheduleRows, setProjectScheduleRows] = useState([
-        { id: 1, date: '', time: '', detail: '' }, // Initial row
+        { id: 1, date: '', time: '', detail: '' }, 
     ]);
 
-    const [targetTotal, setTargetTotal] = useState(0)
+    const [targetTotal, setTargetTotal] = useState('')
     const [targetRows, setTargetRows] = useState([
-        { id: 1, detail: '', count: '' }, // Initial row
+        { id: 1, detail: '', count: '' }, 
     ]);
+
+    const [budgetIncomeTotal, setBudgetIncomeTotal] = useState('')
+    const [budgetIncomeRows, setBudgetIncomeRows] = useState([
+        { id: 1, detail: '', amount: '', source: '' }, 
+    ]);
+
+    const [budgetExpenseTotal, setBudgetExpenseTotal] = useState('')
+    const [budgetExpenseRows, setBudgetExpenseRows] = useState([
+        { id: 1, detail: '', amount: '', note: '' }, 
+    ]);
+    
 
     const addResponsibleRow = () => {
         setResponsibleRows((prevRows) => [
@@ -77,11 +88,25 @@ export default function PN01Form() {
         ])
     }
 
+    const addBudgetIncomeRow = () => {
+        setBudgetIncomeRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, detail: '', amount: '', source: '' }
+        ])
+    }
+
+    const addBudgetExpenseRow = () => {
+        setBudgetExpenseRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, detail: '', amount: '', note: '' }
+        ])
+    }
+
     const deleteResponsibleRow = (id: number) => {
         setResponsibleRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -95,7 +120,7 @@ export default function PN01Form() {
         setOIVTRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -109,7 +134,7 @@ export default function PN01Form() {
         setExpectedResultRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -123,7 +148,7 @@ export default function PN01Form() {
         setOperationDurationRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -137,7 +162,7 @@ export default function PN01Form() {
         setProjectScheduleRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -151,7 +176,35 @@ export default function PN01Form() {
         setTargetRows((prevRows) => {
             const updatedRows = prevRows.filter((row) => row.id !== id);
 
-            // Update IDs to maintain a sequential order
+
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
+    };
+
+    const deleteBudgetIncomeRow = (id: number) => {
+        setBudgetIncomeRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
+    };
+
+    const deleteBudgetExpenseRow = (id: number) => {
+        setBudgetExpenseRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+
             const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
                 ...row,
                 id: index + 1,
@@ -203,11 +256,6 @@ export default function PN01Form() {
     };
     // console.log(projectScheduleRows);
 
-    const calculateTargetTotal = () => {
-        const total = targetRows.reduce((acc, row) => acc + Number(row.count), 0);
-        setTargetTotal(total);
-    };
-
     const handleTargetChange = (id: number, field: string, value: string) => {
         setTargetRows((prevRows) =>
             prevRows.map((row) =>
@@ -216,13 +264,48 @@ export default function PN01Form() {
         );
     };
 
+    const handleBudgetIncomeChange = (id: number, field: string, value: string) => {
+        setBudgetIncomeRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, [field]: field == 'detail' || 'source' ? value : Number(value) } : row
+            )
+        );
+    };
+
+    const handleBudgetExpenseChange = (id: number, field: string, value: string) => {
+        setBudgetExpenseRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, [field]: field == 'detail' || 'note' ? value : Number(value) } : row
+            )
+        );
+    };
+
+    const calculateTargetTotal = () => {
+        const total = targetRows.reduce((acc, row) => acc + Number(row.count), 0);
+        setTargetTotal(total.toLocaleString());
+    };
+
+    const calculateBudgetIncomeTotal = () => {
+        const total = budgetIncomeRows.reduce((acc, row) => acc + Number(row.amount), 0);
+        setBudgetIncomeTotal(total.toLocaleString());
+    };
+
+    const calculateBudgetExpenseTotal = () => {
+        const total = budgetExpenseRows.reduce((acc, row) => acc + Number(row.amount), 0);
+        setBudgetExpenseTotal(total.toLocaleString());
+    };
+
     useEffect(() => {
         calculateTargetTotal();
     }, [targetRows]);
 
-    console.log(targetRows, targetTotal);
+    useEffect(() => {
+        calculateBudgetIncomeTotal();
+    }, [budgetIncomeRows]);
 
-
+    useEffect(() => {
+        calculateBudgetExpenseTotal();
+    }, [budgetExpenseRows]);
 
 
     return (
@@ -1363,9 +1446,6 @@ export default function PN01Form() {
                 13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
             </h3>
             <div className='mb-6'>
-                <div className='flex mb-2'>
-                    <p>รวมจำนวน {targetTotal} คน</p>
-                </div>
                 <div className="grid gap-6 md:grid-cols-1">
                     <table className="w-full rounded border text-left text-sm text-gray-500">
                         <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
@@ -1443,6 +1523,15 @@ export default function PN01Form() {
                                     </td>
                                 </tr>
                             ))}
+                            <tr>
+                                <td className="py-2 text-right font-bold">
+                                    รวมจำนวน
+                                </td>
+                                <td className="px-6 py-2 font-bold text-right">
+                                    {targetTotal}
+                                </td>
+                                <td className='py-2 text-left font-bold'>คน</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -1461,7 +1550,260 @@ export default function PN01Form() {
                         placeholder=""
                     ></textarea>
                 </div>
+            </div>
 
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                15.งบประมาณ
+            </h3>
+            <div className='mb-6'>
+                <div className="grid gap-6 mb-3 md:grid-cols-1">
+                    <div>
+                        <label
+                            htmlFor="project_location"
+                            className="mb-2 block text-base font-medium text-gray-900"
+                        >
+                            15.1 งบประมาณรายรับ
+                        </label>
+                        <table className="w-full rounded border text-left text-sm text-gray-500">
+                            <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                                <tr>
+                                    <th scope="col" className="w-[10%] px-6 py-3">
+                                        ลำดับที่
+                                    </th>
+                                    <th scope="col" className="bg-gray-300 px-6 py-3 w-[40%]">
+                                        รายการ
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 w-[20%]">
+                                        จำนวนเงิน
+                                    </th>
+                                    <th scope="col" className="bg-gray-300 px-6 py-3 w-[20%]">
+                                        แหล่งที่มาของรายรับ
+                                    </th>
+                                    <th scope="col" className="w-[10%] px-6 py-3">
+                                        เพิ่ม/ลบแถว
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {budgetIncomeRows.map((row) => (
+                                    <tr className="border-b bg-white" key={row.id}>
+                                        <th
+                                            scope="row"
+                                            className="px-6 py-4 text-center text-lg font-medium"
+                                        >
+                                            {row.id}
+                                        </th>
+                                        <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <TextField
+                                                    hiddenLabel
+                                                    type="text"
+                                                    id="detail"
+                                                    className='flex w-full'
+                                                    placeholder=""
+                                                    value={row.detail}
+                                                    onChange={(e) =>
+                                                        handleBudgetIncomeChange(row.id, 'detail', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <OutlinedInput
+                                                    // hiddenLabel
+                                                    type="number"
+                                                    id="amount"
+                                                    endAdornment={<InputAdornment position="end">บาท</InputAdornment>}
+                                                    className='flex w-full'
+                                                    placeholder=""
+                                                    value={row.amount}
+                                                    onChange={(e) =>
+                                                        handleBudgetIncomeChange(row.id, 'amount', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 bg-gray-50">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <TextField
+                                                    hiddenLabel
+                                                    type="text"
+                                                    id="source"
+                                                    className='flex w-full'
+                                                    placeholder="งบประมาณ หมวด"
+                                                    value={row.source}
+                                                    onChange={(e) =>
+                                                        handleBudgetIncomeChange(row.id, 'source', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td >
+                                            <div className='flex items-center justify-center'>
+                                                <Tooltip title="เพิ่มแถว">
+                                                    <IconButton
+                                                        aria-label="add_row"
+                                                        size="small"
+                                                        onClick={addBudgetIncomeRow}
+                                                    >
+                                                        <PlusCircleIcon className="h-9 w-9" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                {budgetIncomeRows.length > 1 && (
+                                                    <Tooltip title="ลบแถว">
+                                                        <IconButton
+                                                            aria-label="delete_row"
+                                                            size="small"
+                                                            onClick={() => deleteBudgetIncomeRow(row.id)}
+                                                        >
+                                                            <XCircleIcon className="h-9 w-9" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr>
+                                    <td colSpan={2} className="py-2 text-right font-bold">
+                                        รวมงบประมาณรายรับ
+                                    </td>
+                                    <td className="px-6 py-2 font-bold text-right">
+                                        {budgetIncomeTotal}
+                                    </td>
+                                    <td colSpan={2} className='py-2 text-left font-bold'>บาท</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="project_location"
+                            className="mb-2 block text-base font-medium text-gray-900"
+                        >
+                            15.2 งบประมาณรายจ่าย
+                        </label>
+                        <table className="w-full rounded border text-left text-sm text-gray-500">
+                            <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                                <tr>
+                                    <th scope="col" className="w-[10%] px-6 py-3">
+                                        ลำดับที่
+                                    </th>
+                                    <th scope="col" className="bg-gray-300 px-6 py-3 w-[40%]">
+                                        รายการ
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 w-[20%]">
+                                        จำนวนเงิน
+                                    </th>
+                                    <th scope="col" className="bg-gray-300 px-6 py-3 w-[20%]">
+                                        หมายเหตุ
+                                    </th>
+                                    <th scope="col" className="w-[10%] px-6 py-3">
+                                        เพิ่ม/ลบแถว
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {budgetExpenseRows.map((row) => (
+                                    <tr className="border-b bg-white" key={row.id}>
+                                        <th
+                                            scope="row"
+                                            className="px-6 py-4 text-center text-lg font-medium"
+                                        >
+                                            {row.id}
+                                        </th>
+                                        <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <TextField
+                                                    hiddenLabel
+                                                    type="text"
+                                                    id="detail"
+                                                    className='flex w-full'
+                                                    placeholder=""
+                                                    value={row.detail}
+                                                    onChange={(e) =>
+                                                        handleBudgetExpenseChange(row.id, 'detail', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <OutlinedInput
+                                                    // hiddenLabel
+                                                    type="number"
+                                                    id="amount"
+                                                    endAdornment={<InputAdornment position="end">บาท</InputAdornment>}
+                                                    className='flex w-full'
+                                                    placeholder=""
+                                                    value={row.amount}
+                                                    onChange={(e) =>
+                                                        handleBudgetExpenseChange(row.id, 'amount', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 bg-gray-50">
+                                            <div className={`grid grid-cols-1 gap-6`}>
+                                                <TextField
+                                                    hiddenLabel
+                                                    type="text"
+                                                    id="note"
+                                                    className='flex w-full'
+                                                    placeholder=""
+                                                    value={row.note}
+                                                    onChange={(e) =>
+                                                        handleBudgetExpenseChange(row.id, 'note', e.target.value)
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                        </td>
+                                        <td >
+                                            <div className='flex items-center justify-center'>
+                                                <Tooltip title="เพิ่มแถว">
+                                                    <IconButton
+                                                        aria-label="add_row"
+                                                        size="small"
+                                                        onClick={addBudgetExpenseRow}
+                                                    >
+                                                        <PlusCircleIcon className="h-9 w-9" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                {budgetExpenseRows.length > 1 && (
+                                                    <Tooltip title="ลบแถว">
+                                                        <IconButton
+                                                            aria-label="delete_row"
+                                                            size="small"
+                                                            onClick={() => deleteBudgetExpenseRow(row.id)}
+                                                        >
+                                                            <XCircleIcon className="h-9 w-9" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr>
+                                    <td colSpan={2} className="py-2 text-right font-bold">
+                                        รวมงบประมาณรายจ่าย
+                                    </td>
+                                    <td className="px-6 py-2 font-bold text-right">
+                                        {budgetExpenseTotal}
+                                    </td>
+                                    <td colSpan={2} className='py-2 text-left font-bold'>บาท</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <button
