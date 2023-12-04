@@ -1,7 +1,7 @@
 'use client';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { IconButton, TextField, Tooltip } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -30,8 +30,9 @@ export default function PN01Form() {
         { id: 1, date: '', time: '', detail: '' }, // Initial row
     ]);
 
+    const [targetTotal, setTargetTotal] = useState(0)
     const [targetRows, setTargetRows] = useState([
-        { id: 1, detail: '', count: '', total: '' }, // Initial row
+        { id: 1, detail: '', count: '' }, // Initial row
     ]);
 
     const addResponsibleRow = () => {
@@ -72,7 +73,7 @@ export default function PN01Form() {
     const addTargetRow = () => {
         setTargetRows((prevRows) => [
             ...prevRows,
-            { id: prevRows.length + 1, detail: '', count: '', total: '' }
+            { id: prevRows.length + 1, detail: '', count: '' }
         ])
     }
 
@@ -198,16 +199,29 @@ export default function PN01Form() {
                 row.id === id ? { ...row, [field]: field == 'detail' || 'time' ? value : new Date(value as string) } : row
             )
         );
-        console.log(projectScheduleRows);
+
+    };
+    // console.log(projectScheduleRows);
+
+    const calculateTargetTotal = () => {
+        const total = targetRows.reduce((acc, row) => acc + Number(row.count), 0);
+        setTargetTotal(total);
     };
 
     const handleTargetChange = (id: number, field: string, value: string) => {
         setTargetRows((prevRows) =>
             prevRows.map((row) =>
-                row.id === id ? { ...row, [field]: value } : row
+                row.id === id ? { ...row, [field]: field == 'detail' ? value : Number(value) } : row
             )
         );
     };
+
+    useEffect(() => {
+        calculateTargetTotal();
+    }, [targetRows]);
+
+    console.log(targetRows, targetTotal);
+
 
 
 
@@ -1349,6 +1363,9 @@ export default function PN01Form() {
                 13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
             </h3>
             <div className='mb-6'>
+                <div className='flex mb-2'>
+                    <p>รวมจำนวน {targetTotal} คน</p>
+                </div>
                 <div className="grid gap-6 md:grid-cols-1">
                     <table className="w-full rounded border text-left text-sm text-gray-500">
                         <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
@@ -1366,7 +1383,7 @@ export default function PN01Form() {
                         </thead>
                         <tbody>
                             {targetRows.map((row) => (
-                                <tr className="border-b bg-white">
+                                <tr className="border-b bg-white" key={row.id}>
                                     <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
                                         <div className={`grid grid-cols-1 gap-6`}>
                                             <TextField
@@ -1395,6 +1412,7 @@ export default function PN01Form() {
                                                 onChange={(e) =>
                                                     handleTargetChange(row.id, 'count', e.target.value)
                                                 }
+                                                onBlur={calculateTargetTotal}
                                                 required
                                             />
                                         </div>
@@ -1427,6 +1445,21 @@ export default function PN01Form() {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+            </div>
+
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
+            </h3>
+            <div className='mb-6'>
+                <div>
+                    <textarea
+                        id="improvement"
+                        rows={4}
+                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                        placeholder=""
+                    ></textarea>
                 </div>
 
             </div>
