@@ -20,7 +20,7 @@ const links = [
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
   { name: 'Test', href: '/dashboard/test', icon: DocumentDuplicateIcon},
-  { name: 'Test02', href: '/dashboard/test02', icon: DocumentDuplicateIcon}
+  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: DocumentDuplicateIcon}
 ];
 
 export default function NavLinks() {
