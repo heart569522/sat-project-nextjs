@@ -4,19 +4,19 @@ import { lusitana } from '@/app/components/fonts';
 export default function AcmeLogo() {
   return (
     <>
-    <div className="flex flex-row items-center leading-none justify-center">
+    <div className="hidden md:block">
       <Image
-        src="/identity-B.png"
+        src="/payap-logo.png"
         width={500}
-        height={500}
-        alt="Picture of the author"
+        height={200}
+        alt="payap-logo"
         className="w-full"
       />
     </div>
     <div
       className={`${lusitana.className} flex flex-row items-center leading-none justify-center`}
     >
-      <p className="text-xl">ระบบระเบียนกิจกรรมนักศึกษา</p>
+      <p className="text-2xl pb-2 md:text-xl md:pb-0">ระบบระเบียนกิจกรรมนักศึกษา</p>
     </div>
     </>
   );

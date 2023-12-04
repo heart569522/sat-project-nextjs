@@ -11,40 +11,104 @@ import { DatePicker, TimeField, TimePicker } from '@mui/x-date-pickers';
 
 export default function PN01Form() {
     const [responsibleRows, setResponsibleRows] = useState([
-        { id: 1, firstname: '', lastname: '', position: '', work: '' }, 
+        { id: 1, firstname: '', lastname: '', position: '', work: '' },
     ]);
 
     const [OIVTRows, setOIVTRows] = useState([
-        { id: 1, objective: '', indicator: '', value: '', tool: '' }, 
+        { id: 1, objective: '', indicator: '', value: '', tool: '' },
     ]);
 
     const [expectedResultRows, setExpectedResultRows] = useState([
-        { id: 1, expected_result: '' }, 
+        { id: 1, expected_result: '' },
     ]);
 
     const [operationDurationRows, setOperationDurationRows] = useState([
-        { id: 1, operation_duration: '' }, 
+        { id: 1, operation_duration: '' },
     ]);
 
     const [projectScheduleRows, setProjectScheduleRows] = useState([
-        { id: 1, date: '', time: '', detail: '' }, 
+        { id: 1, date: '', time: '', detail: '' },
     ]);
 
     const [targetTotal, setTargetTotal] = useState('')
     const [targetRows, setTargetRows] = useState([
-        { id: 1, detail: '', count: '' }, 
+        { id: 1, detail: '', count: '' },
     ]);
 
     const [budgetIncomeTotal, setBudgetIncomeTotal] = useState('')
     const [budgetIncomeRows, setBudgetIncomeRows] = useState([
-        { id: 1, detail: '', amount: '', source: '' }, 
+        { id: 1, detail: '', amount: '', source: '' },
     ]);
 
     const [budgetExpenseTotal, setBudgetExpenseTotal] = useState('')
     const [budgetExpenseRows, setBudgetExpenseRows] = useState([
-        { id: 1, detail: '', amount: '', note: '' }, 
+        { id: 1, detail: '', amount: '', note: '' },
     ]);
+
+    const [projectTypes, setProjectTypes] = useState({
+        maintenance: false,
+        academicService: false,
+        knowledgeManagement: false,
+        researchPromotion: false,
+        educationQualityAssurance: false,
+        personnelDevelopment: false,
+        riskManagement: false,
+        studentDevelopment: false,
+        moralEthical: false,
+        academicPromotion: false,
+        knowledge: false,
+        environment: false,
+        IntellectualSkill: false,
+        sport: false,
+        knowledgeAnalysisCommunicationTechnology: false,
+        artCultureDevelopment: false,
+        numericalAnalysisCommunicationTechnology: false,
+        moralEthicalDevelopment: false,
+        leadershipDevelopment: false,
+        subOther: false,
+        subOtherDetail: '',
+        other: false,
+        otherDetail: '',
+    });
+
+    const isSubOtherDisabled = !projectTypes.studentDevelopment || !projectTypes.subOther;
+    const isOtherDisabled = !projectTypes.other;
+
+    const checkOtherDisabled = () => {
+        console.log("--check---");
+        
+        if (isSubOtherDisabled) {
+            setProjectTypes((prevTypes) => ({
+                ...prevTypes,
+                subOtherDetail: '',
+            }));
+        } 
+        if (isOtherDisabled) {
+            setProjectTypes((prevTypes) => ({
+                ...prevTypes,
+                otherDetail: '',
+            }));
+        }
+    };
+
+    const handleCheckboxChange = (event: any) => {
+        const { name, checked, value } = event.target;
     
+        setProjectTypes((prevTypes) => ({
+            ...prevTypes,
+            [name]: name == "otherDetail" || name == "subOtherDetail" ? value : checked,
+        }));
+    
+        
+    };
+
+    useEffect(() => {
+        checkOtherDisabled();
+    }, [isSubOtherDisabled, isOtherDisabled]);
+
+    console.log(projectTypes);
+
+
 
     const addResponsibleRow = () => {
         setResponsibleRows((prevRows) => [
@@ -318,10 +382,10 @@ export default function PN01Form() {
                     >
                         1.ชื่อคณะ/วิทยาลัย/หน่วยงาน
                     </label>
-                    <input
+                    <TextField
                         type="text"
                         id="first_name"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                        className='flex w-full'
                         placeholder=""
                         required
                     />
@@ -333,10 +397,10 @@ export default function PN01Form() {
                     >
                         2.ชื่อโครงการ
                     </label>
-                    <input
+                    <TextField
                         type="text"
                         id="last_name"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                        className="flex w-full"
                         placeholder=""
                         required
                     />
@@ -348,11 +412,11 @@ export default function PN01Form() {
                     >
                         3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ
                     </label>
-                    <input
+                    <TextField
                         type="text"
                         id="company"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                        placeholder="ชื่อ - สกุล"
+                        className="flex w-full"
+                        placeholder="ชื่อ - นามสกุล"
                         required
                     />
                 </div>
@@ -363,10 +427,10 @@ export default function PN01Form() {
                     >
                         หมายเลขโทรศัพท์
                     </label>
-                    <input
+                    <TextField
                         type="tel"
                         id="phone"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                        className="flex w-full"
                         placeholder=""
                         required
                     />
@@ -407,22 +471,22 @@ export default function PN01Form() {
                                     </th>
                                     <td className="px-6 py-4">
                                         <div className={`grid grid-cols-2 gap-6`}>
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="res_firstname"
-                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                                placeholder="ชื่อจริง"
+                                                className="flex w-full"
+                                                placeholder=""
                                                 value={row.firstname}
                                                 onChange={(e) =>
                                                     handleResponsibleChange(row.id, 'firstname', e.target.value)
                                                 }
                                                 required
                                             />
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="res_lastname"
-                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                                placeholder="นามสกุล"
+                                                className="flex w-full"
+                                                placeholder=""
                                                 value={row.lastname}
                                                 onChange={(e) =>
                                                     handleResponsibleChange(row.id, 'lastname', e.target.value)
@@ -433,10 +497,10 @@ export default function PN01Form() {
                                     </td>
                                     <td className="px-6 py-4 bg-gray-50">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="res_position"
-                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className="flex w-full"
                                                 placeholder=""
                                                 value={row.position}
                                                 onChange={(e) =>
@@ -448,10 +512,10 @@ export default function PN01Form() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="res_work"
-                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className="flex w-full"
                                                 placeholder=""
                                                 value={row.work}
                                                 onChange={(e) =>
@@ -609,19 +673,18 @@ export default function PN01Form() {
             <h3 className="mb-2 block text-base font-medium text-gray-900 ">
                 5.ประเภทโครงการ
             </h3>
-            {/* <div className='rounded border border-gray-200 p-2'> */}
             <div className="mb-6">
                 <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="maintenance"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.maintenance}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="maintenance"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนทำนุบำรุงศิลปวัฒนธรรม
@@ -629,14 +692,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="academicService"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.academicService}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="academicService"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนบริการวิชาการ
@@ -644,14 +707,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="knowledgeManagement"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.knowledgeManagement}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="knowledgeManagement"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนการจัดการความรู้
@@ -659,14 +722,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="researchPromotion"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.researchPromotion}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="researchPromotion"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนการส่งเสริมงานวิจัย
@@ -674,14 +737,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="educationQualityAssurance"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.educationQualityAssurance}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="educationQualityAssurance"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนการประกันคุณภาพการศึกษา
@@ -689,14 +752,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="personnelDevelopment"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.personnelDevelopment}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="personnelDevelopment"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนพัฒนาบุคลากร
@@ -704,14 +767,14 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="riskManagement"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.riskManagement}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
-                            htmlFor="bordered-checkbox-1"
+                            htmlFor="riskManagement"
                             className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                         >
                             แผนบริหารความเสี่ยง
@@ -722,14 +785,14 @@ export default function PN01Form() {
                     <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="studentDevelopment"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="studentDevelopment"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา{' '}
@@ -740,14 +803,15 @@ export default function PN01Form() {
                     <div className="grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2">
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="moralEthical"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.moralEthical && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="moralEthical"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 ด้านคุณธรรม จริยธรรม
@@ -755,14 +819,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="academicPromotion"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.academicPromotion && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="academicPromotion"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
@@ -770,14 +835,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="knowledge"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.knowledge && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="knowledge"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 ด้านความรู้
@@ -785,14 +851,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="environment"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.environment && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="environment"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
@@ -800,14 +867,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="IntellectualSkill"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.IntellectualSkill && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="IntellectualSkill"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 ด้านทักษะทางปัญญา
@@ -815,14 +883,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="sport"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.sport && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="sport"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมกีฬา และการส่งเสริมสุขภาพ
@@ -830,14 +899,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="knowledgeAnalysisCommunicationTechnology"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.knowledgeAnalysisCommunicationTechnology && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="knowledgeAnalysisCommunicationTechnology"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
@@ -845,14 +915,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="artCultureDevelopment"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.artCultureDevelopment && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="artCultureDevelopment"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
@@ -860,14 +931,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="numericalAnalysisCommunicationTechnology"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.numericalAnalysisCommunicationTechnology && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="numericalAnalysisCommunicationTechnology"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร และการใช้เทคโนโลยี
@@ -875,14 +947,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="moralEthicalDevelopment"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.moralEthicalDevelopment && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="moralEthicalDevelopment"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
@@ -890,14 +963,15 @@ export default function PN01Form() {
                         </div>
                         <div className="flex items-center ps-4">
                             <input
-                                id="bordered-checkbox-1"
+                                name="leadershipDevelopment"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.leadershipDevelopment && projectTypes.studentDevelopment}
+                                disabled={!projectTypes.studentDevelopment}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
+                                htmlFor="leadershipDevelopment"
                                 className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
                             >
                                 กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
@@ -906,25 +980,29 @@ export default function PN01Form() {
                         <div className="ps-4">
                             <div className="flex items-center">
                                 <input
-                                    id="bordered-checkbox-1"
+                                    name="subOther"
                                     type="checkbox"
-                                    value=""
-                                    name="bordered-checkbox"
+                                    checked={projectTypes.subOther && projectTypes.studentDevelopment}
+                                    disabled={!projectTypes.studentDevelopment}
+                                    onChange={handleCheckboxChange}
                                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                                 />
                                 <label
-                                    htmlFor="bordered-checkbox-1"
-                                    className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                                    htmlFor="subOther"
+                                    className="ms-2 py-4 text-sm font-medium text-gray-900"
                                 >
                                     อื่นๆ
                                 </label>
-                                <div className="border-b border-gray-300">
+                                <div className="border-b border-gray-300 px-2 w-full">
                                     <input
                                         type="text"
-                                        id="website"
-                                        className="w-full rounded bg-gray-50 text-base text-gray-900"
+                                        name="subOtherDetail"
+                                        className="flex w-full border-none "
                                         placeholder="โปรดระบุ"
-                                        required
+                                        value={projectTypes.subOtherDetail || ''}
+                                        onChange={handleCheckboxChange}
+                                        disabled={isSubOtherDisabled}
+                                        required={isSubOtherDisabled}
                                     />
                                 </div>
                             </div>
@@ -935,32 +1013,34 @@ export default function PN01Form() {
                     <div className="rounded border border-gray-200 ps-4">
                         <div className="flex items-center">
                             <input
-                                id="bordered-checkbox-1"
+                                name="other"
                                 type="checkbox"
-                                value=""
-                                name="bordered-checkbox"
+                                checked={projectTypes.other}
+                                onChange={handleCheckboxChange}
                                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                             />
                             <label
-                                htmlFor="bordered-checkbox-1"
-                                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                                htmlFor="other"
+                                className="ms-2 py-4 text-sm font-medium text-gray-900"
                             >
                                 อื่นๆ
                             </label>
-                            <div className="border-b border-gray-300">
+                            <div className="border-b border-gray-300 pl-2 pr-4 w-full">
                                 <input
                                     type="text"
-                                    id="website"
-                                    className="w-full rounded bg-gray-50 text-base text-gray-900"
+                                    name="otherDetail"
+                                    className="flex w-full border-none"
                                     placeholder="โปรดระบุ"
-                                    required
+                                    value={projectTypes.otherDetail || ''}
+                                    onChange={handleCheckboxChange}
+                                    disabled={isOtherDisabled}
+                                    required={isOtherDisabled}
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {/* </div> */}
 
             <h3 className="mb-2 block text-base font-medium text-gray-900 ">
                 6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
@@ -969,10 +1049,10 @@ export default function PN01Form() {
                 <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="academicService"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.academicService}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
@@ -984,10 +1064,10 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="academicService"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.academicService}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
@@ -999,10 +1079,10 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="academicService"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.academicService}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
@@ -1014,10 +1094,10 @@ export default function PN01Form() {
                     </div>
                     <div className="flex items-center rounded border border-gray-200 ps-4">
                         <input
-                            id="bordered-checkbox-1"
+                            name="academicService"
                             type="checkbox"
-                            value=""
-                            name="bordered-checkbox"
+                            checked={projectTypes.academicService}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                         <label
@@ -1075,10 +1155,10 @@ export default function PN01Form() {
                                     <tr className="border-b bg-white">
                                         <td className="px-6 py-4 bg-gray-50">
                                             <div className={`grid grid-cols-1 gap-6`}>
-                                                <input
+                                                <TextField
                                                     type="text"
                                                     id="oivt_objective"
-                                                    className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                    className="flex w-full"
                                                     placeholder=""
                                                     value={row.objective}
                                                     onChange={(e) =>
@@ -1090,10 +1170,10 @@ export default function PN01Form() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`grid grid-cols-1 gap-6`}>
-                                                <input
+                                                <TextField
                                                     type="text"
                                                     id="oivt_indicator"
-                                                    className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                    className="flex w-full"
                                                     placeholder=""
                                                     value={row.indicator}
                                                     onChange={(e) =>
@@ -1105,10 +1185,10 @@ export default function PN01Form() {
                                         </td>
                                         <td className="px-6 py-4 bg-gray-50">
                                             <div className={`grid grid-cols-1 gap-6`}>
-                                                <input
+                                                <TextField
                                                     type="text"
                                                     id="oivt_value"
-                                                    className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                    className="flex w-full"
                                                     placeholder=""
                                                     value={row.value}
                                                     onChange={(e) =>
@@ -1120,10 +1200,10 @@ export default function PN01Form() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`grid grid-cols-1 gap-6`}>
-                                                <input
+                                                <TextField
                                                     type="text"
                                                     id="oivt_tool"
-                                                    className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                    className="flex w-full"
                                                     placeholder=""
                                                     value={row.tool}
                                                     onChange={(e) =>
@@ -1177,10 +1257,10 @@ export default function PN01Form() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="expected_result"
-                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className="flex w-full"
                                                 placeholder=""
                                                 value={row.expected_result}
                                                 onChange={(e) =>
@@ -1235,10 +1315,10 @@ export default function PN01Form() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
+                                            <TextField
                                                 type="text"
                                                 id="operation_duration"
-                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className="flex w-full"
                                                 placeholder=""
                                                 value={row.operation_duration}
                                                 onChange={(e) =>
