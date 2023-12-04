@@ -208,7 +208,7 @@ export default function PN01Form() {
             )
         );
     };
-    
+
 
 
     return (
@@ -1369,10 +1369,11 @@ export default function PN01Form() {
                                 <tr className="border-b bg-white">
                                     <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
+                                            <TextField
+                                                hiddenLabel
                                                 type="text"
                                                 id="detail"
-                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className='flex w-full'
                                                 placeholder=""
                                                 value={row.detail}
                                                 onChange={(e) =>
@@ -1384,10 +1385,11 @@ export default function PN01Form() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className={`grid grid-cols-1 gap-6`}>
-                                            <input
-                                                type="text"
+                                            <TextField
+                                                hiddenLabel
+                                                type="number"
                                                 id="count"
-                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                className='flex w-full'
                                                 placeholder=""
                                                 value={row.count}
                                                 onChange={(e) =>
