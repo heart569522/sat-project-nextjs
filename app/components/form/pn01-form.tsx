@@ -1,6 +1,6 @@
 'use client';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { IconButton, Tooltip } from '@mui/material';
+import { IconButton, TextField, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -28,6 +28,10 @@ export default function PN01Form() {
 
     const [projectScheduleRows, setProjectScheduleRows] = useState([
         { id: 1, date: '', time: '', detail: '' }, // Initial row
+    ]);
+
+    const [targetRows, setTargetRows] = useState([
+        { id: 1, detail: '', count: '', total: '' }, // Initial row
     ]);
 
     const addResponsibleRow = () => {
@@ -62,6 +66,13 @@ export default function PN01Form() {
         setProjectScheduleRows((prevRows) => [
             ...prevRows,
             { id: prevRows.length + 1, date: '', time: '', detail: '' }
+        ])
+    }
+
+    const addTargetRow = () => {
+        setTargetRows((prevRows) => [
+            ...prevRows,
+            { id: prevRows.length + 1, detail: '', count: '', total: '' }
         ])
     }
 
@@ -135,6 +146,20 @@ export default function PN01Form() {
         });
     };
 
+    const deleteTargetRow = (id: number) => {
+        setTargetRows((prevRows) => {
+            const updatedRows = prevRows.filter((row) => row.id !== id);
+
+            // Update IDs to maintain a sequential order
+            const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+                ...row,
+                id: index + 1,
+            }));
+
+            return updatedRowsWithSequentialIds;
+        });
+    };
+
     const handleResponsibleChange = (id: number, field: string, value: string) => {
         setResponsibleRows((prevRows) =>
             prevRows.map((row) =>
@@ -173,9 +198,17 @@ export default function PN01Form() {
                 row.id === id ? { ...row, [field]: field == 'detail' || 'time' ? value : new Date(value as string) } : row
             )
         );
+        console.log(projectScheduleRows);
     };
 
-    console.log(projectScheduleRows);
+    const handleTargetChange = (id: number, field: string, value: string) => {
+        setTargetRows((prevRows) =>
+            prevRows.map((row) =>
+                row.id === id ? { ...row, [field]: value } : row
+            )
+        );
+    };
+    
 
 
     return (
@@ -1153,7 +1186,7 @@ export default function PN01Form() {
             <h3 className="mb-2 block text-base font-medium text-gray-900 ">
                 11.สถานที่จัดโครงการและกำหนดการ
             </h3>
-            <div className="mb-6">
+            <div>
                 <div className="grid gap-6 mb-3 md:grid-cols-2">
                     <div>
                         <label
@@ -1162,11 +1195,13 @@ export default function PN01Form() {
                         >
                             11.1 สถานที่จัดโครงการ
                         </label>
-                        <input
-                            type="text"
+                        <TextField
+                            hiddenLabel
+                            type='text'
                             id="project_location"
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                            placeholder=""
+                            className='flex w-full'
+                            variant="outlined"
+                            placeholder=''
                             required
                         />
                     </div>
@@ -1245,11 +1280,13 @@ export default function PN01Form() {
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <div className={`grid grid-cols-1 gap-6`}>
-                                                            <input
-                                                                type="text"
+                                                            <TextField
+                                                                hiddenLabel
+                                                                type='text'
                                                                 id="oivt_tool"
-                                                                className="block w-full rounded border-b border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                                                placeholder=""
+                                                                className='flex w-full'
+                                                                variant="outlined"
+                                                                placeholder=''
                                                                 value={row.detail}
                                                                 onChange={(e) =>
                                                                     handleProjectScheduleChange(row.id, 'detail', e.target.value as string)
@@ -1289,6 +1326,107 @@ export default function PN01Form() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                12.วิทยากร (ถ้ามี)
+            </h3>
+            <div className="mb-6">
+                <div className="grid gap-6 mb-3 grid-cols-1">
+                    <TextField
+                        hiddenLabel
+                        type='text'
+                        id="lecturer"
+                        className='flex w-full'
+                        variant="outlined"
+                        placeholder=''
+                        required
+                    />
+                </div>
+            </div>
+
+            <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+                13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
+            </h3>
+            <div className='mb-6'>
+                <div className="grid gap-6 md:grid-cols-1">
+                    <table className="w-full rounded border text-left text-sm text-gray-500">
+                        <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                            <tr>
+                                <th scope="col" className="bg-gray-300 px-6 py-3 w-[75%]">
+                                    รายละเอียด
+                                </th>
+                                <th scope="col" className="px-6 py-3 w-[15%]">
+                                    จำนวน/คน
+                                </th>
+                                <th scope="col" className="bg-gray-300 w-[10%] px-6 py-3">
+                                    เพิ่ม/ลบแถว
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {targetRows.map((row) => (
+                                <tr className="border-b bg-white">
+                                    <td className="px-6 py-4 w-[10%] text-center text-base bg-gray-50">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="detail"
+                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.detail}
+                                                onChange={(e) =>
+                                                    handleTargetChange(row.id, 'detail', e.target.value)
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className={`grid grid-cols-1 gap-6`}>
+                                            <input
+                                                type="text"
+                                                id="count"
+                                                className="block w-full rounded border-b border-gray-300 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                                placeholder=""
+                                                value={row.count}
+                                                onChange={(e) =>
+                                                    handleTargetChange(row.id, 'count', e.target.value)
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="w-[10%] px-6 py-4 bg-gray-50">
+                                        <div className='flex items-center justify-center'>
+                                            <Tooltip title="เพิ่มแถว">
+                                                <IconButton
+                                                    aria-label="add_row"
+                                                    size="small"
+                                                    onClick={addTargetRow}
+                                                >
+                                                    <PlusCircleIcon className="h-9 w-9" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {targetRows.length > 1 && (
+                                                <Tooltip title="ลบแถว">
+                                                    <IconButton
+                                                        aria-label="delete_row"
+                                                        size="small"
+                                                        onClick={() => deleteTargetRow(row.id)}
+                                                    >
+                                                        <XCircleIcon className="h-9 w-9" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
             <button
