@@ -1,5 +1,5 @@
 import '@/app/components/global.css';
-import { inter } from '@/app/components/fonts';
+import { notoThai } from '@/app/components/fonts';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${notoThai.className} antialiased`}>{children}</body>
     </html>
   );
 }

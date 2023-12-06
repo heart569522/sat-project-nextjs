@@ -7,12 +7,12 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
+import HelpIcon from '@mui/icons-material/Help';
 import { useEffect, useState } from 'react';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { DatePicker, TimeField, TimePicker } from '@mui/x-date-pickers';
+import { DateField, DateTimeField, TimeField } from '@mui/x-date-pickers';
 import { PN01 } from '@/app/model/pn01';
 
 export default function PN01Form() {
@@ -147,7 +147,7 @@ export default function PN01Form() {
     }
   };
 
-  const handleCheckboxChange = (event: {
+  const handleProjectTypeChange = (event: {
     target: { name: string; checked: boolean; value: string };
   }) => {
     const { name, checked, value } = event.target;
@@ -157,6 +157,12 @@ export default function PN01Form() {
       [name]:
         name == 'otherDetail' || name == 'subOtherDetail' ? value : checked,
     }));
+  };
+
+  const handleUniversityIndentityChange = (event: {
+    target: { name: string; checked: boolean };
+  }) => {
+    const { name, checked } = event.target;
 
     setUniversityIndentity((prevTypes) => ({
       ...prevTypes,
@@ -179,7 +185,7 @@ export default function PN01Form() {
       [name]:
         name === 'projectDatetime'
           ? value
-            ? new Date(value).toISOString()
+            ? new Date(value)
             : ''
           : value || '',
     }));
@@ -397,24 +403,20 @@ export default function PN01Form() {
     );
   };
 
-  const handleProjectScheduleChange = (
-    id: number,
-    field: string,
-    value: Date | string | null,
-  ) => {
+  const handleProjectScheduleChange = (id: number, event: any) => {
+    const { name, value } = event.target;
+
     setProjectScheduleRows((prevRows) =>
       prevRows.map((row) =>
         row.id === id
           ? {
               ...row,
-              [field]:
-                field == 'detail' || 'time' ? value : new Date(value as string),
+              [name]: name === 'detail' ? value : new Date(value),
             }
           : row,
       ),
     );
   };
-  // console.log(projectScheduleRows);
 
   const handleTargetChange = (id: number, field: string, value: string) => {
     setTargetRows((prevRows) =>
@@ -493,6 +495,14 @@ export default function PN01Form() {
     calculateBudgetExpenseTotal();
   }, [budgetExpenseRows]);
 
+  const formatDateToISO = (dateTime: Date | null): string | null => {
+    if (dateTime instanceof Date) {
+      return dateTime.toISOString();
+    } else {
+      return null; // or handle the case when dateTime is not a Date
+    }
+  };
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     const finalFormData = setFinalFormData();
@@ -504,6 +514,12 @@ export default function PN01Form() {
   const setFinalFormData = () => {
     console.log('--set form--');
 
+    const formattedProjectScheduleRows = projectScheduleRows.map((row) => ({
+      ...row,
+      date: formatDateToISO(row.date),
+      time: formatDateToISO(row.time),
+    }));
+
     const finalFormData: PN01 = {
       faculty: formInput.faculty,
       projectName: formInput.projectName,
@@ -511,7 +527,7 @@ export default function PN01Form() {
       projectHeadPhone: formInput.projectHeadPhone,
       principleReason: formInput.principleReason,
       projectLocation: formInput.projectLocation,
-      projectDatetime: formInput.projectDatetime,
+      projectDatetime: formatDateToISO(formInput.projectDatetime),
       lecturer: formInput.lecturer,
       improvement: formInput.improvement,
       strategicIssue: selectedValues.strategicIssue,
@@ -525,7 +541,7 @@ export default function PN01Form() {
       OIVTRows: OIVTRows,
       expectedResultRows: expectedResultRows,
       operationDurationRows: operationDurationRows,
-      projectScheduleRows: projectScheduleRows,
+      projectScheduleRows: formattedProjectScheduleRows,
       targetTotal: targetTotal,
       targetRows: targetRows,
       budgetIncomeTotal: budgetIncomeTotal,
@@ -756,7 +772,7 @@ export default function PN01Form() {
             value={selectedValues.strategicIssue}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -774,7 +790,7 @@ export default function PN01Form() {
             value={selectedValues.objective}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -792,7 +808,7 @@ export default function PN01Form() {
             value={selectedValues.universityStrategic}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -810,7 +826,7 @@ export default function PN01Form() {
             value={selectedValues.strategicPlanKPI}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -828,7 +844,7 @@ export default function PN01Form() {
             value={selectedValues.operationPlanKPI}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -846,7 +862,7 @@ export default function PN01Form() {
             value={selectedValues.projectKPI}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -864,7 +880,7 @@ export default function PN01Form() {
             value={selectedValues.projectStatus}
             onChange={handleSelectChange}
           >
-            <option selected>Choose a country</option>
+            <option value="">Choose a country</option>
             <option value="US">United States</option>
             <option value="CA">Canada</option>
           </select>
@@ -880,7 +896,7 @@ export default function PN01Form() {
               name="maintenance"
               type="checkbox"
               checked={projectTypes.maintenance}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -895,7 +911,7 @@ export default function PN01Form() {
               name="academicService"
               type="checkbox"
               checked={projectTypes.academicService}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -910,7 +926,7 @@ export default function PN01Form() {
               name="knowledgeManagement"
               type="checkbox"
               checked={projectTypes.knowledgeManagement}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -925,7 +941,7 @@ export default function PN01Form() {
               name="researchPromotion"
               type="checkbox"
               checked={projectTypes.researchPromotion}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -940,7 +956,7 @@ export default function PN01Form() {
               name="educationQualityAssurance"
               type="checkbox"
               checked={projectTypes.educationQualityAssurance}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -955,7 +971,7 @@ export default function PN01Form() {
               name="personnelDevelopment"
               type="checkbox"
               checked={projectTypes.personnelDevelopment}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -970,7 +986,7 @@ export default function PN01Form() {
               name="riskManagement"
               type="checkbox"
               checked={projectTypes.riskManagement}
-              onChange={handleCheckboxChange}
+              onChange={handleProjectTypeChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -988,7 +1004,7 @@ export default function PN01Form() {
                 name="studentDevelopment"
                 type="checkbox"
                 checked={projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1015,7 +1031,7 @@ export default function PN01Form() {
                   projectTypes.moralEthical && projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1034,7 +1050,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1052,7 +1068,7 @@ export default function PN01Form() {
                   projectTypes.knowledge && projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1070,7 +1086,7 @@ export default function PN01Form() {
                   projectTypes.environment && projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1089,7 +1105,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1105,7 +1121,7 @@ export default function PN01Form() {
                 type="checkbox"
                 checked={projectTypes.sport && projectTypes.studentDevelopment}
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1124,7 +1140,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1143,7 +1159,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1162,7 +1178,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1181,7 +1197,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1200,7 +1216,7 @@ export default function PN01Form() {
                   projectTypes.studentDevelopment
                 }
                 disabled={!projectTypes.studentDevelopment}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1219,7 +1235,7 @@ export default function PN01Form() {
                     projectTypes.subOther && projectTypes.studentDevelopment
                   }
                   disabled={!projectTypes.studentDevelopment}
-                  onChange={handleCheckboxChange}
+                  onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
@@ -1236,7 +1252,7 @@ export default function PN01Form() {
                       className="flex w-full border-none "
                       placeholder="โปรดระบุ"
                       value={projectTypes.subOtherDetail || ''}
-                      onChange={handleCheckboxChange}
+                      onChange={handleProjectTypeChange}
                       disabled={isSubOtherDisabled}
                       required={isSubOtherDisabled}
                     />
@@ -1255,7 +1271,7 @@ export default function PN01Form() {
                 name="other"
                 type="checkbox"
                 checked={projectTypes.other}
-                onChange={handleCheckboxChange}
+                onChange={handleProjectTypeChange}
                 className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
               />
               <label
@@ -1272,7 +1288,7 @@ export default function PN01Form() {
                     className="flex w-full border-none"
                     placeholder="โปรดระบุ"
                     value={projectTypes.otherDetail || ''}
-                    onChange={handleCheckboxChange}
+                    onChange={handleProjectTypeChange}
                     disabled={isOtherDisabled}
                     required={isOtherDisabled}
                   />
@@ -1295,7 +1311,7 @@ export default function PN01Form() {
               name="moral"
               type="checkbox"
               checked={universityIndentity.moral}
-              onChange={handleCheckboxChange}
+              onChange={handleUniversityIndentityChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -1310,7 +1326,7 @@ export default function PN01Form() {
               name="serve"
               type="checkbox"
               checked={universityIndentity.serve}
-              onChange={handleCheckboxChange}
+              onChange={handleUniversityIndentityChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -1325,7 +1341,7 @@ export default function PN01Form() {
               name="academic"
               type="checkbox"
               checked={universityIndentity.academic}
-              onChange={handleCheckboxChange}
+              onChange={handleUniversityIndentityChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -1340,7 +1356,7 @@ export default function PN01Form() {
               name="develop"
               type="checkbox"
               checked={universityIndentity.develop}
-              onChange={handleCheckboxChange}
+              onChange={handleUniversityIndentityChange}
               className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             />
             <label
@@ -1640,18 +1656,28 @@ export default function PN01Form() {
               htmlFor="project_datetime"
               className="mb-2 block text-base font-medium text-gray-900"
             >
-              11.2 วัน/เวลา ที่จัดโครงการ
+              <p className="flex items-center gap-1">
+                11.2 วัน/เวลา ที่จัดโครงการ
+                <Tooltip
+                  title="รูปแบบ วัน/เดือน/ปี(ค.ศ.) เวลา 24 ชั่วโมง"
+                  placement="top"
+                  arrow
+                >
+                  <HelpIcon className="h-5 w-5 text-gray-500" />
+                </Tooltip>
+              </p>
             </label>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
+              <DateTimeField
                 ampm={false}
                 className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                value={formInput.projectDatetime}
+                value={formInput.projectDatetime || null}
                 onChange={(value) =>
                   handleInputChange({
                     target: { name: 'projectDatetime', value },
                   })
                 }
+                format="DD/MM/YYYY HH:mm"
               />
             </LocalizationProvider>
           </div>
@@ -1671,13 +1697,31 @@ export default function PN01Form() {
                     <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
                       <tr>
                         <th scope="col" className="w-[15%] px-6 py-3">
-                          วันที่
+                          <p className="flex items-center justify-center gap-1">
+                            วันที่
+                            <Tooltip
+                              title="รูปแบบ วัน/เดือน/ปี(ค.ศ.)"
+                              placement="top"
+                              arrow
+                            >
+                              <HelpIcon className="h-5 w-5 text-gray-500" />
+                            </Tooltip>
+                          </p>
                         </th>
                         <th
                           scope="col"
                           className="w-[15%] bg-gray-300 px-6 py-3"
                         >
-                          เวลา
+                          <p className="flex items-center justify-center gap-1">
+                            เวลา
+                            <Tooltip
+                              title="รูปแบบ 24 ชั่วโมง"
+                              placement="top"
+                              arrow
+                            >
+                              <HelpIcon className="h-5 w-5 text-gray-500" />
+                            </Tooltip>
+                          </p>
                         </th>
                         <th scope="col" className="px-6 py-3">
                           รายการกิจกรรม
@@ -1696,16 +1740,18 @@ export default function PN01Form() {
                           <td className="px-6 py-4">
                             <div className={`grid grid-cols-1 gap-6`}>
                               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
+                                <DateField
                                   className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                                   value={row.date}
-                                  onChange={(date) =>
-                                    handleProjectScheduleChange(
-                                      row.id,
-                                      'date',
-                                      date || '',
-                                    )
+                                  onChange={(value) =>
+                                    handleProjectScheduleChange(row.id, {
+                                      target: {
+                                        name: 'date',
+                                        value,
+                                      },
+                                    })
                                   }
+                                  format="DD/MM/YYYY"
                                 />
                               </LocalizationProvider>
                             </div>
@@ -1716,12 +1762,14 @@ export default function PN01Form() {
                                 <TimeField
                                   className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                                   value={row.time}
-                                  onChange={(time) =>
-                                    handleProjectScheduleChange(
-                                      row.id,
-                                      'time',
-                                      time,
-                                    )
+                                  name="time"
+                                  onChange={(value) =>
+                                    handleProjectScheduleChange(row.id, {
+                                      target: {
+                                        name: 'time',
+                                        value,
+                                      },
+                                    })
                                   }
                                   format="HH:mm"
                                 />
@@ -1731,19 +1779,14 @@ export default function PN01Form() {
                           <td className="px-6 py-4">
                             <div className={`grid grid-cols-1 gap-6`}>
                               <TextField
-                                hiddenLabel
                                 type="text"
-                                id="oivt_tool"
+                                name="detail"
                                 className="flex w-full"
                                 variant="outlined"
                                 placeholder=""
                                 value={row.detail}
-                                onChange={(e) =>
-                                  handleProjectScheduleChange(
-                                    row.id,
-                                    'detail',
-                                    e.target.value as string,
-                                  )
+                                onChange={(value) =>
+                                  handleProjectScheduleChange(row.id, value)
                                 }
                                 // required
                               />
