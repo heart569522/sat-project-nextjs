@@ -1,7 +1,6 @@
 import Image from 'next/image';
-// import { lusitana } from '@/app/components/fonts';
 
-export default function AcmeLogo() {
+export default function BannerLogo() {
   return (
     <>
     <div className="hidden md:block">
