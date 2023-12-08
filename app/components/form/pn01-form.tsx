@@ -1,6 +1,8 @@
 'use client';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import {
+  Checkbox,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -14,9 +16,24 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateField, DateTimeField, TimeField } from '@mui/x-date-pickers';
 import { PN01 } from '@/app/model/pn01';
+import { Button } from '../button';
+import Link from 'next/link';
 
 export default function PN01Form() {
   const [formData, setFormData] = useState<PN01>();
+
+  const [isButton, setIsButton] = useState({
+    submit: false,
+    draft: false,
+  });
+
+  const [validationError, setValidationError] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const [validationArrayError, setValidationArrayError] = useState<{
+    [key: string]: Array<{ id: number; error: string }>;
+  }>({});
 
   const [formInput, setFormInput] = useState({
     faculty: '',
@@ -114,8 +131,6 @@ export default function PN01Form() {
   const isStudentDevelopmentDisabled = !projectTypes.studentDevelopment;
 
   const checkDisableCheckBox = () => {
-    // console.log("--check---");
-
     if (isSubOtherDisabled) {
       setProjectTypes((prevTypes) => ({
         ...prevTypes,
@@ -157,6 +172,11 @@ export default function PN01Form() {
       [name]:
         name == 'otherDetail' || name == 'subOtherDetail' ? value : checked,
     }));
+
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      projectTypes: '',
+    }));
   };
 
   const handleUniversityIndentityChange = (event: {
@@ -168,13 +188,17 @@ export default function PN01Form() {
       ...prevTypes,
       [name]: checked,
     }));
+
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      universityIndentity: '',
+    }));
   };
 
   useEffect(() => {
     checkDisableCheckBox();
   }, [isSubOtherDisabled, isOtherDisabled, isStudentDevelopmentDisabled]);
 
-  // console.log(universityIndentity);
   const handleInputChange = (event: {
     target: { name: string; value: string | null };
   }) => {
@@ -188,6 +212,11 @@ export default function PN01Form() {
             ? new Date(value)
             : ''
           : value || '',
+    }));
+
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
     }));
   };
 
@@ -379,6 +408,18 @@ export default function PN01Form() {
     setResponsibleRows((prevRows) =>
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const updatedErrors = {
+        ...prevErrors,
+        [field]: [
+          ...(prevErrors[field] || []),
+          { id, error: !value.trim() ? 'โปรดกรอกข้อมูล' : '' },
+        ],
+      };
+      console.log('Validation Errors:', updatedErrors);
+      return updatedErrors;
+    });
   };
 
   const handleOIVTChange = (id: number, field: string, value: string) => {
@@ -503,12 +544,194 @@ export default function PN01Form() {
     }
   };
 
+  const handleDraft = (event: any) => {
+    event.preventDefault();
+    isButton.draft = true;
+
+    if (isButton.draft) {
+      const formData = setFinalFormData();
+      console.log(formData);
+    }
+  };
+
+  const validateArray = (
+    array: Array<any>,
+    fields: Array<string>,
+    prefix: string,
+  ) => {
+    let isValid = true;
+
+    const errors: { [key: string]: Array<{ id: number; error: string }> } = {};
+
+    array.forEach((item, index) => {
+      fields.forEach((field) => {
+        if (
+          !item[field] ||
+          (typeof item[field] === 'string' && item[field].trim() === '')
+        ) {
+          isValid = false;
+
+          const key = `${prefix}_${field}_${item.id}`;
+
+          errors[key] = [
+            ...(errors[key] || []),
+            { id: item.id, error: 'โปรดกรอกข้อมูล' },
+          ];
+
+          console.error(`${field} is required for item ${item.id}.`);
+        }
+      });
+    });
+
+    setValidationArrayError(errors);
+
+    return isValid;
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const excludedFields = ['lecturer'];
+
+    console.log('--validateForm--');
+
+    // Validate formInput
+    for (const key in formInput) {
+      if (Object.prototype.hasOwnProperty.call(formInput, key)) {
+        if (excludedFields.includes(key)) {
+          continue;
+        }
+        const value = formInput[key as keyof typeof formInput];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          isValid = false;
+
+          setValidationError((prevErrors) => ({
+            ...prevErrors,
+            [key]: `โปรดกรอกข้อมูล`,
+          }));
+
+          console.error(`${key} is required.`);
+        }
+      }
+    }
+
+    // Validate Checkbox (University Indentity)
+    const isUniversityIndentityValid = Object.values(universityIndentity).some(
+      (isChecked) => isChecked,
+    );
+
+    if (!isUniversityIndentityValid) {
+      isValid = false;
+
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        universityIndentity: 'โปรดเลือกอย่างน้อยหนึ่งรายการ',
+      }));
+
+      console.error('University Indentity checkboxes is required.');
+    } else {
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        universityIndentity: '',
+      }));
+    }
+
+    // Validate Checkbox (Project Types)
+    const isProjectTypesValid = Object.values(projectTypes).some(
+      (isChecked) => isChecked,
+    );
+
+    if (!isProjectTypesValid) {
+      isValid = false;
+
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        projectTypes: 'โปรดเลือกอย่างน้อยหนึ่งรายการ',
+      }));
+
+      console.error('Project Types checkboxes is required.');
+    } else {
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        projectTypes: '',
+      }));
+    }
+
+    // Validate Table arrays
+    const responsibleFields = ['firstname', 'lastname', 'position', 'work'];
+    const isResponsibleValid = validateArray(
+      responsibleRows,
+      responsibleFields,
+      'responsible',
+    );
+
+    console.log('isResponsibleValid : ', isResponsibleValid);
+
+    const OIVTFields = ['objective', 'indicator', 'value', 'tool'];
+    const isOIVTValid = validateArray(OIVTRows, OIVTFields, 'OIVT');
+
+    const expectedResultFields = ['expected_result'];
+    const isExpectedResultValid = validateArray(
+      expectedResultRows,
+      expectedResultFields,
+      'expectedResult',
+    );
+
+    const operationDurationFields = ['operation_duration'];
+    const isOperationDurationValid = validateArray(
+      operationDurationRows,
+      operationDurationFields,
+      'operationDuration',
+    );
+
+    const projectScheduleFields = ['date', 'time', 'detail'];
+    const isProjectScheduleValid = validateArray(
+      projectScheduleRows,
+      projectScheduleFields,
+      'projectSchedule',
+    );
+
+    const targetFields = ['detail', 'count'];
+    const isTargetValid = validateArray(targetRows, targetFields, 'target');
+
+    const budgetIncomeFields = ['detail', 'amount', 'source'];
+    const isBudgetIncomeValid = validateArray(
+      budgetIncomeRows,
+      budgetIncomeFields,
+      'budgetIncome',
+    );
+
+    const budgetExpenseFields = ['detail', 'amount', 'note'];
+    const isBudgetExpenseValid = validateArray(
+      budgetExpenseRows,
+      budgetExpenseFields,
+      'budgetExpense',
+    );
+
+    isValid =
+      isResponsibleValid &&
+      isOIVTValid &&
+      isExpectedResultValid &&
+      isOperationDurationValid &&
+      isProjectScheduleValid &&
+      isTargetValid &&
+      isBudgetIncomeValid &&
+      isBudgetExpenseValid &&
+      /* Add other validations here */ isValid;
+
+    return isValid;
+  };
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    const finalFormData = setFinalFormData();
-    // setFormData(finalFormData)
+    isButton.submit = true;
 
-    console.log(finalFormData);
+    const isFormValid = validateForm();
+
+    if (isButton.submit && isFormValid) {
+      console.log('Form is valid. Proceed with submission.');
+    } else {
+      console.error('Form validation failed. Please check the form fields.');
+    }
   };
 
   const setFinalFormData = () => {
@@ -557,855 +780,108 @@ export default function PN01Form() {
 
   return (
     <form onSubmit={handleSubmit} className="py-2">
-      <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
-        <div>
-          <label htmlFor="faculty" className="mb-2 block text-base font-medium">
-            1.ชื่อคณะ/วิทยาลัย/หน่วยงาน
-          </label>
-          <TextField
-            type="text"
-            name="faculty"
-            className="flex w-full"
-            value={formInput.faculty}
-            onChange={handleInputChange}
-            placeholder=""
-            // required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="projectName"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            2.ชื่อโครงการ
-          </label>
-          <TextField
-            type="text"
-            name="projectName"
-            className="flex w-full"
-            value={formInput.projectName}
-            onChange={handleInputChange}
-            placeholder=""
-            // required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="projectHead"
-            className="mb-2 block text-base font-medium text-gray-900 "
-          >
-            3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ
-          </label>
-          <TextField
-            type="text"
-            name="projectHead"
-            className="flex w-full"
-            value={formInput.projectHead}
-            onChange={handleInputChange}
-            placeholder=""
-            // required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="projectHeadPhone"
-            className="mb-2 block text-base font-medium text-gray-900 "
-          >
-            หมายเลขโทรศัพท์
-          </label>
-          <TextField
-            type="text"
-            name="projectHeadPhone"
-            className="flex w-full"
-            value={formInput.projectHeadPhone}
-            onChange={handleInputChange}
-            placeholder=""
-            // required
-          />
-        </div>
-        <div></div>
-      </div>
-      <div className={`mb-6 grid gap-6 md:grid-cols-1`}>
-        <div className="relative overflow-x-auto">
-          <table className="w-full rounded border text-left text-sm text-gray-500">
-            <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-              <tr>
-                <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                  ลำดับที่
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  ชื่อ - สกุล
-                </th>
-                <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
-                  ตำแหน่งโครงการ
-                </th>
-                <th scope="col" className="w-[15%] px-6 py-3">
-                  ภาระงาน (ภารกิจ/สัปดาห์)
-                </th>
-                <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                  เพิ่ม/ลบแถว
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {responsibleRows.map((row) => (
-                <tr className="border-b bg-white" key={row.id}>
-                  <th
-                    scope="row"
-                    className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
-                  >
-                    {row.id}
-                  </th>
-                  <td className="px-6 py-4">
-                    <div className={`grid grid-cols-2 gap-6`}>
-                      <TextField
-                        type="text"
-                        id="res_firstname"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.firstname}
-                        onChange={(e) =>
-                          handleResponsibleChange(
-                            row.id,
-                            'firstname',
-                            e.target.value,
-                          )
-                        }
-                        // required
-                      />
-                      <TextField
-                        type="text"
-                        id="res_lastname"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.lastname}
-                        onChange={(e) =>
-                          handleResponsibleChange(
-                            row.id,
-                            'lastname',
-                            e.target.value,
-                          )
-                        }
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="bg-gray-50 px-6 py-4">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        type="text"
-                        id="res_position"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.position}
-                        onChange={(e) =>
-                          handleResponsibleChange(
-                            row.id,
-                            'position',
-                            e.target.value,
-                          )
-                        }
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        type="text"
-                        id="res_work"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.work}
-                        onChange={(e) =>
-                          handleResponsibleChange(
-                            row.id,
-                            'work',
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </div>
-                  </td>
-                  <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                    <Tooltip title="เพิ่มแถว">
-                      <IconButton
-                        aria-label="add_row"
-                        size="small"
-                        onClick={addResponsibleRow}
-                      >
-                        <PlusCircleIcon className="h-9 w-9" />
-                      </IconButton>
-                    </Tooltip>
-                    {responsibleRows.length > 1 && (
-                      <Tooltip title="ลบแถว">
-                        <IconButton
-                          aria-label="delete_row"
-                          size="small"
-                          onClick={() => deleteResponsibleRow(row.id)}
-                        >
-                          <XCircleIcon className="h-9 w-9" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ
-      </h3>
-      <div className="mb-6 grid gap-x-6 gap-y-3 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="strategicIssue"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.1 ประเด็นยุทธศาสตร์ที่
-          </label>
-          <select
-            name="strategicIssue"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.strategicIssue}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="objectivev"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.2 เป้าประสงค์ที่
-          </label>
-          <select
-            name="objective"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.objective}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="universityStrategic"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.3 กลยุทธ์ระดับมหาวิทยาลัยที่
-          </label>
-          <select
-            name="universityStrategic"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.universityStrategic}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="strategicPlanKPI"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.4 ตัวชี้วัดแผนกลยุทธ์ที่
-          </label>
-          <select
-            name="strategicPlanKPI"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.strategicPlanKPI}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="operationPlanKPI"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.5 ตัวชี้วัดแผนปฏิบัติการที่
-          </label>
-          <select
-            name="operationPlanKPI"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.operationPlanKPI}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="projectKPI"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.6 ตัวชี้วัดโครงการ
-          </label>
-          <select
-            name="projectKPI"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.projectKPI}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="projectStatus"
-            className="mb-2 block text-base font-medium text-gray-900"
-          >
-            4.7 สถานะโครงการ
-          </label>
-          <select
-            name="projectStatus"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            value={selectedValues.projectStatus}
-            onChange={handleSelectChange}
-          >
-            <option value="">Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-          </select>
-        </div>
-      </div>
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        5.ประเภทโครงการ
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="maintenance"
-              type="checkbox"
-              checked={projectTypes.maintenance}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
+      <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
+        <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
+          <div>
             <label
-              htmlFor="maintenance"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+              htmlFor="faculty"
+              className={`mb-2 block text-base font-medium ${
+                validationError.faculty ? 'text-red-600' : 'text-gray-900'
+              }`}
             >
-              แผนทำนุบำรุงศิลปวัฒนธรรม
+              1.ชื่อคณะ/วิทยาลัย/หน่วยงาน
             </label>
-          </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="academicService"
-              type="checkbox"
-              checked={projectTypes.academicService}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            <TextField
+              type="text"
+              name="faculty"
+              className="flex w-full"
+              value={formInput.faculty}
+              onChange={handleInputChange}
+              placeholder=""
+              error={Boolean(validationError.faculty)}
+              helperText={validationError.faculty}
             />
-            <label
-              htmlFor="academicService"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนบริการวิชาการ
-            </label>
           </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="knowledgeManagement"
-              type="checkbox"
-              checked={projectTypes.knowledgeManagement}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          <div>
+            <label
+              htmlFor="projectName"
+              className={`mb-2 block text-base font-medium ${
+                validationError.projectName ? 'text-red-600' : 'text-gray-900'
+              }`}
+            >
+              2.ชื่อโครงการ
+            </label>
+            <TextField
+              type="text"
+              name="projectName"
+              className="flex w-full"
+              value={formInput.projectName}
+              onChange={handleInputChange}
+              placeholder=""
+              error={Boolean(validationError.projectName)}
+              helperText={validationError.projectName}
             />
-            <label
-              htmlFor="knowledgeManagement"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนการจัดการความรู้
-            </label>
           </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="researchPromotion"
-              type="checkbox"
-              checked={projectTypes.researchPromotion}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          <div>
+            <label
+              htmlFor="projectHead"
+              className={`mb-2 block text-base font-medium ${
+                validationError.projectHead ? 'text-red-600' : 'text-gray-900'
+              }`}
+            >
+              3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ
+            </label>
+            <TextField
+              type="text"
+              name="projectHead"
+              className="flex w-full"
+              value={formInput.projectHead}
+              onChange={handleInputChange}
+              placeholder=""
+              error={Boolean(validationError.projectHead)}
+              helperText={validationError.projectHead}
             />
-            <label
-              htmlFor="researchPromotion"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนการส่งเสริมงานวิจัย
-            </label>
           </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="educationQualityAssurance"
-              type="checkbox"
-              checked={projectTypes.educationQualityAssurance}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          <div>
+            <label
+              htmlFor="projectHeadPhone"
+              className={`mb-2 block text-base font-medium ${
+                validationError.projectHeadPhone
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
+            >
+              หมายเลขโทรศัพท์
+            </label>
+            <TextField
+              type="text"
+              name="projectHeadPhone"
+              className="flex w-full"
+              value={formInput.projectHeadPhone}
+              onChange={handleInputChange}
+              placeholder=""
+              error={Boolean(validationError.projectHeadPhone)}
+              helperText={validationError.projectHeadPhone}
             />
-            <label
-              htmlFor="educationQualityAssurance"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนการประกันคุณภาพการศึกษา
-            </label>
           </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="personnelDevelopment"
-              type="checkbox"
-              checked={projectTypes.personnelDevelopment}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="personnelDevelopment"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนพัฒนาบุคลากร
-            </label>
-          </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="riskManagement"
-              type="checkbox"
-              checked={projectTypes.riskManagement}
-              onChange={handleProjectTypeChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="riskManagement"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              แผนบริหารความเสี่ยง
-            </label>
-          </div>
+          <div></div>
         </div>
-        <div className="my-3 rounded border border-gray-200">
-          <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
-            <div className="flex items-center ps-4">
-              <input
-                name="studentDevelopment"
-                type="checkbox"
-                checked={projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="studentDevelopment"
-                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-              >
-                แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา{' '}
-                <b>(เลือกได้มากกว่า 1 ประเภท)</b>
-              </label>
-            </div>
-          </div>
-          <div
-            className={`${
-              !projectTypes.studentDevelopment
-                ? 'bg-gray-100 text-gray-400'
-                : 'text-gray-900'
-            } grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2`}
-          >
-            <div className="flex items-center ps-4">
-              <input
-                name="moralEthical"
-                type="checkbox"
-                checked={
-                  projectTypes.moralEthical && projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="moralEthical"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                ด้านคุณธรรม จริยธรรม
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="academicPromotion"
-                type="checkbox"
-                checked={
-                  projectTypes.academicPromotion &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="academicPromotion"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="knowledge"
-                type="checkbox"
-                checked={
-                  projectTypes.knowledge && projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="knowledge"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                ด้านความรู้
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="environment"
-                type="checkbox"
-                checked={
-                  projectTypes.environment && projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="environment"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="intellectualSkill"
-                type="checkbox"
-                checked={
-                  projectTypes.intellectualSkill &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="intellectualSkill"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                ด้านทักษะทางปัญญา
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="sport"
-                type="checkbox"
-                checked={projectTypes.sport && projectTypes.studentDevelopment}
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="sport"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมกีฬา และการส่งเสริมสุขภาพ
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="knowledgeAnalysisCommunicationTechnology"
-                type="checkbox"
-                checked={
-                  projectTypes.knowledgeAnalysisCommunicationTechnology &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="knowledgeAnalysisCommunicationTechnology"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="artCultureDevelopment"
-                type="checkbox"
-                checked={
-                  projectTypes.artCultureDevelopment &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="artCultureDevelopment"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="numericalAnalysisCommunicationTechnology"
-                type="checkbox"
-                checked={
-                  projectTypes.numericalAnalysisCommunicationTechnology &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="numericalAnalysisCommunicationTechnology"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร และการใช้เทคโนโลยี
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="moralEthicalDevelopment"
-                type="checkbox"
-                checked={
-                  projectTypes.moralEthicalDevelopment &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="moralEthicalDevelopment"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
-              </label>
-            </div>
-            <div className="flex items-center ps-4">
-              <input
-                name="leadershipDevelopment"
-                type="checkbox"
-                checked={
-                  projectTypes.leadershipDevelopment &&
-                  projectTypes.studentDevelopment
-                }
-                disabled={!projectTypes.studentDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="leadershipDevelopment"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
-              </label>
-            </div>
-            <div className="ps-4">
-              <div className="flex items-center">
-                <input
-                  name="subOther"
-                  type="checkbox"
-                  checked={
-                    projectTypes.subOther && projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="subOther"
-                  className="ms-2 py-4 text-sm font-medium"
-                >
-                  อื่นๆ
-                </label>
-                {projectTypes.subOther && projectTypes.studentDevelopment ? (
-                  <div className="w-full border-b border-gray-300 px-2">
-                    <input
-                      type="text"
-                      name="subOtherDetail"
-                      className="flex w-full border-none "
-                      placeholder="โปรดระบุ"
-                      value={projectTypes.subOtherDetail || ''}
-                      onChange={handleProjectTypeChange}
-                      disabled={isSubOtherDisabled}
-                      required={isSubOtherDisabled}
-                    />
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-          <div className="rounded border border-gray-200 ps-4">
-            <div className="flex items-center">
-              <input
-                name="other"
-                type="checkbox"
-                checked={projectTypes.other}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="other"
-                className="ms-2 py-4 text-sm font-medium text-gray-900"
-              >
-                อื่นๆ
-              </label>
-              {projectTypes.other ? (
-                <div className="w-full border-b border-gray-300 pl-2 pr-4">
-                  <input
-                    type="text"
-                    name="otherDetail"
-                    className="flex w-full border-none"
-                    placeholder="โปรดระบุ"
-                    value={projectTypes.otherDetail || ''}
-                    onChange={handleProjectTypeChange}
-                    disabled={isOtherDisabled}
-                    required={isOtherDisabled}
-                  />
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="moral"
-              type="checkbox"
-              checked={universityIndentity.moral}
-              onChange={handleUniversityIndentityChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="bordered-checkbox-1"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              คุณธรรมนำใจ
-            </label>
-          </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="serve"
-              type="checkbox"
-              checked={universityIndentity.serve}
-              onChange={handleUniversityIndentityChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="bordered-checkbox-1"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              รับใช้สังคม
-            </label>
-          </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="academic"
-              type="checkbox"
-              checked={universityIndentity.academic}
-              onChange={handleUniversityIndentityChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="bordered-checkbox-1"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              วิชาการก้าวหน้า
-            </label>
-          </div>
-          <div className="flex items-center rounded border border-gray-200 ps-4">
-            <input
-              name="develop"
-              type="checkbox"
-              checked={universityIndentity.develop}
-              onChange={handleUniversityIndentityChange}
-              className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            />
-            <label
-              htmlFor="bordered-checkbox-1"
-              className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
-            >
-              พัฒนาสู่สากล
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        7.หลักการและเหตุผล
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-6 md:grid-cols-1">
-          <textarea
-            name="principleReason"
-            rows={4}
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            placeholder=""
-            value={formInput.principleReason}
-            onChange={handleInputChange}
-          ></textarea>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        8.วัตถุประสงค์ ตัวชี้วัด ค่าเป้าหมาย/เกณฑ์ความสำเร็จ และ
-        เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-6 md:grid-cols-1">
+        <div className={`mb-6 grid gap-6 md:grid-cols-1`}>
           <div className="relative overflow-x-auto">
             <table className="w-full rounded border text-left text-sm text-gray-500">
               <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
                 <tr>
-                  <th scope="col" className="bg-gray-300 px-6 py-3">
-                    วัตถุประสงค์โครงการ
+                  <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                    ลำดับที่
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    ตัวชี้วัด
+                    ชื่อ - สกุล
                   </th>
-                  <th scope="col" className="bg-gray-300 px-6 py-3">
-                    เป้าหมาย (เกณฑ์ความสำเร็จ)
+                  <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
+                    ตำแหน่งโครงการ
                   </th>
-                  <th scope="col" className="px-6 py-3">
-                    เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+                  <th scope="col" className="w-[15%] px-6 py-3">
+                    ภาระงาน (ภารกิจ/สัปดาห์)
                   </th>
                   <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
                     เพิ่ม/ลบแถว
@@ -1413,20 +889,69 @@ export default function PN01Form() {
                 </tr>
               </thead>
               <tbody>
-                {OIVTRows.map((row) => (
+                {responsibleRows.map((row) => (
                   <tr className="border-b bg-white" key={row.id}>
+                    <th
+                      scope="row"
+                      className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
+                    >
+                      {row.id}
+                    </th>
+                    <td className="px-6 py-4">
+                      <div className={`grid grid-cols-2 gap-6`}>
+                        <TextField
+                          type="text"
+                          name="firstname"
+                          className="flex w-full"
+                          placeholder=""
+                          value={row.firstname}
+                          onChange={(e) =>
+                            handleResponsibleChange(
+                              row.id,
+                              'firstname',
+                              e.target.value,
+                            )
+                          }
+                          error={Boolean(
+                            validationArrayError['firstname']?.find(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['firstname']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
+                        />
+                        <TextField
+                          type="text"
+                          name="lastname"
+                          className="flex w-full"
+                          placeholder=""
+                          value={row.lastname}
+                          onChange={(e) =>
+                            handleResponsibleChange(
+                              row.id,
+                              'lastname',
+                              e.target.value,
+                            )
+                          }
+                          // required
+                        />
+                      </div>
+                    </td>
                     <td className="bg-gray-50 px-6 py-4">
                       <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
                           type="text"
-                          id="oivt_objective"
+                          id="res_position"
                           className="flex w-full"
                           placeholder=""
-                          value={row.objective}
+                          value={row.position}
                           onChange={(e) =>
-                            handleOIVTChange(
+                            handleResponsibleChange(
                               row.id,
-                              'objective',
+                              'position',
                               e.target.value,
                             )
                           }
@@ -1438,48 +963,17 @@ export default function PN01Form() {
                       <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
                           type="text"
-                          id="oivt_indicator"
+                          id="res_work"
                           className="flex w-full"
                           placeholder=""
-                          value={row.indicator}
+                          value={row.work}
                           onChange={(e) =>
-                            handleOIVTChange(
+                            handleResponsibleChange(
                               row.id,
-                              'indicator',
+                              'work',
                               e.target.value,
                             )
                           }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td className="bg-gray-50 px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          id="oivt_value"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.value}
-                          onChange={(e) =>
-                            handleOIVTChange(row.id, 'value', e.target.value)
-                          }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          id="oivt_tool"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.tool}
-                          onChange={(e) =>
-                            handleOIVTChange(row.id, 'tool', e.target.value)
-                          }
-                          // required
                         />
                       </div>
                     </td>
@@ -1488,17 +982,17 @@ export default function PN01Form() {
                         <IconButton
                           aria-label="add_row"
                           size="small"
-                          onClick={addOIVTRow}
+                          onClick={addResponsibleRow}
                         >
                           <PlusCircleIcon className="h-9 w-9" />
                         </IconButton>
                       </Tooltip>
-                      {OIVTRows.length > 1 && (
+                      {responsibleRows.length > 1 && (
                         <Tooltip title="ลบแถว">
                           <IconButton
                             aria-label="delete_row"
                             size="small"
-                            onClick={() => deleteOIVTRow(row.id)}
+                            onClick={() => deleteResponsibleRow(row.id)}
                           >
                             <XCircleIcon className="h-9 w-9" />
                           </IconButton>
@@ -1511,489 +1005,1262 @@ export default function PN01Form() {
             </table>
           </div>
         </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        9.ประโยชน์ที่คาดว่าจะได้รับ
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-6 md:grid-cols-1">
-          <table className="w-full rounded border text-left text-sm text-gray-500">
-            <tbody>
-              {expectedResultRows.map((row) => (
-                <tr className="border-b bg-white" key={row.id}>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                    {row.id}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        type="text"
-                        id="expected_result"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.expected_result}
-                        onChange={(e) =>
-                          handleExpectedResultChange(row.id, e.target.value)
-                        }
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4">
-                    <div className="flex items-center justify-center">
-                      <Tooltip title="เพิ่มแถว">
-                        <IconButton
-                          aria-label="add_row"
-                          size="small"
-                          onClick={addExpectedResultRow}
-                        >
-                          <PlusCircleIcon className="h-9 w-9" />
-                        </IconButton>
-                      </Tooltip>
-                      {expectedResultRows.length > 1 && (
-                        <Tooltip title="ลบแถว">
-                          <IconButton
-                            aria-label="delete_row"
-                            size="small"
-                            onClick={() => deleteExpectedResultRow(row.id)}
-                          >
-                            <XCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-6 md:grid-cols-1">
-          <table className="w-full rounded border text-left text-sm text-gray-500">
-            <tbody>
-              {operationDurationRows.map((row) => (
-                <tr className="border-b bg-white" key={row.id}>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                    {row.id}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        type="text"
-                        id="operation_duration"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.operation_duration}
-                        onChange={(e) =>
-                          handleOperationDurationChange(row.id, e.target.value)
-                        }
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4">
-                    <div className="flex items-center justify-center">
-                      <Tooltip title="เพิ่มแถว">
-                        <IconButton
-                          aria-label="add_row"
-                          size="small"
-                          onClick={addOperationDurationRow}
-                        >
-                          <PlusCircleIcon className="h-9 w-9" />
-                        </IconButton>
-                      </Tooltip>
-                      {operationDurationRows.length > 1 && (
-                        <Tooltip title="ลบแถว">
-                          <IconButton
-                            aria-label="delete_row"
-                            size="small"
-                            onClick={() => deleteOperationDurationRow(row.id)}
-                          >
-                            <XCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        11.สถานที่จัดโครงการและกำหนดการ
-      </h3>
-      <div>
-        <div className="mb-3 grid gap-6 md:grid-cols-2">
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ
+        </h3>
+        <div className="mb-6 grid gap-x-6 gap-y-3 md:grid-cols-2">
           <div>
             <label
-              htmlFor="projectLocation"
+              htmlFor="strategicIssue"
               className="mb-2 block text-base font-medium text-gray-900"
             >
-              11.1 สถานที่จัดโครงการ
+              4.1 ประเด็นยุทธศาสตร์ที่
             </label>
+            <select
+              name="strategicIssue"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.strategicIssue}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="objectivev"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.2 เป้าประสงค์ที่
+            </label>
+            <select
+              name="objective"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.objective}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="universityStrategic"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.3 กลยุทธ์ระดับมหาวิทยาลัยที่
+            </label>
+            <select
+              name="universityStrategic"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.universityStrategic}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="strategicPlanKPI"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.4 ตัวชี้วัดแผนกลยุทธ์ที่
+            </label>
+            <select
+              name="strategicPlanKPI"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.strategicPlanKPI}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="operationPlanKPI"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.5 ตัวชี้วัดแผนปฏิบัติการที่
+            </label>
+            <select
+              name="operationPlanKPI"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.operationPlanKPI}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="projectKPI"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.6 ตัวชี้วัดโครงการ
+            </label>
+            <select
+              name="projectKPI"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.projectKPI}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="projectStatus"
+              className="mb-2 block text-base font-medium text-gray-900"
+            >
+              4.7 สถานะโครงการ
+            </label>
+            <select
+              name="projectStatus"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              value={selectedValues.projectStatus}
+              onChange={handleSelectChange}
+            >
+              <option value="">Choose a country</option>
+              <option value="US">United States</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+        </div>
+
+        <h3
+          className={`mb-2 block text-base font-medium ${
+            validationError.projectTypes ? 'text-red-600' : 'text-gray-900'
+          }`}
+        >
+          5.ประเภทโครงการ
+        </h3>
+        <div
+          className={`mb-6 ${
+            validationError.projectTypes ? ' text-red-600' : 'text-gray-900'
+          }`}
+        >
+          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="maintenance"
+                type="checkbox"
+                checked={projectTypes.maintenance}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="maintenance"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนทำนุบำรุงศิลปวัฒนธรรม
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="academicService"
+                type="checkbox"
+                checked={projectTypes.academicService}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="academicService"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนบริการวิชาการ
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="knowledgeManagement"
+                type="checkbox"
+                checked={projectTypes.knowledgeManagement}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="knowledgeManagement"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนการจัดการความรู้
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="researchPromotion"
+                type="checkbox"
+                checked={projectTypes.researchPromotion}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="researchPromotion"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนการส่งเสริมงานวิจัย
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="educationQualityAssurance"
+                type="checkbox"
+                checked={projectTypes.educationQualityAssurance}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="educationQualityAssurance"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนการประกันคุณภาพการศึกษา
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="personnelDevelopment"
+                type="checkbox"
+                checked={projectTypes.personnelDevelopment}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="personnelDevelopment"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนพัฒนาบุคลากร
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="riskManagement"
+                type="checkbox"
+                checked={projectTypes.riskManagement}
+                onChange={handleProjectTypeChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="riskManagement"
+                className="ms-2 w-full py-4 text-sm font-medium"
+              >
+                แผนบริหารความเสี่ยง
+              </label>
+            </div>
+          </div>
+          <div
+            className={`my-3 rounded border ${
+              validationError.projectTypes
+                ? 'border-red-600'
+                : 'border-gray-200'
+            }`}
+          >
+            <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
+              <div className="flex items-center ps-4">
+                <input
+                  name="studentDevelopment"
+                  type="checkbox"
+                  checked={projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="studentDevelopment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา{' '}
+                  <b>(เลือกได้มากกว่า 1 ประเภท)</b>
+                </label>
+              </div>
+            </div>
+            <div
+              className={`${
+                !projectTypes.studentDevelopment
+                  ? 'bg-gray-100 text-gray-400'
+                  : 'text-gray-900'
+              } grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2`}
+            >
+              <div className="flex items-center ps-4">
+                <input
+                  name="moralEthical"
+                  type="checkbox"
+                  checked={
+                    projectTypes.moralEthical && projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="moralEthical"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  ด้านคุณธรรม จริยธรรม
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="academicPromotion"
+                  type="checkbox"
+                  checked={
+                    projectTypes.academicPromotion &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="academicPromotion"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="knowledge"
+                  type="checkbox"
+                  checked={
+                    projectTypes.knowledge && projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="knowledge"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  ด้านความรู้
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="environment"
+                  type="checkbox"
+                  checked={
+                    projectTypes.environment && projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="environment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="intellectualSkill"
+                  type="checkbox"
+                  checked={
+                    projectTypes.intellectualSkill &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="intellectualSkill"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  ด้านทักษะทางปัญญา
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="sport"
+                  type="checkbox"
+                  checked={
+                    projectTypes.sport && projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="sport"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมกีฬา และการส่งเสริมสุขภาพ
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="knowledgeAnalysisCommunicationTechnology"
+                  type="checkbox"
+                  checked={
+                    projectTypes.knowledgeAnalysisCommunicationTechnology &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="knowledgeAnalysisCommunicationTechnology"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="artCultureDevelopment"
+                  type="checkbox"
+                  checked={
+                    projectTypes.artCultureDevelopment &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="artCultureDevelopment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="numericalAnalysisCommunicationTechnology"
+                  type="checkbox"
+                  checked={
+                    projectTypes.numericalAnalysisCommunicationTechnology &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="numericalAnalysisCommunicationTechnology"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร และการใช้เทคโนโลยี
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="moralEthicalDevelopment"
+                  type="checkbox"
+                  checked={
+                    projectTypes.moralEthicalDevelopment &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="moralEthicalDevelopment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
+                </label>
+              </div>
+              <div className="flex items-center ps-4">
+                <input
+                  name="leadershipDevelopment"
+                  type="checkbox"
+                  checked={
+                    projectTypes.leadershipDevelopment &&
+                    projectTypes.studentDevelopment
+                  }
+                  disabled={!projectTypes.studentDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="leadershipDevelopment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
+                </label>
+              </div>
+              <div className="ps-4">
+                <div className="flex items-center">
+                  <input
+                    name="subOther"
+                    type="checkbox"
+                    checked={
+                      projectTypes.subOther && projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="subOther"
+                    className="ms-2 py-4 text-sm font-medium"
+                  >
+                    อื่นๆ
+                  </label>
+                  {projectTypes.subOther && projectTypes.studentDevelopment && (
+                    <div className="w-full border-b border-gray-300 px-2">
+                      <input
+                        type="text"
+                        name="subOtherDetail"
+                        className="flex w-full border-none "
+                        placeholder="โปรดระบุ"
+                        value={projectTypes.subOtherDetail || ''}
+                        onChange={handleProjectTypeChange}
+                        disabled={isSubOtherDisabled}
+                        required={!isSubOtherDisabled}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+            <div
+              className={`rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <div className="flex items-center">
+                <input
+                  name="other"
+                  type="checkbox"
+                  checked={projectTypes.other}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="other"
+                  className="ms-2 py-4 text-sm font-medium"
+                >
+                  อื่นๆ
+                </label>
+                {projectTypes.other && (
+                  <div className="w-full border-b border-gray-300 pl-2 pr-4">
+                    <input
+                      type="text"
+                      name="otherDetail"
+                      className="flex w-full border-none"
+                      placeholder="โปรดระบุ"
+                      value={projectTypes.otherDetail || ''}
+                      onChange={handleProjectTypeChange}
+                      disabled={isOtherDisabled}
+                      required={!isOtherDisabled}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          {validationError.projectTypes && (
+            <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
+              {validationError.projectTypes}
+            </p>
+          )}
+        </div>
+
+        <h3
+          className={`mb-2 block text-base font-medium ${
+            validationError.universityIndentity
+              ? 'text-red-600'
+              : 'text-gray-900'
+          }`}
+        >
+          6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+            <div
+              className={`flex items-center rounded border ${
+                validationError.universityIndentity
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="moral"
+                type="checkbox"
+                checked={universityIndentity.moral}
+                onChange={handleUniversityIndentityChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="bordered-checkbox-1"
+                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+              >
+                คุณธรรมนำใจ
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.universityIndentity
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="serve"
+                type="checkbox"
+                checked={universityIndentity.serve}
+                onChange={handleUniversityIndentityChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="bordered-checkbox-1"
+                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+              >
+                รับใช้สังคม
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.universityIndentity
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="academic"
+                type="checkbox"
+                checked={universityIndentity.academic}
+                onChange={handleUniversityIndentityChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="bordered-checkbox-1"
+                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+              >
+                วิชาการก้าวหน้า
+              </label>
+            </div>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.universityIndentity
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              } ps-4`}
+            >
+              <input
+                name="develop"
+                type="checkbox"
+                checked={universityIndentity.develop}
+                onChange={handleUniversityIndentityChange}
+                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <label
+                htmlFor="bordered-checkbox-1"
+                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+              >
+                พัฒนาสู่สากล
+              </label>
+            </div>
+          </div>
+          {validationError.universityIndentity && (
+            <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
+              {validationError.universityIndentity}
+            </p>
+          )}
+        </div>
+
+        <h3
+          className={`mb-2 block text-base font-medium ${
+            validationError.principleReason ? 'text-red-600' : 'text-gray-900'
+          }`}
+        >
+          7.หลักการและเหตุผล
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-6 md:grid-cols-1">
             <TextField
-              type="text"
-              name="projectLocation"
+              name="principleReason"
+              multiline
+              rows={5}
+              sx={{
+                '.MuiOutlinedInput-root': {
+                  padding: 1,
+                },
+              }}
               className="flex w-full"
-              value={formInput.projectLocation}
-              onChange={handleInputChange}
+              helperText={validationError.principleReason}
+              error={Boolean(validationError.principleReason)}
               placeholder=""
-              // required
+              value={formInput.principleReason}
+              onChange={handleInputChange}
             />
           </div>
-          <div>
-            <label
-              htmlFor="project_datetime"
-              className="mb-2 block text-base font-medium text-gray-900"
-            >
-              <p className="flex items-center gap-1">
-                11.2 วัน/เวลา ที่จัดโครงการ
-                <Tooltip
-                  title="รูปแบบ วัน/เดือน/ปี(ค.ศ.) เวลา 24 ชั่วโมง"
-                  placement="top"
-                  arrow
-                >
-                  <HelpIcon className="h-5 w-5 text-gray-500" />
-                </Tooltip>
-              </p>
-            </label>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimeField
-                ampm={false}
-                className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                value={formInput.projectDatetime || null}
-                onChange={(value) =>
-                  handleInputChange({
-                    target: { name: 'projectDatetime', value },
-                  })
-                }
-                format="DD/MM/YYYY HH:mm"
-              />
-            </LocalizationProvider>
+        </div>
+
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          8.วัตถุประสงค์ ตัวชี้วัด ค่าเป้าหมาย/เกณฑ์ความสำเร็จ และ
+          เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-6 md:grid-cols-1">
+            <div className="relative overflow-x-auto">
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                  <tr>
+                    <th scope="col" className="bg-gray-300 px-6 py-3">
+                      วัตถุประสงค์โครงการ
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      ตัวชี้วัด
+                    </th>
+                    <th scope="col" className="bg-gray-300 px-6 py-3">
+                      เป้าหมาย (เกณฑ์ความสำเร็จ)
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+                    </th>
+                    <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                      เพิ่ม/ลบแถว
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {OIVTRows.map((row) => (
+                    <tr className="border-b bg-white" key={row.id}>
+                      <td className="bg-gray-50 px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            id="oivt_objective"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.objective}
+                            onChange={(e) =>
+                              handleOIVTChange(
+                                row.id,
+                                'objective',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            id="oivt_indicator"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.indicator}
+                            onChange={(e) =>
+                              handleOIVTChange(
+                                row.id,
+                                'indicator',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="bg-gray-50 px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            id="oivt_value"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.value}
+                            onChange={(e) =>
+                              handleOIVTChange(row.id, 'value', e.target.value)
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            id="oivt_tool"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.tool}
+                            onChange={(e) =>
+                              handleOIVTChange(row.id, 'tool', e.target.value)
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                        <Tooltip title="เพิ่มแถว">
+                          <IconButton
+                            aria-label="add_row"
+                            size="small"
+                            onClick={addOIVTRow}
+                          >
+                            <PlusCircleIcon className="h-9 w-9" />
+                          </IconButton>
+                        </Tooltip>
+                        {OIVTRows.length > 1 && (
+                          <Tooltip title="ลบแถว">
+                            <IconButton
+                              aria-label="delete_row"
+                              size="small"
+                              onClick={() => deleteOIVTRow(row.id)}
+                            >
+                              <XCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-1">
-          <div>
-            <label
-              htmlFor="countries"
-              className="mb-2 block text-base font-medium text-gray-900"
-            >
-              11.3 กำหนดการ (โดยละเอียด)
-            </label>
-            <div className="mb-6">
-              <div className="grid gap-6 md:grid-cols-1">
-                <div className="relative overflow-x-auto">
-                  <table className="w-full rounded border text-left text-sm text-gray-500">
-                    <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                      <tr>
-                        <th scope="col" className="w-[15%] px-6 py-3">
-                          <p className="flex items-center justify-center gap-1">
-                            วันที่
-                            <Tooltip
-                              title="รูปแบบ วัน/เดือน/ปี(ค.ศ.)"
-                              placement="top"
-                              arrow
+
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          9.ประโยชน์ที่คาดว่าจะได้รับ
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-6 md:grid-cols-1">
+            <table className="w-full rounded border text-left text-sm text-gray-500">
+              <tbody>
+                {expectedResultRows.map((row) => (
+                  <tr className="border-b bg-white" key={row.id}>
+                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                      {row.id}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className={`grid grid-cols-1 gap-6`}>
+                        <TextField
+                          type="text"
+                          id="expected_result"
+                          className="flex w-full"
+                          placeholder=""
+                          value={row.expected_result}
+                          onChange={(e) =>
+                            handleExpectedResultChange(row.id, e.target.value)
+                          }
+                          // required
+                        />
+                      </div>
+                    </td>
+                    <td className="w-[10%] bg-gray-50 px-6 py-4">
+                      <div className="flex items-center justify-center">
+                        <Tooltip title="เพิ่มแถว">
+                          <IconButton
+                            aria-label="add_row"
+                            size="small"
+                            onClick={addExpectedResultRow}
+                          >
+                            <PlusCircleIcon className="h-9 w-9" />
+                          </IconButton>
+                        </Tooltip>
+                        {expectedResultRows.length > 1 && (
+                          <Tooltip title="ลบแถว">
+                            <IconButton
+                              aria-label="delete_row"
+                              size="small"
+                              onClick={() => deleteExpectedResultRow(row.id)}
                             >
-                              <HelpIcon className="h-5 w-5 text-gray-500" />
-                            </Tooltip>
-                          </p>
-                        </th>
-                        <th
-                          scope="col"
-                          className="w-[15%] bg-gray-300 px-6 py-3"
-                        >
-                          <p className="flex items-center justify-center gap-1">
-                            เวลา
-                            <Tooltip
-                              title="รูปแบบ 24 ชั่วโมง"
-                              placement="top"
-                              arrow
+                              <XCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-6 md:grid-cols-1">
+            <table className="w-full rounded border text-left text-sm text-gray-500">
+              <tbody>
+                {operationDurationRows.map((row) => (
+                  <tr className="border-b bg-white" key={row.id}>
+                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                      {row.id}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className={`grid grid-cols-1 gap-6`}>
+                        <TextField
+                          type="text"
+                          id="operation_duration"
+                          className="flex w-full"
+                          placeholder=""
+                          value={row.operation_duration}
+                          onChange={(e) =>
+                            handleOperationDurationChange(
+                              row.id,
+                              e.target.value,
+                            )
+                          }
+                          // required
+                        />
+                      </div>
+                    </td>
+                    <td className="w-[10%] bg-gray-50 px-6 py-4">
+                      <div className="flex items-center justify-center">
+                        <Tooltip title="เพิ่มแถว">
+                          <IconButton
+                            aria-label="add_row"
+                            size="small"
+                            onClick={addOperationDurationRow}
+                          >
+                            <PlusCircleIcon className="h-9 w-9" />
+                          </IconButton>
+                        </Tooltip>
+                        {operationDurationRows.length > 1 && (
+                          <Tooltip title="ลบแถว">
+                            <IconButton
+                              aria-label="delete_row"
+                              size="small"
+                              onClick={() => deleteOperationDurationRow(row.id)}
                             >
-                              <HelpIcon className="h-5 w-5 text-gray-500" />
-                            </Tooltip>
-                          </p>
-                        </th>
-                        <th scope="col" className="px-6 py-3">
-                          รายการกิจกรรม
-                        </th>
-                        <th
-                          scope="col"
-                          className="w-[10%] bg-gray-300 px-6 py-3"
-                        >
-                          เพิ่ม/ลบแถว
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {projectScheduleRows.map((row) => (
-                        <tr className="border-b bg-white" key={row.id}>
-                          <td className="px-6 py-4">
-                            <div className={`grid grid-cols-1 gap-6`}>
-                              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DateField
-                                  className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                  value={row.date}
-                                  onChange={(value) =>
-                                    handleProjectScheduleChange(row.id, {
-                                      target: {
-                                        name: 'date',
-                                        value,
-                                      },
-                                    })
-                                  }
-                                  format="DD/MM/YYYY"
-                                />
-                              </LocalizationProvider>
-                            </div>
-                          </td>
-                          <td className="bg-gray-50 px-6 py-4">
-                            <div className={`grid grid-cols-1 gap-6`}>
-                              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <TimeField
-                                  className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                  value={row.time}
-                                  name="time"
-                                  onChange={(value) =>
-                                    handleProjectScheduleChange(row.id, {
-                                      target: {
-                                        name: 'time',
-                                        value,
-                                      },
-                                    })
-                                  }
-                                  format="HH:mm"
-                                />
-                              </LocalizationProvider>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className={`grid grid-cols-1 gap-6`}>
-                              <TextField
-                                type="text"
-                                name="detail"
-                                className="flex w-full"
-                                variant="outlined"
-                                placeholder=""
-                                value={row.detail}
-                                onChange={(value) =>
-                                  handleProjectScheduleChange(row.id, value)
-                                }
-                                // required
-                              />
-                            </div>
-                          </td>
-                          <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                            <Tooltip title="เพิ่มแถว">
-                              <IconButton
-                                aria-label="add_row"
-                                size="small"
-                                onClick={addProjectScheduleRow}
+                              <XCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          11.สถานที่จัดโครงการและกำหนดการ
+        </h3>
+        <div>
+          <div className="mb-3 grid gap-6 md:grid-cols-2">
+            <div>
+              <label
+                htmlFor="projectLocation"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectLocation
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                11.1 สถานที่จัดโครงการ
+              </label>
+              <TextField
+                type="text"
+                name="projectLocation"
+                className="flex w-full"
+                value={formInput.projectLocation}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.projectLocation)}
+                helperText={validationError.projectLocation}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="project_datetime"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectDatetime
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                <p className="flex items-center gap-1">
+                  11.2 วัน/เวลา ที่จัดโครงการ
+                  <Tooltip
+                    title="รูปแบบ วัน/เดือน/ปี(ค.ศ.) เวลา 24 ชั่วโมง"
+                    placement="top"
+                    arrow
+                  >
+                    <HelpIcon className="h-5 w-5 text-gray-500" />
+                  </Tooltip>
+                </p>
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimeField
+                  ampm={false}
+                  className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                  value={formInput.projectDatetime || null}
+                  onChange={(value) =>
+                    handleInputChange({
+                      target: { name: 'projectDatetime', value },
+                    })
+                  }
+                  format="DD/MM/YYYY HH:mm"
+                  helperText={validationError.projectDatetime}
+                  sx={{
+                    color: validationError.projectDatetime
+                      ? '#D32F2F'
+                      : 'inherit',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: validationError.projectDatetime
+                        ? '#D32F2F'
+                        : 'inherit',
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: validationError.projectDatetime
+                        ? '#D32F2F'
+                        : 'inherit',
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-1">
+            <div>
+              <label
+                htmlFor="countries"
+                className="mb-2 block text-base font-medium text-gray-900"
+              >
+                11.3 กำหนดการ (โดยละเอียด)
+              </label>
+              <div className="mb-6">
+                <div className="grid gap-6 md:grid-cols-1">
+                  <div className="relative overflow-x-auto">
+                    <table className="w-full rounded border text-left text-sm text-gray-500">
+                      <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                        <tr>
+                          <th scope="col" className="w-[15%] px-6 py-3">
+                            <p className="flex items-center justify-center gap-1">
+                              วันที่
+                              <Tooltip
+                                title="รูปแบบ วัน/เดือน/ปี(ค.ศ.)"
+                                placement="top"
+                                arrow
                               >
-                                <PlusCircleIcon className="h-9 w-9" />
-                              </IconButton>
-                            </Tooltip>
-                            {projectScheduleRows.length > 1 && (
-                              <Tooltip title="ลบแถว">
-                                <IconButton
-                                  aria-label="delete_row"
-                                  size="small"
-                                  onClick={() =>
-                                    deleteProjectScheduleRow(row.id)
-                                  }
+                                <HelpIcon className="h-5 w-5 text-gray-500" />
+                              </Tooltip>
+                            </p>
+                          </th>
+                          <th
+                            scope="col"
+                            className="w-[15%] bg-gray-300 px-6 py-3"
+                          >
+                            <p className="flex items-center justify-center gap-1">
+                              เวลา
+                              <Tooltip
+                                title="รูปแบบ 24 ชั่วโมง"
+                                placement="top"
+                                arrow
+                              >
+                                <HelpIcon className="h-5 w-5 text-gray-500" />
+                              </Tooltip>
+                            </p>
+                          </th>
+                          <th scope="col" className="px-6 py-3">
+                            รายการกิจกรรม
+                          </th>
+                          <th
+                            scope="col"
+                            className="w-[10%] bg-gray-300 px-6 py-3"
+                          >
+                            เพิ่ม/ลบแถว
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {projectScheduleRows.map((row) => (
+                          <tr className="border-b bg-white" key={row.id}>
+                            <td className="px-6 py-4">
+                              <div className={`grid grid-cols-1 gap-6`}>
+                                <LocalizationProvider
+                                  dateAdapter={AdapterDayjs}
                                 >
-                                  <XCircleIcon className="h-9 w-9" />
+                                  <DateField
+                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                    value={row.date}
+                                    onChange={(value) =>
+                                      handleProjectScheduleChange(row.id, {
+                                        target: {
+                                          name: 'date',
+                                          value,
+                                        },
+                                      })
+                                    }
+                                    format="DD/MM/YYYY"
+                                  />
+                                </LocalizationProvider>
+                              </div>
+                            </td>
+                            <td className="bg-gray-50 px-6 py-4">
+                              <div className={`grid grid-cols-1 gap-6`}>
+                                <LocalizationProvider
+                                  dateAdapter={AdapterDayjs}
+                                >
+                                  <TimeField
+                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                    value={row.time}
+                                    name="time"
+                                    onChange={(value) =>
+                                      handleProjectScheduleChange(row.id, {
+                                        target: {
+                                          name: 'time',
+                                          value,
+                                        },
+                                      })
+                                    }
+                                    format="HH:mm"
+                                  />
+                                </LocalizationProvider>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className={`grid grid-cols-1 gap-6`}>
+                                <TextField
+                                  type="text"
+                                  name="detail"
+                                  className="flex w-full"
+                                  variant="outlined"
+                                  placeholder=""
+                                  value={row.detail}
+                                  onChange={(value) =>
+                                    handleProjectScheduleChange(row.id, value)
+                                  }
+                                  // required
+                                />
+                              </div>
+                            </td>
+                            <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                              <Tooltip title="เพิ่มแถว">
+                                <IconButton
+                                  aria-label="add_row"
+                                  size="small"
+                                  onClick={addProjectScheduleRow}
+                                >
+                                  <PlusCircleIcon className="h-9 w-9" />
                                 </IconButton>
                               </Tooltip>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              {projectScheduleRows.length > 1 && (
+                                <Tooltip title="ลบแถว">
+                                  <IconButton
+                                    aria-label="delete_row"
+                                    size="small"
+                                    onClick={() =>
+                                      deleteProjectScheduleRow(row.id)
+                                    }
+                                  >
+                                    <XCircleIcon className="h-9 w-9" />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        12.วิทยากร (ถ้ามี)
-      </h3>
-      <div className="mb-6">
-        <div className="mb-3 grid grid-cols-1 gap-6">
-          <TextField
-            type="text"
-            name="lecturer"
-            className="flex w-full"
-            value={formInput.lecturer}
-            onChange={handleInputChange}
-            placeholder=""
-            // required
-          />
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          12.วิทยากร (ถ้ามี)
+        </h3>
+        <div className="mb-6">
+          <div className="mb-3 grid grid-cols-1 gap-6">
+            <TextField
+              type="text"
+              name="lecturer"
+              className="flex w-full"
+              value={formInput.lecturer}
+              onChange={handleInputChange}
+              placeholder=""
+              // required
+            />
+          </div>
         </div>
-      </div>
 
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
-      </h3>
-      <div className="mb-6">
-        <div className="grid gap-6 md:grid-cols-1">
-          <table className="w-full rounded border text-left text-sm text-gray-500">
-            <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-              <tr>
-                <th scope="col" className="w-[75%] bg-gray-300 px-6 py-3">
-                  รายละเอียด
-                </th>
-                <th scope="col" className="w-[15%] px-6 py-3">
-                  จำนวน/คน
-                </th>
-                <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                  เพิ่ม/ลบแถว
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {targetRows.map((row) => (
-                <tr className="border-b bg-white" key={row.id}>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        hiddenLabel
-                        type="text"
-                        id="detail"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.detail}
-                        onChange={(e) =>
-                          handleTargetChange(row.id, 'detail', e.target.value)
-                        }
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`grid grid-cols-1 gap-6`}>
-                      <TextField
-                        hiddenLabel
-                        type="number"
-                        id="count"
-                        className="flex w-full"
-                        placeholder=""
-                        value={row.count}
-                        onChange={(e) =>
-                          handleTargetChange(row.id, 'count', e.target.value)
-                        }
-                        onBlur={calculateTargetTotal}
-                        // required
-                      />
-                    </div>
-                  </td>
-                  <td className="w-[10%] bg-gray-50 px-6 py-4">
-                    <div className="flex items-center justify-center">
-                      <Tooltip title="เพิ่มแถว">
-                        <IconButton
-                          aria-label="add_row"
-                          size="small"
-                          onClick={addTargetRow}
-                        >
-                          <PlusCircleIcon className="h-9 w-9" />
-                        </IconButton>
-                      </Tooltip>
-                      {targetRows.length > 1 && (
-                        <Tooltip title="ลบแถว">
-                          <IconButton
-                            aria-label="delete_row"
-                            size="small"
-                            onClick={() => deleteTargetRow(row.id)}
-                          >
-                            <XCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              <tr>
-                <td className="py-2 text-right font-bold">รวมจำนวน</td>
-                <td className="px-6 py-2 text-right font-bold">
-                  {targetTotal}
-                </td>
-                <td className="py-2 text-left font-bold">คน</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
-      </h3>
-      <div className="mb-6">
-        <div>
-          <textarea
-            name="improvement"
-            rows={4}
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            placeholder=""
-            value={formInput.improvement}
-            onChange={handleInputChange}
-          ></textarea>
-        </div>
-      </div>
-
-      <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-        15.งบประมาณ
-      </h3>
-      <div className="mb-6">
-        <div className="mb-3 grid gap-6 md:grid-cols-1">
-          <div>
-            <label
-              htmlFor="project_location"
-              className="mb-2 block text-base font-medium text-gray-900"
-            >
-              15.1 งบประมาณรายรับ
-            </label>
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
+        </h3>
+        <div className="mb-6">
+          <div className="grid gap-6 md:grid-cols-1">
             <table className="w-full rounded border text-left text-sm text-gray-500">
               <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
                 <tr>
-                  <th scope="col" className="w-[10%] px-6 py-3">
-                    ลำดับที่
+                  <th scope="col" className="w-[75%] bg-gray-300 px-6 py-3">
+                    รายละเอียด
                   </th>
-                  <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
-                    รายการ
+                  <th scope="col" className="w-[15%] px-6 py-3">
+                    จำนวน/คน
                   </th>
-                  <th scope="col" className="w-[20%] px-6 py-3">
-                    จำนวนเงิน
-                  </th>
-                  <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
-                    แหล่งที่มาของรายรับ
-                  </th>
-                  <th scope="col" className="w-[10%] px-6 py-3">
+                  <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
                     เพิ่ม/ลบแถว
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {budgetIncomeRows.map((row) => (
+                {targetRows.map((row) => (
                   <tr className="border-b bg-white" key={row.id}>
-                    <th
-                      scope="row"
-                      className="px-6 py-4 text-center text-lg font-medium"
-                    >
-                      {row.id}
-                    </th>
                     <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                       <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
@@ -2004,11 +2271,7 @@ export default function PN01Form() {
                           placeholder=""
                           value={row.detail}
                           onChange={(e) =>
-                            handleBudgetIncomeChange(
-                              row.id,
-                              'detail',
-                              e.target.value,
-                            )
+                            handleTargetChange(row.id, 'detail', e.target.value)
                           }
                           // required
                         />
@@ -2016,64 +2279,38 @@ export default function PN01Form() {
                     </td>
                     <td className="px-6 py-4">
                       <div className={`grid grid-cols-1 gap-6`}>
-                        <OutlinedInput
-                          // hiddenLabel
-                          type="number"
-                          id="amount"
-                          endAdornment={
-                            <InputAdornment position="end">บาท</InputAdornment>
-                          }
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.amount}
-                          onChange={(e) =>
-                            handleBudgetIncomeChange(
-                              row.id,
-                              'amount',
-                              e.target.value,
-                            )
-                          }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td className="bg-gray-50 px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
                           hiddenLabel
-                          type="text"
-                          id="source"
+                          type="number"
+                          id="count"
                           className="flex w-full"
-                          placeholder="งบประมาณ หมวด"
-                          value={row.source}
+                          placeholder=""
+                          value={row.count}
                           onChange={(e) =>
-                            handleBudgetIncomeChange(
-                              row.id,
-                              'source',
-                              e.target.value,
-                            )
+                            handleTargetChange(row.id, 'count', e.target.value)
                           }
+                          onBlur={calculateTargetTotal}
                           // required
                         />
                       </div>
                     </td>
-                    <td>
+                    <td className="w-[10%] bg-gray-50 px-6 py-4">
                       <div className="flex items-center justify-center">
                         <Tooltip title="เพิ่มแถว">
                           <IconButton
                             aria-label="add_row"
                             size="small"
-                            onClick={addBudgetIncomeRow}
+                            onClick={addTargetRow}
                           >
                             <PlusCircleIcon className="h-9 w-9" />
                           </IconButton>
                         </Tooltip>
-                        {budgetIncomeRows.length > 1 && (
+                        {targetRows.length > 1 && (
                           <Tooltip title="ลบแถว">
                             <IconButton
                               aria-label="delete_row"
                               size="small"
-                              onClick={() => deleteBudgetIncomeRow(row.id)}
+                              onClick={() => deleteTargetRow(row.id)}
                             >
                               <XCircleIcon className="h-9 w-9" />
                             </IconButton>
@@ -2084,167 +2321,350 @@ export default function PN01Form() {
                   </tr>
                 ))}
                 <tr>
-                  <td colSpan={2} className="py-2 text-right font-bold">
-                    รวมงบประมาณรายรับ
-                  </td>
+                  <td className="py-2 text-right font-bold">รวมจำนวน</td>
                   <td className="px-6 py-2 text-right font-bold">
-                    {budgetIncomeTotal}
+                    {targetTotal}
                   </td>
-                  <td colSpan={2} className="py-2 text-left font-bold">
-                    บาท
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <label
-              htmlFor="project_location"
-              className="mb-2 block text-base font-medium text-gray-900"
-            >
-              15.2 งบประมาณรายจ่าย
-            </label>
-            <table className="w-full rounded border text-left text-sm text-gray-500">
-              <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                <tr>
-                  <th scope="col" className="w-[10%] px-6 py-3">
-                    ลำดับที่
-                  </th>
-                  <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
-                    รายการ
-                  </th>
-                  <th scope="col" className="w-[20%] px-6 py-3">
-                    จำนวนเงิน
-                  </th>
-                  <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
-                    หมายเหตุ
-                  </th>
-                  <th scope="col" className="w-[10%] px-6 py-3">
-                    เพิ่ม/ลบแถว
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {budgetExpenseRows.map((row) => (
-                  <tr className="border-b bg-white" key={row.id}>
-                    <th
-                      scope="row"
-                      className="px-6 py-4 text-center text-lg font-medium"
-                    >
-                      {row.id}
-                    </th>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          hiddenLabel
-                          type="text"
-                          id="detail"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.detail}
-                          onChange={(e) =>
-                            handleBudgetExpenseChange(
-                              row.id,
-                              'detail',
-                              e.target.value,
-                            )
-                          }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <OutlinedInput
-                          // hiddenLabel
-                          type="number"
-                          id="amount"
-                          endAdornment={
-                            <InputAdornment position="end">บาท</InputAdornment>
-                          }
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.amount}
-                          onChange={(e) =>
-                            handleBudgetExpenseChange(
-                              row.id,
-                              'amount',
-                              e.target.value,
-                            )
-                          }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td className="bg-gray-50 px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          hiddenLabel
-                          type="text"
-                          id="note"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.note}
-                          onChange={(e) =>
-                            handleBudgetExpenseChange(
-                              row.id,
-                              'note',
-                              e.target.value,
-                            )
-                          }
-                          // required
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center justify-center">
-                        <Tooltip title="เพิ่มแถว">
-                          <IconButton
-                            aria-label="add_row"
-                            size="small"
-                            onClick={addBudgetExpenseRow}
-                          >
-                            <PlusCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                        {budgetExpenseRows.length > 1 && (
-                          <Tooltip title="ลบแถว">
-                            <IconButton
-                              aria-label="delete_row"
-                              size="small"
-                              onClick={() => deleteBudgetExpenseRow(row.id)}
-                            >
-                              <XCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td colSpan={2} className="py-2 text-right font-bold">
-                    รวมงบประมาณรายจ่าย
-                  </td>
-                  <td className="px-6 py-2 text-right font-bold">
-                    {budgetExpenseTotal}
-                  </td>
-                  <td colSpan={2} className="py-2 text-left font-bold">
-                    บาท
-                  </td>
+                  <td className="py-2 text-left font-bold">คน</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-base font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto"
-      >
-        Submit
-      </button>
+        <h3
+          className={`mb-2 block text-base font-medium ${
+            validationError.improvement ? 'text-red-600' : 'text-gray-900'
+          }`}
+        >
+          14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
+        </h3>
+        <div className="mb-6">
+          <div>
+            <TextField
+              name="improvement"
+              rows={5}
+              multiline
+              className={`flex w-full`}
+              sx={{
+                '.MuiOutlinedInput-root': {
+                  padding: 1,
+                },
+              }}
+              placeholder=""
+              helperText={validationError.improvement}
+              error={Boolean(validationError.improvement)}
+              value={formInput.improvement}
+              onChange={handleInputChange}
+            />
+          </div>
+        </div>
+
+        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+          15.งบประมาณ
+        </h3>
+        <div className="mb-6">
+          <div className="mb-3 grid gap-6 md:grid-cols-1">
+            <div>
+              <label
+                htmlFor="project_location"
+                className="mb-2 block text-base font-medium text-gray-900"
+              >
+                15.1 งบประมาณรายรับ
+              </label>
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                  <tr>
+                    <th scope="col" className="w-[10%] px-6 py-3">
+                      ลำดับที่
+                    </th>
+                    <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
+                      รายการ
+                    </th>
+                    <th scope="col" className="w-[20%] px-6 py-3">
+                      จำนวนเงิน
+                    </th>
+                    <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
+                      แหล่งที่มาของรายรับ
+                    </th>
+                    <th scope="col" className="w-[10%] px-6 py-3">
+                      เพิ่ม/ลบแถว
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetIncomeRows.map((row) => (
+                    <tr className="border-b bg-white" key={row.id}>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 text-center text-lg font-medium"
+                      >
+                        {row.id}
+                      </th>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            hiddenLabel
+                            type="text"
+                            id="detail"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.detail}
+                            onChange={(e) =>
+                              handleBudgetIncomeChange(
+                                row.id,
+                                'detail',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <OutlinedInput
+                            // hiddenLabel
+                            type="number"
+                            id="amount"
+                            endAdornment={
+                              <InputAdornment position="end">
+                                บาท
+                              </InputAdornment>
+                            }
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.amount}
+                            onChange={(e) =>
+                              handleBudgetIncomeChange(
+                                row.id,
+                                'amount',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="bg-gray-50 px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            hiddenLabel
+                            type="text"
+                            id="source"
+                            className="flex w-full"
+                            placeholder="งบประมาณ หมวด"
+                            value={row.source}
+                            onChange={(e) =>
+                              handleBudgetIncomeChange(
+                                row.id,
+                                'source',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center justify-center">
+                          <Tooltip title="เพิ่มแถว">
+                            <IconButton
+                              aria-label="add_row"
+                              size="small"
+                              onClick={addBudgetIncomeRow}
+                            >
+                              <PlusCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                          {budgetIncomeRows.length > 1 && (
+                            <Tooltip title="ลบแถว">
+                              <IconButton
+                                aria-label="delete_row"
+                                size="small"
+                                onClick={() => deleteBudgetIncomeRow(row.id)}
+                              >
+                                <XCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan={2} className="py-2 text-right font-bold">
+                      รวมงบประมาณรายรับ
+                    </td>
+                    <td className="px-6 py-2 text-right font-bold">
+                      {budgetIncomeTotal}
+                    </td>
+                    <td colSpan={2} className="py-2 text-left font-bold">
+                      บาท
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <label
+                htmlFor="project_location"
+                className="mb-2 block text-base font-medium text-gray-900"
+              >
+                15.2 งบประมาณรายจ่าย
+              </label>
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                  <tr>
+                    <th scope="col" className="w-[10%] px-6 py-3">
+                      ลำดับที่
+                    </th>
+                    <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
+                      รายการ
+                    </th>
+                    <th scope="col" className="w-[20%] px-6 py-3">
+                      จำนวนเงิน
+                    </th>
+                    <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
+                      หมายเหตุ
+                    </th>
+                    <th scope="col" className="w-[10%] px-6 py-3">
+                      เพิ่ม/ลบแถว
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetExpenseRows.map((row) => (
+                    <tr className="border-b bg-white" key={row.id}>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 text-center text-lg font-medium"
+                      >
+                        {row.id}
+                      </th>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            hiddenLabel
+                            type="text"
+                            id="detail"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.detail}
+                            onChange={(e) =>
+                              handleBudgetExpenseChange(
+                                row.id,
+                                'detail',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <OutlinedInput
+                            // hiddenLabel
+                            type="number"
+                            id="amount"
+                            endAdornment={
+                              <InputAdornment position="end">
+                                บาท
+                              </InputAdornment>
+                            }
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.amount}
+                            onChange={(e) =>
+                              handleBudgetExpenseChange(
+                                row.id,
+                                'amount',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td className="bg-gray-50 px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            hiddenLabel
+                            type="text"
+                            id="note"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.note}
+                            onChange={(e) =>
+                              handleBudgetExpenseChange(
+                                row.id,
+                                'note',
+                                e.target.value,
+                              )
+                            }
+                            // required
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex items-center justify-center">
+                          <Tooltip title="เพิ่มแถว">
+                            <IconButton
+                              aria-label="add_row"
+                              size="small"
+                              onClick={addBudgetExpenseRow}
+                            >
+                              <PlusCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                          {budgetExpenseRows.length > 1 && (
+                            <Tooltip title="ลบแถว">
+                              <IconButton
+                                aria-label="delete_row"
+                                size="small"
+                                onClick={() => deleteBudgetExpenseRow(row.id)}
+                              >
+                                <XCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan={2} className="py-2 text-right font-bold">
+                      รวมงบประมาณรายจ่าย
+                    </td>
+                    <td className="px-6 py-2 text-right font-bold">
+                      {budgetExpenseTotal}
+                    </td>
+                    <td colSpan={2} className="py-2 text-left font-bold">
+                      บาท
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 flex justify-end gap-4">
+        <Link
+          href="/dashboard/"
+          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        >
+          ยกเลิก
+        </Link>
+        <button
+          onClick={handleDraft}
+          className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+        >
+          แบบร่าง
+        </button>
+        <Button type="submit">ตกลง</Button>
+      </div>
     </form>
   );
 }
