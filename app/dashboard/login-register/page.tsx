@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Form from '@/app/components/login-register/form';
 
 export const metadata: Metadata = {
-  title: 'Test Page',
+    title: 'เข้าสู่ระบบ/สมัครสมาชิก',
 };
 
 export default async function Page({}: {}) {
