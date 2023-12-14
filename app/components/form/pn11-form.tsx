@@ -11,6 +11,7 @@ import faculties from '@/app/model/faculties';
 import majors from '@/app/model/majors';
 import Link from 'next/link';
 import { Button } from '../button';
+import { PN11 } from '@/app/model/pn11';
 
 export default function PN11Form() {
   const [formInput, setFormInput] = useState({
@@ -108,7 +109,11 @@ export default function PN11Form() {
 
   const validateForm = () => {
     let isValid = true;
-    const excludedFields = ['recipientName', 'recipientAddress', 'recipientPhone'];
+    const excludedFields = [
+      'recipientName',
+      'recipientAddress',
+      'recipientPhone',
+    ];
 
     console.log('--validateForm--');
 
@@ -135,6 +140,18 @@ export default function PN11Form() {
       }
     }
 
+    // Validate formRadio
+    if (!formRadio.deliveryMethod) {
+      isValid = false;
+
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        formRadio: `โปรดเลือกวิธีการจัดส่ง`,
+      }));
+
+      console.error(`Delivery method is required.`);
+    }
+
     return isValid;
   };
 
@@ -144,13 +161,31 @@ export default function PN11Form() {
     const isFormValid = validateForm();
 
     if (isFormValid) {
-      // const formData = setFinalFormData();
-      // console.log('formData: ',formData);
-      console.log('form valid');
-      
+      const formData = setFinalFormData();
+      console.log('formData: ',formData);
     } else {
       console.error('Form validation failed. Please check the form fields.');
     }
+  };
+
+  const setFinalFormData = () => {
+    console.log('--set form--');
+
+    const finalFormData: PN11 = {
+      firstname: formInput.firstname,
+      lastname: formInput.lastname,
+      studentId: formInput.studentId,
+      phone: formInput.phone,
+      faculty: formInput.faculty,
+      major: formInput.major,
+      email: formInput.email,
+      deliveryMethod: formRadio.deliveryMethod,
+      recipientName: formInput.recipientName,
+      recipientAddress: formInput.recipientAddress,
+      recipientPhone: formInput.recipientPhone,
+    };
+
+    return finalFormData;
   };
 
   return (
@@ -271,9 +306,7 @@ export default function PN11Form() {
             >
               สาขาวิชา
             </label>
-            <FormControl
-              className="flex w-full"
-            >
+            <FormControl className="flex w-full">
               <Select
                 name="major"
                 value={formInput.major}
@@ -314,7 +347,7 @@ export default function PN11Form() {
       </div>
       <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
         <h3
-          className={`mb-3 block text-lg font-semibold ${
+          className={`mb-3 block text-lg font-medium ${
             validationError.formRadio ? 'text-red-600' : 'text-gray-900'
           }`}
         >
@@ -325,7 +358,11 @@ export default function PN11Form() {
             validationError.formRadio ? ' text-red-600' : 'text-gray-900'
           }`}
         >
-          <div className="mb-6 grid gap-x-6 gap-y-3 md:grid-cols-2">
+          <div
+            className={`${
+              validationError.formRadio ? 'mb-0' : 'mb-6'
+            } grid gap-x-6 gap-y-3 md:grid-cols-2`}
+          >
             <div
               className={`flex items-center rounded border ${
                 validationError.formRadio ? 'border-red-600' : 'border-gray-200'

@@ -34,8 +34,6 @@ interface ValidationErrors {
 }
 
 export default function PN01Form() {
-  const [formData, setFormData] = useState<PN01>();
-
   const [isButton, setIsButton] = useState({
     submit: false,
     draft: false,
