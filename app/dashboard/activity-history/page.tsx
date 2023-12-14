@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import SearchIcon from '@mui/icons-material/Search';
 
 export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
@@ -15,6 +16,13 @@ export default async function Page({}: {}) {
       <div className="mt-4">
         <div className="mt-6 flex justify-start gap-4">
           <Link
+            href="dashboard\activity-history\history.tsx"
+            className="flex h-12 md:h-20 items-center rounded-lg bg-blue-600 px-4 text-lg font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            <span className="hidden md:block">ค้นหาประวัติกิจกรรม <br />Activity History Search</span>{' '}
+            <SearchIcon className="h-8 w-8 md:ml-2" />
+          </Link>
+          <Link
             href="/dashboard/activity-history/transcript"
             className="flex h-12 md:h-20 items-center rounded-lg bg-blue-600 px-4 text-lg font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
@@ -22,6 +30,7 @@ export default async function Page({}: {}) {
             <DescriptionOutlinedIcon className="h-8 w-8 md:ml-2" />
           </Link>
         </div>
+   
       </div>
     </div>
   );
