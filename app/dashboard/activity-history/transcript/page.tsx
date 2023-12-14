@@ -15,7 +15,7 @@ export default async function Page({}: {}) {
             { label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history' },
             {
               label: 'แบบร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
-              href: '/dashboard/activity-history/pn11',
+              href: '/dashboard/activity-history/transcript',
               active: true,
             },
           ]}

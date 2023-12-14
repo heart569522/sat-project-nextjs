@@ -13,5 +13,5 @@ export const lusitana = Lusitana({
 
 export const notoThai = Noto_Sans_Thai_Looped({
   subsets: ['thai'],
-  weight: ['400', '700'],
+  weight: ['400', '600', '700'],
 });
