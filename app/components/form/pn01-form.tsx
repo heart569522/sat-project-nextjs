@@ -2,10 +2,15 @@
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import {
   Checkbox,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   OutlinedInput,
+  Select,
   TextField,
   Tooltip,
 } from '@mui/material';
@@ -19,6 +24,15 @@ import { PN01 } from '@/app/model/pn01';
 import { Button } from '../button';
 import Link from 'next/link';
 
+interface ValidationError {
+  id: number;
+  error: string;
+}
+
+interface ValidationErrors {
+  [key: string]: ValidationError[];
+}
+
 export default function PN01Form() {
   const [formData, setFormData] = useState<PN01>();
 
@@ -31,8 +45,11 @@ export default function PN01Form() {
     [key: string]: string;
   }>({});
 
-  const [validationArrayError, setValidationArrayError] = useState<{
-    [key: string]: Array<{ id: number; error: string }>;
+  const [validationArrayError, setValidationArrayError] =
+    useState<ValidationErrors>({});
+
+  const [validationSelectError, setValidationSelectError] = useState<{
+    [key: string]: string;
   }>({});
 
   const [formInput, setFormInput] = useState({
@@ -222,9 +239,15 @@ export default function PN01Form() {
 
   const handleSelectChange = (event: any) => {
     const { value, name } = event.target;
+
     setSelectedValues((prevValues) => ({
       ...prevValues,
       [name]: value,
+    }));
+
+    setValidationSelectError((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
     }));
   };
 
@@ -297,17 +320,34 @@ export default function PN01Form() {
   };
 
   const deleteResponsibleRow = (id: number) => {
-    setResponsibleRows((prevRows) => {
-      const updatedRows = prevRows.filter((row) => row.id !== id);
+  setResponsibleRows((prevRows) => {
+    const updatedRows = prevRows.filter((row) => row.id !== id);
 
-      const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
-        ...row,
-        id: index + 1,
-      }));
+    const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+      ...row,
+      id: index + 1,
+    }));
 
-      return updatedRowsWithSequentialIds;
+    setValidationArrayError((prevErrors) => {
+      const updatedErrors = { ...prevErrors };
+
+      Object.keys(updatedErrors).forEach((key) => {
+        if (key.startsWith(`responsible_`) && updatedErrors[key].some((error) => error.id === id)) {
+          updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+
+          if (updatedErrors[key].length === 0) {
+            delete updatedErrors[key];
+          }
+        }
+      });
+
+      return updatedErrors;
     });
-  };
+
+    return updatedRowsWithSequentialIds;
+  });
+};
+  
 
   const deleteOIVTRow = (id: number) => {
     setOIVTRows((prevRows) => {
@@ -317,6 +357,22 @@ export default function PN01Form() {
         ...row,
         id: index + 1,
       }));
+
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`OIVT_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
 
       return updatedRowsWithSequentialIds;
     });
@@ -331,6 +387,22 @@ export default function PN01Form() {
         id: index + 1,
       }));
 
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`expectedResult_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
+
       return updatedRowsWithSequentialIds;
     });
   };
@@ -343,6 +415,22 @@ export default function PN01Form() {
         ...row,
         id: index + 1,
       }));
+
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`operationDuration_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
 
       return updatedRowsWithSequentialIds;
     });
@@ -357,6 +445,22 @@ export default function PN01Form() {
         id: index + 1,
       }));
 
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`projectSchedule_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
+
       return updatedRowsWithSequentialIds;
     });
   };
@@ -369,6 +473,22 @@ export default function PN01Form() {
         ...row,
         id: index + 1,
       }));
+
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`target_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
 
       return updatedRowsWithSequentialIds;
     });
@@ -383,6 +503,22 @@ export default function PN01Form() {
         id: index + 1,
       }));
 
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`budgetIncome_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
+
       return updatedRowsWithSequentialIds;
     });
   };
@@ -396,36 +532,53 @@ export default function PN01Form() {
         id: index + 1,
       }));
 
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+  
+        Object.keys(updatedErrors).forEach((key) => {
+          if (key.startsWith(`budgetExpense_`) && updatedErrors[key].some((error) => error.id === id)) {
+            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+  
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
+          }
+        });
+  
+        return updatedErrors;
+      });
+
       return updatedRowsWithSequentialIds;
     });
   };
 
-  const handleResponsibleChange = (
-    id: number,
-    field: string,
-    value: string,
-  ) => {
+  const handleResponsibleChange = (id: number, field: string, value: string) => {
     setResponsibleRows((prevRows) =>
-      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
-
+  
     setValidationArrayError((prevErrors) => {
-      const updatedErrors = {
-        ...prevErrors,
-        [field]: [
-          ...(prevErrors[field] || []),
-          { id, error: !value.trim() ? 'โปรดกรอกข้อมูล' : '' },
-        ],
-      };
-      console.log('Validation Errors:', updatedErrors);
-      return updatedErrors;
+      const key = `responsible_${field}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
     });
   };
+  
 
   const handleOIVTChange = (id: number, field: string, value: string) => {
     setOIVTRows((prevRows) =>
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `OIVT_${field}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleExpectedResultChange = (id: number, value: string) => {
@@ -434,6 +587,14 @@ export default function PN01Form() {
         row.id === id ? { ...row, expected_result: value } : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `expectedResult_expected_result`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleOperationDurationChange = (id: number, value: string) => {
@@ -442,6 +603,14 @@ export default function PN01Form() {
         row.id === id ? { ...row, operation_duration: value } : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `operationDuration_operation_duration`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleProjectScheduleChange = (id: number, event: any) => {
@@ -457,6 +626,14 @@ export default function PN01Form() {
           : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `projectSchedule_${name}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleTargetChange = (id: number, field: string, value: string) => {
@@ -467,6 +644,14 @@ export default function PN01Form() {
           : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `target_${field}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleBudgetIncomeChange = (
@@ -484,6 +669,14 @@ export default function PN01Form() {
           : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `budgetIncome_${field}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const handleBudgetExpenseChange = (
@@ -501,6 +694,14 @@ export default function PN01Form() {
           : row,
       ),
     );
+
+    setValidationArrayError((prevErrors) => {
+      const key = `budgetExpense_${field}`;
+      const specificErrors = prevErrors[key] || [];
+      const updatedErrors = specificErrors.filter((error) => error.id !== id);
+      const restErrors = { ...prevErrors, [key]: updatedErrors };
+      return restErrors;
+    });
   };
 
   const calculateTargetTotal = () => {
@@ -544,49 +745,39 @@ export default function PN01Form() {
     }
   };
 
-  const handleDraft = (event: any) => {
-    event.preventDefault();
-    isButton.draft = true;
-
-    if (isButton.draft) {
-      const formData = setFinalFormData();
-      console.log(formData);
-    }
-  };
-
   const validateArray = (
     array: Array<any>,
     fields: Array<string>,
-    prefix: string,
-  ) => {
+    prefix: string
+  ): boolean => {
     let isValid = true;
-
-    const errors: { [key: string]: Array<{ id: number; error: string }> } = {};
-
-    array.forEach((item, index) => {
+  
+    const errors: ValidationErrors = {};
+  
+    array.forEach((item) => {
       fields.forEach((field) => {
-        if (
-          !item[field] ||
-          (typeof item[field] === 'string' && item[field].trim() === '')
-        ) {
+        const key = `${prefix}_${field}` as keyof ValidationErrors;
+  
+        if (!item[field] || (typeof item[field] === 'string' && item[field].trim() === '')) {
           isValid = false;
-
-          const key = `${prefix}_${field}_${item.id}`;
-
-          errors[key] = [
-            ...(errors[key] || []),
-            { id: item.id, error: 'โปรดกรอกข้อมูล' },
-          ];
-
-          console.error(`${field} is required for item ${item.id}.`);
+  
+          errors[key] = errors[key] || [];
+          errors[key].push({ id: item.id, error: 'โปรดกรอกข้อมูล' });
+  
+          console.log(`${field} is required for item ${item.id}.`);
+          console.log('Validation errors:', errors);
+  
+          setValidationArrayError((prevErrors) => ({
+            ...prevErrors,
+            ...errors,
+          }));
         }
       });
     });
-
-    setValidationArrayError(errors);
-
+  
     return isValid;
   };
+  
 
   const validateForm = () => {
     let isValid = true;
@@ -607,6 +798,26 @@ export default function PN01Form() {
           setValidationError((prevErrors) => ({
             ...prevErrors,
             [key]: `โปรดกรอกข้อมูล`,
+          }));
+
+          console.error(`${key} is required.`);
+        }
+      }
+    }
+
+    // Validate Select
+    for (const key in selectedValues) {
+      if (Object.prototype.hasOwnProperty.call(selectedValues, key)) {
+        if (excludedFields.includes(key)) {
+          continue;
+        }
+        const value = selectedValues[key as keyof typeof selectedValues];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          isValid = false;
+
+          setValidationSelectError((prevErrors) => ({
+            ...prevErrors,
+            [key]: `โปรดเลือกข้อมูล`,
           }));
 
           console.error(`${key} is required.`);
@@ -663,11 +874,11 @@ export default function PN01Form() {
       responsibleFields,
       'responsible',
     );
-
     console.log('isResponsibleValid : ', isResponsibleValid);
 
     const OIVTFields = ['objective', 'indicator', 'value', 'tool'];
     const isOIVTValid = validateArray(OIVTRows, OIVTFields, 'OIVT');
+    console.log('isOIVTValid : ', isOIVTValid);
 
     const expectedResultFields = ['expected_result'];
     const isExpectedResultValid = validateArray(
@@ -683,7 +894,7 @@ export default function PN01Form() {
       'operationDuration',
     );
 
-    const projectScheduleFields = ['date', 'time', 'detail'];
+    const projectScheduleFields = ['detail'];
     const isProjectScheduleValid = validateArray(
       projectScheduleRows,
       projectScheduleFields,
@@ -721,14 +932,27 @@ export default function PN01Form() {
     return isValid;
   };
 
+  const handleDraft = (event: any) => {
+    event.preventDefault();
+    isButton.draft = true;
+
+    if (isButton.draft) {
+      const formData = setFinalFormData();
+      console.log('formData: ',formData);
+    }
+  };
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     isButton.submit = true;
 
+    // setValidationArrayError({});
+
     const isFormValid = validateForm();
 
     if (isButton.submit && isFormValid) {
-      console.log('Form is valid. Proceed with submission.');
+      const formData = setFinalFormData();
+      console.log('formData: ',formData);
     } else {
       console.error('Form validation failed. Please check the form fields.');
     }
@@ -905,23 +1129,9 @@ export default function PN01Form() {
                           className="flex w-full"
                           placeholder=""
                           value={row.firstname}
-                          onChange={(e) =>
-                            handleResponsibleChange(
-                              row.id,
-                              'firstname',
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError['firstname']?.find(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['firstname']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
+                          onChange={(e) => handleResponsibleChange(row.id, 'firstname', e.target.value)}
+                          error={Boolean(validationArrayError['responsible_firstname']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['responsible_firstname']?.find((item) => item.id === row.id)?.error || ''}
                         />
                         <TextField
                           type="text"
@@ -936,7 +1146,8 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          // required
+                          error={Boolean(validationArrayError['responsible_lastname']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['responsible_lastname']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -944,7 +1155,7 @@ export default function PN01Form() {
                       <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
                           type="text"
-                          id="res_position"
+                          name="position"
                           className="flex w-full"
                           placeholder=""
                           value={row.position}
@@ -955,7 +1166,8 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          // required
+                          error={Boolean(validationArrayError['responsible_position']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['responsible_position']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -963,7 +1175,7 @@ export default function PN01Form() {
                       <div className={`grid grid-cols-1 gap-6`}>
                         <TextField
                           type="text"
-                          id="res_work"
+                          name="work"
                           className="flex w-full"
                           placeholder=""
                           value={row.work}
@@ -974,6 +1186,8 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
+                          error={Boolean(validationArrayError['responsible_work']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['responsible_work']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -1008,132 +1222,221 @@ export default function PN01Form() {
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
           4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ
         </h3>
-        <div className="mb-6 grid gap-x-6 gap-y-3 md:grid-cols-2">
+        <div className="mb-6">
           <div>
             <label
-              htmlFor="strategicIssue"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.strategicIssue
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.1 ประเด็นยุทธศาสตร์ที่
             </label>
-            <select
-              name="strategicIssue"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.strategicIssue}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.strategicIssue)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="strategicIssue"
+                value={selectedValues.strategicIssue}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.strategicIssue}
+              </FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="objectivev"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.objective
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.2 เป้าประสงค์ที่
             </label>
-            <select
-              name="objective"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.objective}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.objective)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="objective"
+                value={selectedValues.objective}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>{validationSelectError.objective}</FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="universityStrategic"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.universityStrategic
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.3 กลยุทธ์ระดับมหาวิทยาลัยที่
             </label>
-            <select
-              name="universityStrategic"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.universityStrategic}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.universityStrategic)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="universityStrategic"
+                value={selectedValues.universityStrategic}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.universityStrategic}
+              </FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="strategicPlanKPI"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.strategicPlanKPI
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.4 ตัวชี้วัดแผนกลยุทธ์ที่
             </label>
-            <select
-              name="strategicPlanKPI"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.strategicPlanKPI}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.strategicPlanKPI)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="strategicPlanKPI"
+                value={selectedValues.strategicPlanKPI}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.strategicPlanKPI}
+              </FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="operationPlanKPI"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.operationPlanKPI
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.5 ตัวชี้วัดแผนปฏิบัติการที่
             </label>
-            <select
-              name="operationPlanKPI"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.operationPlanKPI}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.operationPlanKPI)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="operationPlanKPI"
+                value={selectedValues.operationPlanKPI}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.operationPlanKPI}
+              </FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="projectKPI"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.projectKPI
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.6 ตัวชี้วัดโครงการ
             </label>
-            <select
-              name="projectKPI"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.projectKPI}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.projectKPI)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="projectKPI"
+                value={selectedValues.projectKPI}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.projectKPI}
+              </FormHelperText>
+            </FormControl>
           </div>
           <div>
             <label
-              htmlFor="projectStatus"
-              className="mb-2 block text-base font-medium text-gray-900"
+              className={`mb-2 block text-base font-medium ${
+                validationSelectError.projectStatus
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              }`}
             >
               4.7 สถานะโครงการ
             </label>
-            <select
-              name="projectStatus"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-              value={selectedValues.projectStatus}
-              onChange={handleSelectChange}
+            <FormControl
+              className="flex w-full"
+              error={Boolean(validationSelectError.projectStatus)}
             >
-              <option value="">Choose a country</option>
-              <option value="US">United States</option>
-              <option value="CA">Canada</option>
-            </select>
+              <Select
+                name="projectStatus"
+                value={selectedValues.projectStatus}
+                onChange={handleSelectChange}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+              <FormHelperText>
+                {validationSelectError.projectStatus}
+              </FormHelperText>
+            </FormControl>
           </div>
         </div>
 
@@ -1626,7 +1929,13 @@ export default function PN01Form() {
         >
           6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
         </h3>
-        <div className="mb-6">
+        <div
+          className={`mb-6 ${
+            validationError.universityIndentity
+              ? ' text-red-600'
+              : 'text-gray-900'
+          }`}
+        >
           <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
             <div
               className={`flex items-center rounded border ${
@@ -1644,7 +1953,7 @@ export default function PN01Form() {
               />
               <label
                 htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                className="ms-2 w-full py-4 text-sm font-medium"
               >
                 คุณธรรมนำใจ
               </label>
@@ -1665,7 +1974,7 @@ export default function PN01Form() {
               />
               <label
                 htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                className="ms-2 w-full py-4 text-sm font-medium"
               >
                 รับใช้สังคม
               </label>
@@ -1686,7 +1995,7 @@ export default function PN01Form() {
               />
               <label
                 htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                className="ms-2 w-full py-4 text-sm font-medium"
               >
                 วิชาการก้าวหน้า
               </label>
@@ -1707,7 +2016,7 @@ export default function PN01Form() {
               />
               <label
                 htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium text-gray-900"
+                className="ms-2 w-full py-4 text-sm font-medium"
               >
                 พัฒนาสู่สากล
               </label>
@@ -1782,7 +2091,7 @@ export default function PN01Form() {
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             type="text"
-                            id="oivt_objective"
+                            name="objective"
                             className="flex w-full"
                             placeholder=""
                             value={row.objective}
@@ -1793,7 +2102,8 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['OIVT_objective']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['OIVT_objective']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
@@ -1801,7 +2111,7 @@ export default function PN01Form() {
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             type="text"
-                            id="oivt_indicator"
+                            name="indicator"
                             className="flex w-full"
                             placeholder=""
                             value={row.indicator}
@@ -1812,7 +2122,8 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['OIVT_indicator']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['OIVT_indicator']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
@@ -1820,14 +2131,15 @@ export default function PN01Form() {
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             type="text"
-                            id="oivt_value"
+                            name="value"
                             className="flex w-full"
                             placeholder=""
                             value={row.value}
                             onChange={(e) =>
                               handleOIVTChange(row.id, 'value', e.target.value)
                             }
-                            // required
+                            error={Boolean(validationArrayError['OIVT_value']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['OIVT_value']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
@@ -1835,14 +2147,15 @@ export default function PN01Form() {
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             type="text"
-                            id="oivt_tool"
+                            name="tool"
                             className="flex w-full"
                             placeholder=""
                             value={row.tool}
                             onChange={(e) =>
                               handleOIVTChange(row.id, 'tool', e.target.value)
                             }
-                            // required
+                            error={Boolean(validationArrayError['OIVT_tool']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['OIVT_tool']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
@@ -1899,7 +2212,8 @@ export default function PN01Form() {
                           onChange={(e) =>
                             handleExpectedResultChange(row.id, e.target.value)
                           }
-                          // required
+                          error={Boolean(validationArrayError['expectedResult_expected_result']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['expectedResult_expected_result']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -1960,7 +2274,8 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          // required
+                          error={Boolean(validationArrayError['operationDuration_operation_duration']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['operationDuration_operation_duration']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -2183,7 +2498,8 @@ export default function PN01Form() {
                                   onChange={(value) =>
                                     handleProjectScheduleChange(row.id, value)
                                   }
-                                  // required
+                                  error={Boolean(validationArrayError['projectSchedule_detail']?.some((item) => item.id === row.id))}
+                                  helperText={validationArrayError['projectSchedule_detail']?.find((item) => item.id === row.id)?.error || ''}
                                 />
                               </div>
                             </td>
@@ -2273,7 +2589,8 @@ export default function PN01Form() {
                           onChange={(e) =>
                             handleTargetChange(row.id, 'detail', e.target.value)
                           }
-                          // required
+                          error={Boolean(validationArrayError['target_detail']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['target_detail']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -2282,7 +2599,7 @@ export default function PN01Form() {
                         <TextField
                           hiddenLabel
                           type="number"
-                          id="count"
+                          name="count"
                           className="flex w-full"
                           placeholder=""
                           value={row.count}
@@ -2290,7 +2607,8 @@ export default function PN01Form() {
                             handleTargetChange(row.id, 'count', e.target.value)
                           }
                           onBlur={calculateTargetTotal}
-                          // required
+                          error={Boolean(validationArrayError['target_count']?.some((item) => item.id === row.id))}
+                          helperText={validationArrayError['target_count']?.find((item) => item.id === row.id)?.error || ''}
                         />
                       </div>
                     </td>
@@ -2406,7 +2724,7 @@ export default function PN01Form() {
                           <TextField
                             hiddenLabel
                             type="text"
-                            id="detail"
+                            name="detail"
                             className="flex w-full"
                             placeholder=""
                             value={row.detail}
@@ -2417,16 +2735,17 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetIncome_detail']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['budgetIncome_detail']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
+                        <div className={`grid grid-cols-1 gap-0`}>
                           <OutlinedInput
                             // hiddenLabel
                             type="number"
-                            id="amount"
+                            name="amount"
                             endAdornment={
                               <InputAdornment position="end">
                                 บาท
@@ -2442,8 +2761,13 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetIncome_amount']?.some((item) => item.id === row.id))}
                           />
+                          <FormHelperText className='text-red-700 ml-3'>
+                            {validationArrayError['budgetIncome_amount']?.find(
+                              (item) => item.id === row.id
+                            )?.error || ''}
+                          </FormHelperText>
                         </div>
                       </td>
                       <td className="bg-gray-50 px-6 py-4">
@@ -2451,7 +2775,7 @@ export default function PN01Form() {
                           <TextField
                             hiddenLabel
                             type="text"
-                            id="source"
+                            name="source"
                             className="flex w-full"
                             placeholder="งบประมาณ หมวด"
                             value={row.source}
@@ -2462,7 +2786,8 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetIncome_source']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['budgetIncome_source']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
@@ -2547,7 +2872,7 @@ export default function PN01Form() {
                           <TextField
                             hiddenLabel
                             type="text"
-                            id="detail"
+                            name="detail"
                             className="flex w-full"
                             placeholder=""
                             value={row.detail}
@@ -2558,16 +2883,17 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetExpense_detail']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['budgetExpense_detail']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
+                        <div className={`grid grid-cols-1 gap-0`}>
                           <OutlinedInput
                             // hiddenLabel
                             type="number"
-                            id="amount"
+                            name="amount"
                             endAdornment={
                               <InputAdornment position="end">
                                 บาท
@@ -2583,8 +2909,13 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetExpense_amount']?.some((item) => item.id === row.id))}
                           />
+                          <FormHelperText className='text-red-700 ml-3'>
+                            {validationArrayError['budgetExpense_amount']?.find(
+                              (item) => item.id === row.id
+                            )?.error || ''}
+                          </FormHelperText>
                         </div>
                       </td>
                       <td className="bg-gray-50 px-6 py-4">
@@ -2592,7 +2923,7 @@ export default function PN01Form() {
                           <TextField
                             hiddenLabel
                             type="text"
-                            id="note"
+                            name="note"
                             className="flex w-full"
                             placeholder=""
                             value={row.note}
@@ -2603,7 +2934,8 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            // required
+                            error={Boolean(validationArrayError['budgetExpense_note']?.some((item) => item.id === row.id))}
+                            helperText={validationArrayError['budgetExpense_note']?.find((item) => item.id === row.id)?.error || ''}
                           />
                         </div>
                       </td>
