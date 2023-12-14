@@ -5,6 +5,9 @@ import {
   HomeIcon,
   DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
+import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
+import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
+import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -19,8 +22,10 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
-  { name: 'Test', href: '/dashboard/test', icon: DocumentDuplicateIcon},
-  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: DocumentDuplicateIcon}
+  { name: 'เสนอโครงการ/กิจกรรม', href: '/dashboard/project-proposal', icon: DocumentDuplicateIcon},
+  { name: 'บันทึกการเข้าร่วมโครการ/กิจกรรม', href: '/dashboard/activity-record', icon: ContactPageOutlinedIcon},
+  { name: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history', icon: FindInPageOutlinedIcon},
+  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: LoginOutlinedIcon}
 ];
 
 export default function NavLinks() {
