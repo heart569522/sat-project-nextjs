@@ -172,6 +172,7 @@ export default function PN11Form() {
     console.log('--set form--');
 
     const finalFormData: PN11 = {
+      date: new Date().toISOString(),
       firstname: formInput.firstname,
       lastname: formInput.lastname,
       studentId: formInput.studentId,

@@ -10,6 +10,11 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import { FormHelperText, MenuItem, Select } from '@mui/material';
+import faculties from '@/app/model/faculties';
+import majors from '@/app/model/majors';
+import Link from 'next/link';
+import { Button } from '../button';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -49,6 +54,60 @@ export default function Form() {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const [formInput, setFormInput] = useState({
+    firstname: '',
+    lastname: '',
+    studentId: '',
+    phone: '',
+    major: '',
+    faculty: '',
+    email: '',
+    username: '',
+    password: '',
+  });
+
+  const [formRadio, setFormRadio] = useState({
+    formRole: '',
+  });
+  const isStudent = formRadio.formRole == 'student';
+
+  const [validationError, setValidationError] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const handleFacultyChange = (event: { target: { value: any } }) => {
+    const facultyValue = event.target.value;
+    setFormInput((prevInput) => ({
+      ...prevInput,
+      faculty: facultyValue,
+      major: '', // Reset major when changing faculty
+    }));
+    setValidationError((prevError) => ({ ...prevError, faculty: '' }));
+  };
+
+  const handleMajorChange = (event: { target: { value: any } }) => {
+    const majorValue = event.target.value;
+    setFormInput((prevInput) => ({ ...prevInput, major: majorValue }));
+    setValidationError((prevError) => ({ ...prevError, major: '' }));
+  };
+
+  const handleRadioChange = (event: {
+    target: { name: string; value: string };
+  }) => {
+    const { name, value } = event.target;
+
+    setFormRadio((prevTypes) => ({
+      ...prevTypes,
+      [name]: value,
+    }));
+
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      formRadio: '',
+    }));
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -102,22 +161,46 @@ export default function Form() {
           <FormLabel id="demo-row-radio-buttons-group-label">
             เลือกตำแหน่ง
           </FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="demo-row-radio-buttons-group-label"
-            name="row-radio-buttons-group"
+          <div
+            className={`${
+              validationError.formRadio ? 'mb-0' : 'mb-6'
+            } grid gap-x-6 gap-y-3 md:grid-cols-2`}
           >
-            <FormControlLabel
-              value="อาจารย์"
-              control={<Radio />}
-              label="อาจารย์"
-            />
-            <FormControlLabel
-              value="นักศึกษา"
-              control={<Radio />}
-              label="นักศึกษา"
-            />
-          </RadioGroup>
+            <div
+              className={`flex items-center rounded border ${
+                validationError.formRadio ? 'border-red-600' : 'border-gray-200'
+              } ps-4`}
+            >
+            <div className="grid grid-cols-2">
+              <div>
+              <input
+                name="formRole"
+                type="radio"
+                value="teacher"
+                checked={formRadio.formRole === 'teacher'}
+                onChange={handleRadioChange}
+                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+              />
+              <label className="ms-2 w-full py-4 text-sm font-medium">
+                อาจารย์
+              </label>
+              </div>
+              <div>
+              <input
+                name="formRole"
+                type="radio"
+                value="student"
+                checked={formRadio.formRole === 'student'}
+                onChange={handleRadioChange}
+                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+              />
+              <label className="ms-2 w-full py-4 text-sm font-medium">
+                นักศึกษา
+              </label>
+              </div>
+              </div>
+            </div>
+          </div>
         </FormControl>
         <form action="" className="grid grid-cols-2">
           <div className="grid grid-cols-2">
@@ -132,7 +215,7 @@ export default function Form() {
                 className="mb-3 block w-full appearance-none rounded border bg-white py-3 leading-tight text-gray-700 focus:bg-white focus:outline-none"
                 id="grid-first-name"
                 type="text"
-                placeholder="Jane"
+                placeholder="ชื่อจริง"
               />
             </div>
             <div className="mb-6 w-full md:mb-0 md:ps-2">
@@ -146,9 +229,25 @@ export default function Form() {
                 className="mb-3 block w-full appearance-none rounded border bg-white py-3 leading-tight text-gray-700 focus:bg-white focus:outline-none"
                 id="grid-last-name"
                 type="text"
-                placeholder="Jane"
+                placeholder="นามสกุลจริง"
               />
             </div>
+            {isStudent && (
+              <div className="col-span-2 mb-6 w-full md:mb-0 md:ps-2">
+                <label
+                  className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
+                  htmlFor="username"
+                >
+                  รหัสนักศึกษา
+                </label>
+                <input
+                  className="mb-3 block w-full appearance-none rounded border bg-white py-3 leading-tight text-gray-700 focus:bg-white focus:outline-none"
+                  id="username"
+                  type="number"
+                  placeholder="รหัสนักศึกษา 10 ตัว"
+                />
+              </div>
+            )}
             <div className="col-span-2 mb-6 w-full md:mb-0 md:ps-2">
               <label
                 className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
@@ -160,7 +259,7 @@ export default function Form() {
                 className="mb-3 block w-full appearance-none rounded border bg-white py-3 leading-tight text-gray-700 focus:bg-white focus:outline-none"
                 id="username"
                 type="text"
-                placeholder="Username"
+                placeholder="ชื่อผู้ใช้งาน"
               />
             </div>
             <div className="col-span-2 mb-6 w-full md:mb-0 md:ps-2">
@@ -185,7 +284,7 @@ export default function Form() {
                 ยืนยันรหัสผ่าน
               </label>
               <input
-                className="mb-3 block w-full appearance-none rounded borderbg-white px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
+                className="borderbg-white mb-3 block w-full appearance-none rounded px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
                 id="grid-comfirm-password"
                 type="password"
                 placeholder="********"
@@ -193,24 +292,94 @@ export default function Form() {
             </div>
           </div>
           <div className="grid grid-cols-1">
-          <div className="w-80 px-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-tel">
-            เบอร์โทร์
-          </label>
-          <input className="appearance-none block w-full bg-white text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-tel" type="tel" placeholder="000-000000" />
+            <div className="w-80 px-3">
+              <label
+                className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
+                htmlFor="grid-tel"
+              >
+                เบอร์โทร์
+              </label>
+              <input
+                className="block w-full appearance-none rounded border bg-white px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
+                id="grid-tel"
+                type="tel"
+                placeholder="000-000000"
+              />
+            </div>
+            <div className="w-80 px-3">
+              <label
+                className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
+                htmlFor="grid-email"
+              >
+                อีเมล
+              </label>
+              <input
+                className="block w-full appearance-none rounded border bg-white px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
+                id="grid-email"
+                type="email"
+                placeholder="example@exammail.com"
+              />
+            </div>
+            <div className="w-80 px-3">
+              <label
+                className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
+                htmlFor="grid-email"
+              >
+                คณะ
+              </label>
+              <FormControl
+                className="w-full appearance-none rounded border px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none"
+                error={Boolean(validationError.faculty)}
+              >
+                <Select
+                  className="bg-white"
+                  name="faculty"
+                  value={formInput.faculty}
+                  onChange={handleFacultyChange}
+                >
+                  {faculties.map((faculty) => (
+                    <MenuItem key={faculty} value={faculty}>
+                      {faculty}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>{validationError.faculty}</FormHelperText>
+              </FormControl>
+            </div>
+            <div className="w-80 px-3">
+              <label
+                htmlFor="major"
+                className={`mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700`}
+              >
+                สาขาวิชา
+              </label>
+              <FormControl className="w-full appearance-none rounded border px-4 py-3 leading-tight text-gray-700 focus:border-gray-500 focus:bg-white focus:outline-none">
+                <Select
+                  className="bg-white"
+                  name="major"
+                  value={formInput.major}
+                  onChange={handleMajorChange}
+                  disabled={!formInput.faculty}
+                >
+                  {majors[formInput.faculty as keyof typeof majors]?.map(
+                    (major) => (
+                      <MenuItem key={major} value={major}>
+                        {major}
+                      </MenuItem>
+                    ),
+                  )}
+                </Select>
+              </FormControl>
+            </div>
           </div>
-          <div className="w-80 px-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-email">
-            อีเมล
-          </label>
-          <input className="appearance-none block w-full bg-white text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-email" type="email" placeholder="example@exammail.com" />
-          </div>
-          <div className="w-80 px-3">
-          <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" htmlFor="grid-email">
-            คณะ
-          </label>
-          <input className="appearance-none block w-full bg-white text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-email" type="email" placeholder="example@exammail.com" />
-          </div>
+          <div className="mt-6 flex justify-end gap-4">
+            <Link
+              href="/dashboard/login-register"
+              className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+            >
+              ยกเลิก
+            </Link>
+            <Button type="submit">สมัครสมาชิก</Button>
           </div>
         </form>
       </CustomTabPanel>

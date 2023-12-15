@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import SearchIcon from '@mui/icons-material/Search';
+import Search from '@/app/components/search';
+import { CreateRequestTranscript } from '@/app/components/invoices/buttons';
+import Pagination from '@/app/components/invoices/pagination';
+import Table from '@/app/components/history-activity/table';
 
 export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
@@ -14,23 +15,15 @@ export default async function Page({}: {}) {
         <h1 className={`text-2xl`}>ประวัติการเข้าร่วมโครงการ/กิจกรรม</h1>
       </div>
       <div className="mt-4">
-        <div className="mt-6 flex justify-start gap-4">
-          <Link
-            href="/dashboard/activity-history/history"
-            className="flex h-12 md:h-20 items-center rounded-lg bg-blue-600 px-4 text-lg font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-          >
-            <span className="hidden md:block">ค้นหาประวัติกิจกรรม <br />Activity History Search</span>{' '}
-            <SearchIcon className="h-8 w-8 md:ml-2" />
-          </Link>
-          <Link
-            href="/dashboard/activity-history/transcript"
-            className="flex h-12 md:h-20 items-center rounded-lg bg-blue-600 px-4 text-lg font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-          >
-            <span className="hidden md:block">ร้องขอระเบียนกิจกรรม <br />Activity Transcript</span>{' '}
-            <DescriptionOutlinedIcon className="h-8 w-8 md:ml-2" />
-          </Link>
+        <div className="flex items-center justify-between gap-2 md:mt-8">
+          <CreateRequestTranscript />
+          <Search placeholder="ค้นหาประวัติการเข้าร่วมกิจกรรม" />
         </div>
-   
+        <Table />
+        {/* <Table query={null} currentPage={currentPage} /> */}
+        {/* <div className="mt-5 flex w-full justify-center">
+          <Pagination totalPages={null} />
+        </div> */}
       </div>
     </div>
   );
