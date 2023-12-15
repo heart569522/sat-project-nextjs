@@ -1,14 +1,23 @@
 import { Metadata } from 'next';
-
+import Breadcrumbs from '@/app/components/invoices/breadcrumbs';
 export const metadata: Metadata = {
-  title: 'คำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
+  title: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรมนักศึกษา',
 };
 
 export default async function Page({}: {}) {
   return (
     <>
       <div>
-        <h1>Hello World</h1>
+      <Breadcrumbs
+          breadcrumbs={[
+            { label: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history' },
+            {
+              label: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม',
+              href: '/dashboard/activity-history/history',
+              active: true,
+            },
+          ]}
+        />
       </div>
     </>
   );
