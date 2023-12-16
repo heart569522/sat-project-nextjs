@@ -695,7 +695,15 @@ export default function PN01Paper() {
               </p>
             </div>
           </article>
-          <figure></figure>
+          <figure>
+            <Image
+              src="/pn01-lastpage.png"
+              width={1654}
+              height={2339}
+              className="h-full w-full"
+              alt="last-page"
+            />
+          </figure>
         </div>
       </div>
     </section>
