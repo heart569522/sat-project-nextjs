@@ -7,6 +7,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${sarabun.className}`}>{children}</div>
+    <main className={`${sarabun.className}`}>{children}</main>
   );
 }

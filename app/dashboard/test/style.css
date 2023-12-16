@@ -1,13 +1,12 @@
-.online-view-v1 {
-  width: 794px; /* Width of A4 */
+.box-area {
+  width: 794px;
   margin: auto auto auto auto;
-  /* font-size: 20px; */
   padding: 0px !important;
   line-height: 32px;
   position: relative;
 }
 
-.online-scope {
+.box {
   margin: 20px auto;
   width: 900px;
   background: #fff;
@@ -23,7 +22,6 @@
 }
 
 .container {
-  /* background: #aaaaaa; */
   padding-right: 10%;
   padding-left: 10%;
   margin-right: auto;
@@ -37,7 +35,7 @@
   margin-left: auto;
 }
 
-.online-view-v1 {
+.box-area {
   position: relative;
 }
 
@@ -59,7 +57,6 @@
 
   .container {
     background: #ffffff;
-    /* You may want a white background for printing */
     padding-right: 0;
     padding-left: 0;
     margin-right: 0;
@@ -71,17 +68,15 @@
     margin: 5mm;
   }
 
-  .online-view-v1 {
+  .box-area {
     margin: 0 auto !important;
     border: 0 !important;
     box-shadow: none !important;
     height: 100%;
-    /* width: 100%; */
-    /* font-size: 1rem; */
     width: 100% !important;
   }
 
-  .online-scope {
+  .box {
     margin: 0px !important;
     max-height: 100% !important;
     overflow: hidden;
