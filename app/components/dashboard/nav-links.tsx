@@ -25,7 +25,8 @@ const links = [
   { name: 'เสนอโครงการ/กิจกรรม', href: '/dashboard/project-proposal', icon: DocumentDuplicateIcon},
   { name: 'บันทึกการเข้าร่วมโครการ/กิจกรรม', href: '/dashboard/activity-record', icon: ContactPageOutlinedIcon},
   { name: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history', icon: FindInPageOutlinedIcon},
-  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: LoginOutlinedIcon}
+  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: LoginOutlinedIcon},
+  { name: 'test', href: '/dashboard/test', icon: DocumentDuplicateIcon}
 ];
 
 export default function NavLinks() {
