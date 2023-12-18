@@ -1,0 +1,134 @@
+{
+  "faculty": "urtuir",
+  "projectName": "asdfasdf",
+  "projectHead": "asdfuyiortyuasdf",
+  "projectHeadPhone": "65426a5sdf",
+  "principleReason": "tyuyu",
+  "projectLocation": "sdfrttrtrttrtytygsdfg",
+  "projectDatetime": "2024-08-08T22:51:00.000Z",
+  "lecturer": "cvbsdfgsdfg sdfgsdfgsdfg",
+  "improvement": "asdtawfggnxcvbxcgsdrtgsdrg",
+  "strategicIssue": 10,
+  "objective": 20,
+  "universityStrategic": 10,
+  "strategicPlanKPI": 30,
+  "operationPlanKPI": 20,
+  "projectKPI": 20,
+  "projectStatus": 30,
+  "responsibleRows": [
+    {
+      "id": 1,
+      "firstname": "asdf",
+      "lastname": "asdf",
+      "position": "asdf",
+      "work": "6"
+    }
+  ],
+  "OIVTRows": [
+    {
+      "id": 1,
+      "objective": "sdfg",
+      "indicator": "sdfg",
+      "value": "sdfg",
+      "tool": "sdfg"
+    }
+  ],
+  "expectedResultRows": [
+    {
+      "id": 1,
+      "expected_result": "ด่กดเ้กดเกหเฎ"
+    },
+    {
+      "id": 2,
+      "expected_result": "ฟหำพไำพไำ"
+    }
+  ],
+  "operationDurationRows": [
+    {
+      "id": 1,
+      "operation_duration": "sdrtye"
+    }
+  ],
+  "projectScheduleRows": [
+    {
+      "id": 1,
+      "date": "2024-02-11T17:00:00.000Z",
+      "time": "2023-12-17T01:09:00.000Z",
+      "detail": "sdfgsdfg"
+    }
+  ],
+  "targetTotal": "115",
+  "targetRows": [
+    {
+      "id": 1,
+      "detail": "sdfgsdfg",
+      "count": 55
+    },
+    {
+      "id": 2,
+      "detail": "wwerwer",
+      "count": 60
+    }
+  ],
+  "budgetIncomeTotal": "103,848",
+  "budgetIncomeRows": [
+    {
+      "id": 1,
+      "detail": "sdfgsdfgsdfgsdfg",
+      "amount": "5000",
+      "source": "sdfgsdfg68"
+    },
+    {
+      "id": 2,
+      "detail": "rtywer",
+      "amount": "98848",
+      "source": "sdfgert"
+    }
+  ],
+  "budgetExpenseTotal": "74,566",
+  "budgetExpenseRows": [
+    {
+      "id": 1,
+      "detail": "asdfsdfgsfdg",
+      "amount": "54444",
+      "note": "werwer"
+    },
+    {
+      "id": 2,
+      "detail": "ssss",
+      "amount": "20122",
+      "note": "wer6"
+    }
+  ],
+  "projectTypes": {
+    "maintenance": true,
+    "academicService": false,
+    "knowledgeManagement": false,
+    "researchPromotion": false,
+    "educationQualityAssurance": false,
+    "personnelDevelopment": false,
+    "riskManagement": true,
+    "studentDevelopment": true,
+    "moralEthical": false,
+    "academicPromotion": false,
+    "knowledge": false,
+    "environment": false,
+    "intellectualSkill": false,
+    "sport": false,
+    "knowledgeAnalysisCommunicationTechnology": false,
+    "artCultureDevelopment": false,
+    "numericalAnalysisCommunicationTechnology": false,
+    "moralEthicalDevelopment": true,
+    "leadershipDevelopment": false,
+    "subOther": true,
+    "subOtherDetail": "asfdqwer",
+    "other": false,
+    "otherDetail": ""
+  },
+  "universityIndentity": {
+    "moral": true,
+    "serve": true,
+    "academic": true,
+    "develop": false
+  }
+}

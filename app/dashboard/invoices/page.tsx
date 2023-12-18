@@ -1,5 +1,5 @@
 import Pagination from '@/app/components/invoices/pagination';
-import Search from '@/app/components/search';
+import SearchAuto from '@/app/components/search-box/search-auto';
 import Table from '@/app/components/invoices/table';
 import { CreateInvoice } from '@/app/components/invoices/buttons';
 import { InvoicesTableSkeleton } from '@/app/components/skeletons';
@@ -31,7 +31,7 @@ export default async function Page({
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <CreateInvoice />
-        <Search placeholder="Search invoices..." />
+        <SearchAuto placeholder="Search invoices..." />
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />

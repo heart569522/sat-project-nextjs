@@ -2,32 +2,53 @@
 import Image from 'next/image';
 import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
-import { useEffect, useRef } from 'react';
+import { PN01 } from '@/app/model/pn01';
+import { useState } from 'react';
+import { ThaiBaht } from 'thai-baht-text-ts';
+import moment from 'moment-timezone';
 
-export default function PN01Paper() {
-  const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
+  const [data, setData] = useState<PN01>(dataPaper);
 
-  useEffect(() => {
-    const paragraph = paragraphRef.current;
-
-    if (paragraph) {
-      const text = `ในการนี้จึงเรียนมาเพื่อขออนุมัติจัดโครงการ...และขออนุมัติงบประมาณเพื่อดำเนินโครงการจำนวน...บาท (...บาทถ้วน)`;
-      const lines = text.split('\n');
-      if (lines.length > 1) {
-        paragraph.innerHTML = lines
-          .map((line, index) => {
-            const isFirstLine = index === 0;
-            const lineClass = isFirstLine
-              ? 'whitespace-normal pl-10'
-              : 'whitespace-normal pl-0';
-            return `<span class="${lineClass}">${line}</span>`;
-          })
-          .join('<br>');
-      } else {
-        paragraph.innerHTML = `<span class="whitespace-normal pl-10">${text}</span>`;
-      }
+  const convertStringToThaiBathText = (value: string | undefined) => {
+    const numberValue = Number(value?.replace(/,/g, ''));
+    if (isNaN(numberValue)) {
+      console.error('Invalid numeric value');
+      return null;
     }
-  }, []);
+    return ThaiBaht(numberValue);
+  };
+
+  const convertISOStringToDateText = (value: any) => {
+    const formattedDate = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date(value));
+    return formattedDate;
+  };
+
+  const convertISOStringToTimeText = (value: any) => {
+    const formattedTime = moment(value).tz('Asia/Bangkok').format('HH:mm น.');
+    return formattedTime;
+  };
+
+  const convertISOStringToDateTimeText = (value: any) => {
+    const momentDateTime = moment(value).tz('Asia/Bangkok');
+    const formattedDate = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(momentDateTime.toDate());
+    const formattedTime = momentDateTime.format('HH:mm');
+    const formattedDateTime = `${formattedDate} ${formattedTime} น.`;
+    return formattedDateTime;
+  };
+
+  const convertToLocaleString = (value: any) => {
+    const formattedAmount = Number(value).toLocaleString('en-US');
+    return formattedAmount
+  }
 
   return (
     <section className={`box text-black`}>
@@ -78,7 +99,7 @@ export default function PN01Paper() {
               <label className={`font-semibold`}>
                 1.&nbsp;&nbsp;&nbsp;ชื่อคณะ/วิทยาลัย/หน่วยงาน:
               </label>
-              <p>แพนนนนน</p>
+              <p>{data.faculty}</p>
             </div>
           </article>
           <article>
@@ -86,7 +107,7 @@ export default function PN01Paper() {
               <label className={`font-semibold`}>
                 2.&nbsp;&nbsp;&nbsp;ชื่อโครงการ:
               </label>
-              <p>ยานนนนน</p>
+              <p>{data.projectName}</p>
             </div>
           </article>
           <article>
@@ -94,11 +115,11 @@ export default function PN01Paper() {
               <label className={`font-semibold`}>
                 3.&nbsp;&nbsp;&nbsp;ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ:
               </label>
-              <p>หาดเกก</p>
+              <p>{data.projectHead}</p>
             </div>
             <div className="flex gap-x-3 py-2 pl-28 text-sm">
               <label className="font-semibold">หมายเลขโทรศัพท์:</label>
-              <p>0885469875</p>
+              <p>{data.projectHeadPhone}</p>
             </div>
             <div className="mb-1 flex justify-center">
               <table className="w-[95%] border border-black">
@@ -119,16 +140,22 @@ export default function PN01Paper() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="text-sm">
-                    <td className="border border-black px-2 py-1 text-center">
-                      1
-                    </td>
-                    <td className="border border-black px-2 py-1">ยาน ดาส</td>
-                    <td className="border border-black px-2 py-1">นาา</td>
-                    <td className="border border-black px-2 py-1  text-center">
-                      3
-                    </td>
-                  </tr>
+                  {data.responsibleRows?.map((row) => (
+                    <tr className="text-sm" key={row.id}>
+                      <td className="border border-black px-2 py-1 text-center">
+                        {row.id}
+                      </td>
+                      <td className="border border-black px-2 py-1">
+                        {row.firstname}&nbsp;{row.lastname}
+                      </td>
+                      <td className="border border-black px-2 py-1">
+                        {row.position}
+                      </td>
+                      <td className="border border-black px-2 py-1 text-center">
+                        {row.work}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -216,50 +243,71 @@ export default function PN01Paper() {
             <div className="pl-6">
               <div className="grid grid-cols-2">
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.maintenance ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนทำนุบำรุงศิลปวัฒนธรรม
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.academicService ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนบริการวิชาการ
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.knowledgeManagement ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการจัดการความรู้
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.researchPromotion ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการส่งเสริมงานวิจัย
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.educationQualityAssurance ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการประกันคุณภาพการศึกษา
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.personnelDevelopment ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนพัฒนาบุคลากร
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.riskManagement ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     แผนบริหารความเสี่ยง
                   </label>
@@ -267,8 +315,11 @@ export default function PN01Paper() {
               </div>
 
               <div className="flex gap-x-1 py-1 text-sm">
-                {/* <CheckBoxOutlineBlankOutlinedIcon /> */}
-                <CheckBoxOutlinedIcon />
+                {data.projectTypes?.studentDevelopment ? (
+                  <CheckBoxOutlinedIcon />
+                ) : (
+                  <CheckBoxOutlineBlankOutlinedIcon />
+                )}
                 <label className="flex whitespace-nowrap pl-3">
                   แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา
                   <p className="font-semibold">
@@ -278,95 +329,142 @@ export default function PN01Paper() {
               </div>
               <div className="grid grid-cols-2 pl-9">
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.moralEthical ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     ด้านคุณธรรม จริยธรรม
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.academicPromotion ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.knowledge ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">ด้านความรู้</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.environment ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.intellectualSkill ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     ด้านทักษะทางปัญญา
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.sport ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมกีฬา และการส่งเสริมสุขภาพ
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes
+                    ?.knowledgeAnalysisCommunicationTechnology ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-normal pl-3">
                     ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.artCultureDevelopment ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes
+                    ?.numericalAnalysisCommunicationTechnology ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-normal pl-3">
                     ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร
                     และการใช้เทคโนโลยี
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.projectTypes?.moralEthicalDevelopment ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
+                  {data.projectTypes?.subOther ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     อื่นๆ (โปรดระบุ)
                   </label>
-                  <p className="whitespace-normal">...</p>
+                  <p className="whitespace-normal">
+                    {data.projectTypes?.subOtherDetail}
+                  </p>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  {/* <CheckBoxOutlineBlankOutlinedIcon /> */}
-                  <CheckBoxOutlinedIcon />
+                  {data.projectTypes?.leadershipDevelopment ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
                   </label>
                 </div>
               </div>
               <div className="flex gap-x-1 py-1 text-sm">
-                <CheckBoxOutlineBlankOutlinedIcon />
+                {data.projectTypes?.other ? (
+                  <CheckBoxOutlinedIcon />
+                ) : (
+                  <CheckBoxOutlineBlankOutlinedIcon />
+                )}
                 <label className="whitespace-nowrap pl-3">
                   อื่นๆ (โปรดระบุ)
                 </label>
-                <p className="whitespace-normal">...</p>
+                <p className="whitespace-normal">
+                  {data.projectTypes?.otherDetail}
+                </p>
               </div>
             </div>
           </article>
@@ -379,25 +477,37 @@ export default function PN01Paper() {
             <div className="px-10">
               <div className="grid grid-cols-4">
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.universityIndentity?.moral ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-1">คุณธรรมนำใจ</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.universityIndentity?.serve ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-1">รับใช้สังคม</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.universityIndentity?.academic ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-1">
                     วิชาการก้าวหน้า
                   </label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  <CheckBoxOutlineBlankOutlinedIcon />
-                  {/* <CheckBoxOutlinedIcon /> */}
+                  {data.universityIndentity?.develop ? (
+                    <CheckBoxOutlinedIcon />
+                  ) : (
+                    <CheckBoxOutlineBlankOutlinedIcon />
+                  )}
                   <label className="whitespace-nowrap pl-1">พัฒนาสู่สากล</label>
                 </div>
               </div>
@@ -411,9 +521,7 @@ export default function PN01Paper() {
             </div>
             <div className="pl-6">
               <div className="flex gap-x-3 py-1 text-sm">
-                <p className="whitespace-normal">
-                  โครงการที่ดำเนินการเองในแผนปฏิบัติการของหน่วยงาน/คณะวิชา
-                </p>
+                <p className="whitespace-normal">{data.principleReason}</p>
               </div>
             </div>
           </article>
@@ -444,12 +552,22 @@ export default function PN01Paper() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="text-sm">
-                    <td className="border border-black px-2 py-1">แงง</td>
-                    <td className="border border-black px-2 py-1">แงง</td>
-                    <td className="border border-black px-2 py-1">แงง</td>
-                    <td className="border border-black px-2 py-1">แงง</td>
-                  </tr>
+                  {data.OIVTRows?.map((row) => (
+                    <tr className="text-sm" key={row.id}>
+                      <td className="border border-black px-2 py-1">
+                        {row.objective}
+                      </td>
+                      <td className="border border-black px-2 py-1">
+                        {row.indicator}
+                      </td>
+                      <td className="border border-black px-2 py-1">
+                        {row.tool}
+                      </td>
+                      <td className="border border-black px-2 py-1">
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -461,10 +579,14 @@ export default function PN01Paper() {
               </label>
             </div>
             <div className="pl-6">
-              <div className="flex gap-x-1 py-1 text-sm">
-                <label className="whitespace-nowrap">9.1&nbsp;&nbsp;</label>
-                <p className="whitespace-normal">...</p>
-              </div>
+              {data.expectedResultRows?.map((row) => (
+                <div className="flex gap-x-1 py-1 text-sm" key={row.id}>
+                  <label className="whitespace-nowrap">
+                    9.{row.id}&nbsp;&nbsp;
+                  </label>
+                  <p className="whitespace-normal">{row.expected_result}</p>
+                </div>
+              ))}
             </div>
           </article>
           <article>
@@ -474,10 +596,14 @@ export default function PN01Paper() {
               </label>
             </div>
             <div className="pl-6">
-              <div className="flex gap-x-1 py-1 text-sm">
-                <label className="whitespace-nowrap">10.1&nbsp;&nbsp;</label>
-                <p className="whitespace-normal">...</p>
-              </div>
+              {data.operationDurationRows?.map((row) => (
+                <div className="flex gap-x-1 py-1 text-sm" key={row.id}>
+                  <label className="whitespace-nowrap">
+                    10.{row.id}&nbsp;&nbsp;
+                  </label>
+                  <p className="whitespace-normal">{row.operation_duration}</p>
+                </div>
+              ))}
             </div>
           </article>
           <article>
@@ -491,15 +617,17 @@ export default function PN01Paper() {
                 <label className="whitespace-nowrap">
                   11.1&nbsp;&nbsp;สถานที่จัดโครงการ
                 </label>
-                <p className="whitespace-normal">...</p>
+                <p className="whitespace-normal">{data.projectLocation}</p>
               </div>
               <div className="flex gap-x-1 py-1 text-sm">
                 <label className="whitespace-nowrap">
                   11.2&nbsp;&nbsp;วัน/เวลา ที่จัดโครงการ
                 </label>
-                <p className="whitespace-normal">...</p>
+                <p className="whitespace-normal">
+                  {convertISOStringToDateTimeText(data.projectDatetime)}
+                </p>
               </div>
-              <div className="flex gap-x-1 py-2 text-sm">
+              <div className="flex gap-x-1 py-1 text-sm">
                 <label className="whitespace-nowrap">
                   11.3&nbsp;&nbsp;กำหนดการ (โดยละเอียด)
                 </label>
@@ -518,15 +646,19 @@ export default function PN01Paper() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="text-sm">
-                      <td className="border border-black px-2 py-1">
-                        12/12/2566
-                      </td>
-                      <td className="border border-black px-2 py-1">
-                        08:00 - 16:00
-                      </td>
-                      <td className="border border-black px-2 py-1">แงง</td>
-                    </tr>
+                    {data.projectScheduleRows?.map((row) => (
+                      <tr className="text-sm" key={row.id}>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {convertISOStringToDateText(row.date)}
+                        </td>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {convertISOStringToTimeText(row.time)}
+                        </td>
+                        <td className="border border-black px-2 py-1">
+                          {row.detail}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -537,7 +669,7 @@ export default function PN01Paper() {
               <label className={`font-semibold`}>
                 12.&nbsp;&nbsp;&nbsp;วิทยากร (ถ้ามี)
               </label>
-              <p className="whitespace-normal">...</p>
+              <p className="whitespace-normal">{data.lecturer}</p>
             </div>
           </article>
           <article>
@@ -545,18 +677,24 @@ export default function PN01Paper() {
               <label className={`font-semibold`}>
                 13.&nbsp;&nbsp;&nbsp;ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
               </label>
-              <p className="whitespace-normal">(รวมจำนวน ... คน)</p>
+              <p className="whitespace-normal">
+                (รวมจำนวน {data.targetTotal} คน)
+              </p>
             </div>
             <div className="mb-1 flex justify-center">
               <table className="w-[95%]">
                 <tbody>
-                  <tr className="text-sm">
-                    <td className="w-[8%] px-2 py-1">13.1</td>
-                    <td className="w-[62%] px-2 py-1">....</td>
-                    <td className="w-[10%] px-2 py-1 text-center">จำนวน</td>
-                    <td className="w-[12%] px-2 py-1 text-center">...</td>
-                    <td className="w-[8%]px-2 py-1 text-center">คน</td>
-                  </tr>
+                  {data.targetRows?.map((row) => (
+                    <tr className="text-sm" key={row.id}>
+                      <td className="w-[8%] px-2 py-1">13.{row.id}</td>
+                      <td className="w-[62%] px-2 py-1">{row.detail}</td>
+                      <td className="w-[10%] px-2 py-1 text-center">จำนวน</td>
+                      <td className="w-[12%] px-2 py-1 text-center">
+                        {convertToLocaleString(row.count)}
+                      </td>
+                      <td className="w-[8%]px-2 py-1 text-center">คน</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -569,7 +707,7 @@ export default function PN01Paper() {
             </div>
             <div className="pl-6">
               <div className="flex gap-x-3 py-1 text-sm">
-                <p className="whitespace-normal">...</p>
+                <p className="whitespace-normal">{data.improvement}</p>
               </div>
             </div>
           </article>
@@ -604,22 +742,28 @@ export default function PN01Paper() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="text-sm">
-                      <td className="border border-black px-2 py-1 text-center">
-                        1
-                      </td>
-                      <td className="border border-black px-2 py-1">...</td>
-                      <td className="border border-black px-2 py-1 text-center">
-                        ...
-                      </td>
-                      <td className="border border-black px-2 py-1">...</td>
-                    </tr>
+                    {data.budgetIncomeRows?.map((row) => (
+                      <tr className="text-sm" key={row.id}>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {row.id}
+                        </td>
+                        <td className="border border-black px-2 py-1">
+                          {row.detail}
+                        </td>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {convertToLocaleString(row.amount)}
+                        </td>
+                        <td className="border border-black px-2 py-1">
+                          {row.source}
+                        </td>
+                      </tr>
+                    ))}
                     <tr className="text-sm">
                       <td colSpan={2} className="px-2 py-1 text-right">
                         รวมงบประมาณรายรับ
                       </td>
                       <td className="border border-black px-2 py-1 text-center">
-                        0
+                        {data.budgetIncomeTotal}
                       </td>
                       <td className="px-2 py-1 text-left">บาท</td>
                     </tr>
@@ -650,22 +794,28 @@ export default function PN01Paper() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="text-sm">
-                      <td className="border border-black px-2 py-1 text-center">
-                        1
-                      </td>
-                      <td className="border border-black px-2 py-1">...</td>
-                      <td className="border border-black px-2 py-1 text-center">
-                        ...
-                      </td>
-                      <td className="border border-black px-2 py-1">...</td>
-                    </tr>
+                    {data.budgetExpenseRows?.map((row) => (
+                      <tr className="text-sm" key={row.id}>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {row.id}
+                        </td>
+                        <td className="border border-black px-2 py-1">
+                          {row.detail}
+                        </td>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {convertToLocaleString(row.amount)}
+                        </td>
+                        <td className="border border-black px-2 py-1">
+                          {row.note}
+                        </td>
+                      </tr>
+                    ))}
                     <tr className="text-sm">
                       <td colSpan={2} className="px-2 py-1 text-right">
                         รวมงบประมาณรายจ่าย
                       </td>
                       <td className="border border-black px-2 py-1 text-center">
-                        0
+                        {data.budgetExpenseTotal}
                       </td>
                       <td className="px-2 py-1 text-left">บาท</td>
                     </tr>
@@ -676,10 +826,12 @@ export default function PN01Paper() {
           </article>
           <article>
             <div className="flex gap-x-3 py-1 text-sm">
-              <p
-                ref={paragraphRef}
-                dangerouslySetInnerHTML={{ __html: '' }}
-              ></p>
+              <p className="pl-10 pt-4">
+                ในการนี้จึงเรียนมาเพื่อขออนุมัติจัดโครงการ{data.projectName}
+                &nbsp; และขออนุมัติงบประมาณเพื่อดำเนินโครงการจำนวน{' '}
+                {data.budgetExpenseTotal} บาท (
+                {convertStringToThaiBathText(data.budgetExpenseTotal)})
+              </p>
             </div>
           </article>
           <article>

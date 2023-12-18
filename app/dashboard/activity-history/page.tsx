@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Search from '@/app/components/search';
+import Search from '@/app/components/search-box/search';
 import { CreateRequestTranscript } from '@/app/components/invoices/buttons';
 import Pagination from '@/app/components/invoices/pagination';
 import Table from '@/app/components/history-activity/table';

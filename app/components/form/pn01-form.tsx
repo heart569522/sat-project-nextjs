@@ -318,34 +318,38 @@ export default function PN01Form() {
   };
 
   const deleteResponsibleRow = (id: number) => {
-  setResponsibleRows((prevRows) => {
-    const updatedRows = prevRows.filter((row) => row.id !== id);
+    setResponsibleRows((prevRows) => {
+      const updatedRows = prevRows.filter((row) => row.id !== id);
 
-    const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
-      ...row,
-      id: index + 1,
-    }));
+      const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
+        ...row,
+        id: index + 1,
+      }));
 
-    setValidationArrayError((prevErrors) => {
-      const updatedErrors = { ...prevErrors };
+      setValidationArrayError((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
 
-      Object.keys(updatedErrors).forEach((key) => {
-        if (key.startsWith(`responsible_`) && updatedErrors[key].some((error) => error.id === id)) {
-          updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
+        Object.keys(updatedErrors).forEach((key) => {
+          if (
+            key.startsWith(`responsible_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
 
-          if (updatedErrors[key].length === 0) {
-            delete updatedErrors[key];
+            if (updatedErrors[key].length === 0) {
+              delete updatedErrors[key];
+            }
           }
-        }
+        });
+
+        return updatedErrors;
       });
 
-      return updatedErrors;
+      return updatedRowsWithSequentialIds;
     });
-
-    return updatedRowsWithSequentialIds;
-  });
-};
-  
+  };
 
   const deleteOIVTRow = (id: number) => {
     setOIVTRows((prevRows) => {
@@ -358,17 +362,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`OIVT_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`OIVT_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -387,17 +396,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`expectedResult_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`expectedResult_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -416,17 +430,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`operationDuration_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`operationDuration_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -445,17 +464,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`projectSchedule_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`projectSchedule_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -474,17 +498,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`target_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`target_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -503,17 +532,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`budgetIncome_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`budgetIncome_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -532,17 +566,22 @@ export default function PN01Form() {
 
       setValidationArrayError((prevErrors) => {
         const updatedErrors = { ...prevErrors };
-  
+
         Object.keys(updatedErrors).forEach((key) => {
-          if (key.startsWith(`budgetExpense_`) && updatedErrors[key].some((error) => error.id === id)) {
-            updatedErrors[key] = updatedErrors[key].filter((error) => error.id !== id);
-  
+          if (
+            key.startsWith(`budgetExpense_`) &&
+            updatedErrors[key].some((error) => error.id === id)
+          ) {
+            updatedErrors[key] = updatedErrors[key].filter(
+              (error) => error.id !== id,
+            );
+
             if (updatedErrors[key].length === 0) {
               delete updatedErrors[key];
             }
           }
         });
-  
+
         return updatedErrors;
       });
 
@@ -550,11 +589,15 @@ export default function PN01Form() {
     });
   };
 
-  const handleResponsibleChange = (id: number, field: string, value: string) => {
+  const handleResponsibleChange = (
+    id: number,
+    field: string,
+    value: string,
+  ) => {
     setResponsibleRows((prevRows) =>
-      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
-  
+
     setValidationArrayError((prevErrors) => {
       const key = `responsible_${field}`;
       const specificErrors = prevErrors[key] || [];
@@ -563,7 +606,6 @@ export default function PN01Form() {
       return restErrors;
     });
   };
-  
 
   const handleOIVTChange = (id: number, field: string, value: string) => {
     setOIVTRows((prevRows) =>
@@ -746,25 +788,28 @@ export default function PN01Form() {
   const validateArray = (
     array: Array<any>,
     fields: Array<string>,
-    prefix: string
+    prefix: string,
   ): boolean => {
     let isValid = true;
-  
+
     const errors: ValidationErrors = {};
-  
+
     array.forEach((item) => {
       fields.forEach((field) => {
         const key = `${prefix}_${field}` as keyof ValidationErrors;
-  
-        if (!item[field] || (typeof item[field] === 'string' && item[field].trim() === '')) {
+
+        if (
+          !item[field] ||
+          (typeof item[field] === 'string' && item[field].trim() === '')
+        ) {
           isValid = false;
-  
+
           errors[key] = errors[key] || [];
           errors[key].push({ id: item.id, error: 'โปรดกรอกข้อมูล' });
-  
+
           console.log(`${field} is required for item ${item.id}.`);
           console.log('Validation errors:', errors);
-  
+
           setValidationArrayError((prevErrors) => ({
             ...prevErrors,
             ...errors,
@@ -772,10 +817,9 @@ export default function PN01Form() {
         }
       });
     });
-  
+
     return isValid;
   };
-  
 
   const validateForm = () => {
     let isValid = true;
@@ -936,7 +980,7 @@ export default function PN01Form() {
 
     if (isButton.draft) {
       const formData = setFinalFormData();
-      console.log('formData: ',formData);
+      console.log('formData: ', formData);
     }
   };
 
@@ -950,7 +994,28 @@ export default function PN01Form() {
 
     if (isButton.submit && isFormValid) {
       const formData = setFinalFormData();
-      console.log('formData: ',formData);
+      console.log('formData: ', formData);
+
+      const jsonData = JSON.stringify(formData, null, 2); // Convert JSON data to string with indentation
+
+      // Create a Blob from the JSON data
+      const blob = new Blob([jsonData], { type: 'application/json' });
+
+      // Create a link element
+      const link = document.createElement('a');
+
+      // Set the link's attributes
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'formData.json';
+
+      // Append the link to the document body
+      document.body.appendChild(link);
+
+      // Trigger a click on the link to start the download
+      link.click();
+
+      // Remove the link from the document body
+      document.body.removeChild(link);
     } else {
       console.error('Form validation failed. Please check the form fields.');
     }
@@ -1127,9 +1192,23 @@ export default function PN01Form() {
                           className="flex w-full"
                           placeholder=""
                           value={row.firstname}
-                          onChange={(e) => handleResponsibleChange(row.id, 'firstname', e.target.value)}
-                          error={Boolean(validationArrayError['responsible_firstname']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['responsible_firstname']?.find((item) => item.id === row.id)?.error || ''}
+                          onChange={(e) =>
+                            handleResponsibleChange(
+                              row.id,
+                              'firstname',
+                              e.target.value,
+                            )
+                          }
+                          error={Boolean(
+                            validationArrayError['responsible_firstname']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['responsible_firstname']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                         <TextField
                           type="text"
@@ -1144,8 +1223,16 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          error={Boolean(validationArrayError['responsible_lastname']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['responsible_lastname']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError['responsible_lastname']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['responsible_lastname']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -1164,8 +1251,16 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          error={Boolean(validationArrayError['responsible_position']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['responsible_position']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError['responsible_position']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['responsible_position']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -1184,8 +1279,16 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          error={Boolean(validationArrayError['responsible_work']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['responsible_work']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError['responsible_work']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['responsible_work']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -2100,8 +2203,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['OIVT_objective']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['OIVT_objective']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['OIVT_objective']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['OIVT_objective']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2120,8 +2231,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['OIVT_indicator']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['OIVT_indicator']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['OIVT_indicator']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['OIVT_indicator']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2136,8 +2255,16 @@ export default function PN01Form() {
                             onChange={(e) =>
                               handleOIVTChange(row.id, 'value', e.target.value)
                             }
-                            error={Boolean(validationArrayError['OIVT_value']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['OIVT_value']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['OIVT_value']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['OIVT_value']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2152,8 +2279,16 @@ export default function PN01Form() {
                             onChange={(e) =>
                               handleOIVTChange(row.id, 'tool', e.target.value)
                             }
-                            error={Boolean(validationArrayError['OIVT_tool']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['OIVT_tool']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['OIVT_tool']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['OIVT_tool']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2210,8 +2345,16 @@ export default function PN01Form() {
                           onChange={(e) =>
                             handleExpectedResultChange(row.id, e.target.value)
                           }
-                          error={Boolean(validationArrayError['expectedResult_expected_result']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['expectedResult_expected_result']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError[
+                              'expectedResult_expected_result'
+                            ]?.some((item) => item.id === row.id),
+                          )}
+                          helperText={
+                            validationArrayError[
+                              'expectedResult_expected_result'
+                            ]?.find((item) => item.id === row.id)?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -2272,8 +2415,16 @@ export default function PN01Form() {
                               e.target.value,
                             )
                           }
-                          error={Boolean(validationArrayError['operationDuration_operation_duration']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['operationDuration_operation_duration']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError[
+                              'operationDuration_operation_duration'
+                            ]?.some((item) => item.id === row.id),
+                          )}
+                          helperText={
+                            validationArrayError[
+                              'operationDuration_operation_duration'
+                            ]?.find((item) => item.id === row.id)?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -2496,8 +2647,17 @@ export default function PN01Form() {
                                   onChange={(value) =>
                                     handleProjectScheduleChange(row.id, value)
                                   }
-                                  error={Boolean(validationArrayError['projectSchedule_detail']?.some((item) => item.id === row.id))}
-                                  helperText={validationArrayError['projectSchedule_detail']?.find((item) => item.id === row.id)?.error || ''}
+                                  error={Boolean(
+                                    validationArrayError[
+                                      'projectSchedule_detail'
+                                    ]?.some((item) => item.id === row.id),
+                                  )}
+                                  helperText={
+                                    validationArrayError[
+                                      'projectSchedule_detail'
+                                    ]?.find((item) => item.id === row.id)
+                                      ?.error || ''
+                                  }
                                 />
                               </div>
                             </td>
@@ -2587,8 +2747,16 @@ export default function PN01Form() {
                           onChange={(e) =>
                             handleTargetChange(row.id, 'detail', e.target.value)
                           }
-                          error={Boolean(validationArrayError['target_detail']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['target_detail']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError['target_detail']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['target_detail']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -2605,8 +2773,16 @@ export default function PN01Form() {
                             handleTargetChange(row.id, 'count', e.target.value)
                           }
                           onBlur={calculateTargetTotal}
-                          error={Boolean(validationArrayError['target_count']?.some((item) => item.id === row.id))}
-                          helperText={validationArrayError['target_count']?.find((item) => item.id === row.id)?.error || ''}
+                          error={Boolean(
+                            validationArrayError['target_count']?.some(
+                              (item) => item.id === row.id,
+                            ),
+                          )}
+                          helperText={
+                            validationArrayError['target_count']?.find(
+                              (item) => item.id === row.id,
+                            )?.error || ''
+                          }
                         />
                       </div>
                     </td>
@@ -2733,8 +2909,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetIncome_detail']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['budgetIncome_detail']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['budgetIncome_detail']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['budgetIncome_detail']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2759,11 +2943,15 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetIncome_amount']?.some((item) => item.id === row.id))}
+                            error={Boolean(
+                              validationArrayError['budgetIncome_amount']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
                           />
-                          <FormHelperText className='text-red-700 ml-3'>
+                          <FormHelperText className="ml-3 text-red-700">
                             {validationArrayError['budgetIncome_amount']?.find(
-                              (item) => item.id === row.id
+                              (item) => item.id === row.id,
                             )?.error || ''}
                           </FormHelperText>
                         </div>
@@ -2784,8 +2972,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetIncome_source']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['budgetIncome_source']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['budgetIncome_source']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['budgetIncome_source']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2881,8 +3077,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetExpense_detail']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['budgetExpense_detail']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError[
+                                'budgetExpense_detail'
+                              ]?.some((item) => item.id === row.id),
+                            )}
+                            helperText={
+                              validationArrayError[
+                                'budgetExpense_detail'
+                              ]?.find((item) => item.id === row.id)?.error || ''
+                            }
                           />
                         </div>
                       </td>
@@ -2907,11 +3111,15 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetExpense_amount']?.some((item) => item.id === row.id))}
+                            error={Boolean(
+                              validationArrayError[
+                                'budgetExpense_amount'
+                              ]?.some((item) => item.id === row.id),
+                            )}
                           />
-                          <FormHelperText className='text-red-700 ml-3'>
+                          <FormHelperText className="ml-3 text-red-700">
                             {validationArrayError['budgetExpense_amount']?.find(
-                              (item) => item.id === row.id
+                              (item) => item.id === row.id,
                             )?.error || ''}
                           </FormHelperText>
                         </div>
@@ -2932,8 +3140,16 @@ export default function PN01Form() {
                                 e.target.value,
                               )
                             }
-                            error={Boolean(validationArrayError['budgetExpense_note']?.some((item) => item.id === row.id))}
-                            helperText={validationArrayError['budgetExpense_note']?.find((item) => item.id === row.id)?.error || ''}
+                            error={Boolean(
+                              validationArrayError['budgetExpense_note']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['budgetExpense_note']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
                           />
                         </div>
                       </td>

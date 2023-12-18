@@ -6,7 +6,7 @@ export interface PN01 {
     projectHeadPhone?: string;
     principleReason?: string;
     projectLocation?: string;
-    projectDatetime?: string | null; // Adjust the type based on your needs
+    projectDatetime?: string | null;
     lecturer?: string;
     improvement?: string;
     strategicIssue?: string
@@ -59,8 +59,8 @@ interface OperationDurationRow {
 
 interface ProjectScheduleRow {
     id: number;
-    date: string | null; // Adjust the type based on your needs
-    time: string | null; // Adjust the type based on your needs
+    date: string | null;
+    time: string | null;
     detail: string;
 }
 
