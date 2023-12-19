@@ -1,8 +1,7 @@
-import Image from 'next/image';
-import Search from '@/app/components/search-box/search';
-// import { CustomersTableType, FormattedCustomersTable } from '@/app/lib/definitions';
 
-export default async function HistoryActivityTable({
+import { CustomersTableType, FormattedCustomersTable } from '@/app/lib/definitions';
+
+export default async function ProjectProposalTable({
   // customers,
 }: {
   // customers: FormattedCustomersTable[];
@@ -63,16 +62,19 @@ export default async function HistoryActivityTable({
                       ลำดับ
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      รหัสนักศึกษา
+                      รหัสเอกสาร
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
                       โครงการ/กิจกรรม
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      ปีการศึกษา
+                      วันที่
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      จำนวนชั่วโมง
+                      สถานะ
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      จัดการ
                     </th>
                   </tr>
                 </thead>
@@ -83,18 +85,7 @@ export default async function HistoryActivityTable({
                     // key={customer.id} 
                     className="group">
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
-                        <div className="flex items-center gap-3">
-                          {/* <Image
-                            // src={customer.image_url}
-                            className="rounded-full"
-                            // alt={`${customer.name}'s profile picture`}
-                            width={28}
-                            height={28}
-                          /> */}
-                          <p>
-                            {/* {customer.name} */}
-                          </p>
-                        </div>
+
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {/* {customer.email} */}
@@ -104,6 +95,9 @@ export default async function HistoryActivityTable({
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {/* {customer.total_pending} */}
+                      </td>
+                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                        {/* {customer.status} */}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
                         {/* {customer.total_paid} */}

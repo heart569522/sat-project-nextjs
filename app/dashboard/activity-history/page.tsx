@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
 import Search from '@/app/components/search-box/search';
-import { CreateRequestTranscript } from '@/app/components/invoices/buttons';
-import Pagination from '@/app/components/invoices/pagination';
+import { CreateRequestTranscript } from '@/app/components/buttons';
+import Pagination from '@/app/components/pagination';
 import Table from '@/app/components/history-activity/table';
+import Breadcrumbs from '@/app/components/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
@@ -11,9 +12,15 @@ export const metadata: Metadata = {
 export default async function Page({}: {}) {
   return (
     <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className={`text-2xl`}>ประวัติการเข้าร่วมโครงการ/กิจกรรม</h1>
-      </div>
+      <Breadcrumbs
+        breadcrumbs={[
+          {
+            label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
+            href: '/dashboard/activity-history',
+            active: true,
+          },
+        ]}
+      />
       <div className="mt-4">
         <div className="flex items-center justify-between gap-2 md:mt-8">
           <CreateRequestTranscript />

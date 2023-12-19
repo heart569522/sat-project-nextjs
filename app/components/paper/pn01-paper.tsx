@@ -1,14 +1,12 @@
-'use client';
+// 'use client';
 import Image from 'next/image';
-import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
-import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
+import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
 import { PN01 } from '@/app/model/pn01';
-import { useState } from 'react';
 import { ThaiBaht } from 'thai-baht-text-ts';
 import moment from 'moment-timezone';
 
-export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
-  const [data, setData] = useState<PN01>(dataPaper);
+export default function PN01Paper({ data }: { data: PN01 }) {
 
   const convertStringToThaiBathText = (value: string | undefined) => {
     const numberValue = Number(value?.replace(/,/g, ''));
@@ -51,10 +49,10 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
   }
 
   return (
-    <section className={`box text-black`}>
-      <div className="box-area">
+    <section id='box' className="box text-black">
+      <div id='box-area' className="box-area">
         <div className="relative">
-          <article>
+          <article id="part" className="part">
             <table className="w-full">
               <tbody>
                 <tr className="">
@@ -94,7 +92,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               ********************************************************************************************************
             </p>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 1.&nbsp;&nbsp;&nbsp;ชื่อคณะ/วิทยาลัย/หน่วยงาน:
@@ -102,7 +100,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <p>{data.faculty}</p>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 2.&nbsp;&nbsp;&nbsp;ชื่อโครงการ:
@@ -110,7 +108,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <p>{data.projectName}</p>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 3.&nbsp;&nbsp;&nbsp;ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ:
@@ -122,7 +120,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <p>{data.projectHeadPhone}</p>
             </div>
             <div className="mb-1 flex justify-center">
-              <table className="w-[95%] border border-black">
+              <table className="w-[95%]">
                 <thead>
                   <tr className="text-center text-sm">
                     <td className="w-[10%] border border-black p-1">
@@ -160,7 +158,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </table>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 4.&nbsp;&nbsp;&nbsp;ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ
@@ -234,7 +232,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 5.&nbsp;&nbsp;&nbsp;ประเภทโครงการ
@@ -244,9 +242,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <div className="grid grid-cols-2">
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.maintenance ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนทำนุบำรุงศิลปวัฒนธรรม
@@ -254,9 +252,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.academicService ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนบริการวิชาการ
@@ -264,9 +262,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.knowledgeManagement ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการจัดการความรู้
@@ -274,9 +272,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.researchPromotion ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการส่งเสริมงานวิจัย
@@ -284,9 +282,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.educationQualityAssurance ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนการประกันคุณภาพการศึกษา
@@ -294,9 +292,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.personnelDevelopment ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนพัฒนาบุคลากร
@@ -304,9 +302,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.riskManagement ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     แผนบริหารความเสี่ยง
@@ -316,9 +314,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
 
               <div className="flex gap-x-1 py-1 text-sm">
                 {data.projectTypes?.studentDevelopment ? (
-                  <CheckBoxOutlinedIcon />
+                  <CheckBoxSharpIcon />
                 ) : (
-                  <CheckBoxOutlineBlankOutlinedIcon />
+                  <CheckBoxOutlineBlankSharpIcon />
                 )}
                 <label className="flex whitespace-nowrap pl-3">
                   แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา
@@ -330,9 +328,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <div className="grid grid-cols-2 pl-9">
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.moralEthical ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     ด้านคุณธรรม จริยธรรม
@@ -340,9 +338,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.academicPromotion ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
@@ -350,17 +348,17 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.knowledge ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">ด้านความรู้</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.environment ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
@@ -368,9 +366,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.intellectualSkill ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     ด้านทักษะทางปัญญา
@@ -378,9 +376,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.sport ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมกีฬา และการส่งเสริมสุขภาพ
@@ -389,9 +387,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes
                     ?.knowledgeAnalysisCommunicationTechnology ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-normal pl-3">
                     ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
@@ -399,9 +397,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.artCultureDevelopment ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
@@ -410,9 +408,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes
                     ?.numericalAnalysisCommunicationTechnology ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-normal pl-3">
                     ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร
@@ -421,9 +419,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.moralEthicalDevelopment ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
@@ -431,9 +429,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.subOther ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     อื่นๆ (โปรดระบุ)
@@ -444,9 +442,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.projectTypes?.leadershipDevelopment ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-3">
                     กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
@@ -455,9 +453,9 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
               <div className="flex gap-x-1 py-1 text-sm">
                 {data.projectTypes?.other ? (
-                  <CheckBoxOutlinedIcon />
+                  <CheckBoxSharpIcon />
                 ) : (
-                  <CheckBoxOutlineBlankOutlinedIcon />
+                  <CheckBoxOutlineBlankSharpIcon />
                 )}
                 <label className="whitespace-nowrap pl-3">
                   อื่นๆ (โปรดระบุ)
@@ -468,7 +466,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 6.&nbsp;&nbsp;&nbsp;การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
@@ -478,25 +476,25 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <div className="grid grid-cols-4">
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.universityIndentity?.moral ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-1">คุณธรรมนำใจ</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.universityIndentity?.serve ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-1">รับใช้สังคม</label>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.universityIndentity?.academic ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-1">
                     วิชาการก้าวหน้า
@@ -504,16 +502,16 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   {data.universityIndentity?.develop ? (
-                    <CheckBoxOutlinedIcon />
+                    <CheckBoxSharpIcon />
                   ) : (
-                    <CheckBoxOutlineBlankOutlinedIcon />
+                    <CheckBoxOutlineBlankSharpIcon />
                   )}
                   <label className="whitespace-nowrap pl-1">พัฒนาสู่สากล</label>
                 </div>
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 7.&nbsp;&nbsp;&nbsp;หลักการและเหตุผล
@@ -525,7 +523,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 8.&nbsp;&nbsp;&nbsp;วัตถุประสงค์ ตัวชี้วัด
@@ -534,7 +532,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </label>
             </div>
             <div className="mb-1 flex justify-center">
-              <table className="w-[95%] border border-black">
+              <table className="w-[95%]">
                 <thead>
                   <tr className="text-center text-sm">
                     <td className="w-[25%] border border-black p-1">
@@ -572,7 +570,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </table>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 9.&nbsp;&nbsp;&nbsp;ประโยชน์ที่คาดว่าจะได้รับ
@@ -589,7 +587,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               ))}
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 10.&nbsp;&nbsp;&nbsp;วิธีดำเนินงานและระยะเวลาดำเนินโครงการ
@@ -606,7 +604,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               ))}
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 11.&nbsp;&nbsp;&nbsp;สถานที่จัดโครงการและกำหนดการ
@@ -633,7 +631,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
                 </label>
               </div>
               <div className="mb-1 flex justify-center">
-                <table className="w-[95%] border border-black">
+                <table className="w-[95%]">
                   <thead>
                     <tr className="text-center text-sm">
                       <td className="w-[20%] border border-black p-1">
@@ -664,7 +662,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 12.&nbsp;&nbsp;&nbsp;วิทยากร (ถ้ามี)
@@ -672,13 +670,13 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               <p className="whitespace-normal">{data.lecturer}</p>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 13.&nbsp;&nbsp;&nbsp;ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
               </label>
               <p className="whitespace-normal">
-                (รวมจำนวน {data.targetTotal} คน)
+                (รวมจำนวน {convertToLocaleString(data.targetTotal)} คน)
               </p>
             </div>
             <div className="mb-1 flex justify-center">
@@ -699,7 +697,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </table>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 14.&nbsp;&nbsp;&nbsp;การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
@@ -711,7 +709,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-2 text-sm">
               <label className={`font-semibold`}>
                 15.&nbsp;&nbsp;&nbsp;งบประมาณ
@@ -824,7 +822,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </div>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="flex gap-x-3 py-1 text-sm">
               <p className="pl-10 pt-4">
                 ในการนี้จึงเรียนมาเพื่อขออนุมัติจัดโครงการ{data.projectName}
@@ -834,7 +832,7 @@ export default function PN01Paper({ dataPaper }: { dataPaper: any }) {
               </p>
             </div>
           </article>
-          <article>
+          <article id="part" className="part">
             <div className="mt-10 pl-6 text-center text-sm">
               <p className="py-1">
                 ลงชื่อ............................................................ผู้เสนอโครงการ/กิจกรรม

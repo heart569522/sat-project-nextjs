@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Breadcrumbs from '@/app/components/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/components/breadcrumbs';
 export const metadata: Metadata = {
   title: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรมนักศึกษา',
 };

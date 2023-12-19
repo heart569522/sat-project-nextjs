@@ -1,5 +1,5 @@
 import PN11Form from '@/app/components/form/pn11-form';
-import Breadcrumbs from '@/app/components/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/components/breadcrumbs';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -8,13 +8,13 @@
   "projectDatetime": "2024-08-08T22:51:00.000Z",
   "lecturer": "cvbsdfgsdfg sdfgsdfgsdfg",
   "improvement": "asdtawfggnxcvbxcgsdrtgsdrg",
-  "strategicIssue": 10,
-  "objective": 20,
-  "universityStrategic": 10,
-  "strategicPlanKPI": 30,
-  "operationPlanKPI": 20,
-  "projectKPI": 20,
-  "projectStatus": 30,
+  "strategicIssue": "10",
+  "objective": "20",
+  "universityStrategic": "10",
+  "strategicPlanKPI": "30",
+  "operationPlanKPI": "20",
+  "projectKPI": "20",
+  "projectStatus": "30",
   "responsibleRows": [
     {
       "id": 1,
@@ -62,12 +62,12 @@
     {
       "id": 1,
       "detail": "sdfgsdfg",
-      "count": 55
+      "count": "55"
     },
     {
       "id": 2,
       "detail": "wwerwer",
-      "count": 60
+      "count": "60"
     }
   ],
   "budgetIncomeTotal": "103,848",
