@@ -3,73 +3,84 @@ import { notoThai } from '@/app/components/fonts';
 import PrintIcon from '@mui/icons-material/Print';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import generatePDF, { Resolution, Margin } from 'react-to-pdf';
-import { jsPDF } from 'jspdf';
 
 export default function ToolBox({
   rootElementId,
   downloadFileName,
+  isPaperMargin,
 }: {
   rootElementId: string;
   downloadFileName: string;
+  isPaperMargin: boolean;
 }) {
   const handlePrint = () => {
     window.print();
   };
 
-  const getTargetElement = () => document.getElementById(rootElementId);
+  const handleDownloadPDF = async () => {
+      const getTargetElement = () => document.getElementById(rootElementId);
 
-  const adjustScaleAndDownloadPdf = async () => {
-    const originalTargetElement = getTargetElement();
-    if (!originalTargetElement) {
-      console.error(`Element with ID '${rootElementId}' not found.`);
-      return;
-    }
+      const originalTargetElement = getTargetElement();
+      if (!originalTargetElement) {
+        console.error(`Element with ID '${rootElementId}' not found.`);
+        return;
+      }
 
-    const clonedTargetElement = originalTargetElement.cloneNode(
-      true,
-    ) as HTMLElement;
+      const clonedTargetElement = originalTargetElement.cloneNode(
+        true,
+      ) as HTMLElement;
 
-    const boxElement = clonedTargetElement.querySelector('#box');
-    const boxAreaElement = clonedTargetElement.querySelector('#box-area');
+      const boxElements = clonedTargetElement.querySelectorAll('#box');
+      const boxAreaElements = clonedTargetElement.querySelectorAll('#box-area');
+      const pageHeightElements = clonedTargetElement.querySelectorAll('#page-height');
+      const tablePaddingElements = clonedTargetElement.querySelectorAll('.table-p');
 
-    // Modify classes of the found elements
-    if (boxElement) {
-      boxElement.classList.remove('box', 'text-black');
-      boxElement.classList.add('box-pdf', 'text-black');
-    }
-
-    if (boxAreaElement) {
-      boxAreaElement.classList.remove('box-area');
-      boxAreaElement.classList.add('box-area-pdf');
-    }
-
-    console.log(clonedTargetElement);
-
-    originalTargetElement.parentNode?.replaceChild(
-      clonedTargetElement,
-      originalTargetElement,
-    );
-
-    try {
-      await generatePDF(getTargetElement, {
-        resolution: Resolution.MEDIUM,
-        filename: `${downloadFileName}.pdf`,
-        page: {
-          margin: Margin.MEDIUM,
-        },
+      boxElements.forEach((boxElement) => {
+        boxElement.classList.remove('box', 'text-black');
+        boxElement.classList.add('box-pdf', 'text-black');
       });
 
-      clonedTargetElement.parentNode?.replaceChild(
-        originalTargetElement,
+      boxAreaElements.forEach((boxAreaElement) => {
+        boxAreaElement.classList.remove('box-area');
+        boxAreaElement.classList.add('box-area-pdf');
+      });
+
+      pageHeightElements.forEach((pageHeightElement) => {
+        pageHeightElement.classList.remove('page-height');
+        pageHeightElement.classList.add('page-height-pdf');
+      });
+
+      tablePaddingElements.forEach((tablePaddingElement) => {
+        tablePaddingElement.classList.remove('table-p')
+        tablePaddingElement.classList.add('table-p-pdf')
+      })
+
+      originalTargetElement.parentNode?.replaceChild(
         clonedTargetElement,
-      );
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      clonedTargetElement.parentNode?.replaceChild(
         originalTargetElement,
-        clonedTargetElement,
       );
-    }
+
+      try {
+        await generatePDF(getTargetElement, {
+          resolution: Resolution.MEDIUM,
+          filename: `${downloadFileName}.pdf`,
+          page: {
+            margin: isPaperMargin ? Margin.MEDIUM : 0,
+          },
+        });
+
+        clonedTargetElement.parentNode?.replaceChild(
+          originalTargetElement,
+          clonedTargetElement,
+        );
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        clonedTargetElement.parentNode?.replaceChild(
+          originalTargetElement,
+          clonedTargetElement,
+        );
+      }
+    
   };
 
   return (
@@ -84,7 +95,7 @@ export default function ToolBox({
           <PrintIcon />
         </button>
         <button
-          onClick={adjustScaleAndDownloadPdf}
+          onClick={handleDownloadPDF}
           className={`${notoThai.className} flex h-12 w-full items-center justify-center gap-x-1 rounded-md bg-gray-200 px-4 text-base transition-colors hover:bg-gray-300`}
         >
           ดาวน์โหลด

@@ -1,19 +1,24 @@
+// "use client"
 import { sarabun } from '@/app/components/fonts';
 import PN01Paper from '@/app/components/paper/pn01-paper';
 import ToolBox from '@/app/components/paper/tool-box';
-import formData from '@/app/model/formData.json';
-import './style.css';
-import { Box } from '@mui/material';
+import pn01Data from '@/app/model/pn01Data.json';
+import { Metadata } from 'next';
 
-export default function page() {
+export const metadata: Metadata = {
+  title: 'แบบฟอร์มเสนอโครงการ/กิจกรรม (พน.01)',
+};
+
+export default function Page() {
   return (
-    <div className='flex justify-center'>
-      <div id="pdf-content" className={`${sarabun.className} w-[794px]`}>
-        <PN01Paper data={formData} />
+    <div className="flex justify-center">
+      <div id="pdf-content" className={`${sarabun.className}`}>
+        <PN01Paper data={pn01Data} />
       </div>
       <ToolBox
         downloadFileName="แบบฟอร์มเสนอโครงการ/กิจกรรม(พน.01)"
         rootElementId="pdf-content"
+        isPaperMargin={false}
       />
     </div>
   );

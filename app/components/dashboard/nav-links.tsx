@@ -11,6 +11,7 @@ import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { useRouter } from 'next/router';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -22,11 +23,27 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
-  { name: 'เสนอโครงการ/กิจกรรม', href: '/dashboard/project-proposal', icon: DocumentDuplicateIcon},
-  { name: 'บันทึกการเข้าร่วมโครการ/กิจกรรม', href: '/dashboard/activity-record', icon: ContactPageOutlinedIcon},
-  { name: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history', icon: FindInPageOutlinedIcon},
-  { name: 'เข้าสู่ระบบ/สมัครสมาชิก', href: '/dashboard/login-register', icon: LoginOutlinedIcon},
-  { name: 'test', href: '/dashboard/test', icon: DocumentDuplicateIcon}
+  {
+    name: 'โครงการ/กิจกรรม',
+    href: '/dashboard/project-proposal',
+    icon: DocumentDuplicateIcon,
+  },
+  {
+    name: 'บันทึกการเข้าร่วมโครการ/กิจกรรม',
+    href: '/dashboard/activity-record',
+    icon: ContactPageOutlinedIcon,
+  },
+  {
+    name: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม',
+    href: '/dashboard/activity-history',
+    icon: FindInPageOutlinedIcon,
+  },
+  {
+    name: 'เข้าสู่ระบบ/สมัครสมาชิก',
+    href: '/dashboard/login-register',
+    icon: LoginOutlinedIcon,
+  },
+  { name: 'test', href: '/dashboard/test', icon: DocumentDuplicateIcon },
 ];
 
 export default function NavLinks() {
@@ -36,6 +53,10 @@ export default function NavLinks() {
     <>
       {links.map((link) => {
         const LinkIcon = link.icon;
+        const isActive =
+          pathname.startsWith(link.href) &&
+          (link.href === '/dashboard' ? pathname === '/dashboard' : true);
+
         return (
           <Link
             key={link.name}
@@ -43,7 +64,7 @@ export default function NavLinks() {
             className={clsx(
               'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
               {
-                'bg-sky-100 text-blue-600': pathname === link.href,
+                'bg-sky-100 text-blue-600': isActive,
               },
             )}
           >

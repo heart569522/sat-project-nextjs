@@ -162,7 +162,7 @@ export default function PN11Form() {
 
     if (isFormValid) {
       const formData = setFinalFormData();
-      console.log('formData: ',formData);
+      console.log('formData: ', formData);
     } else {
       console.error('Form validation failed. Please check the form fields.');
     }
@@ -303,7 +303,9 @@ export default function PN11Form() {
           <div>
             <label
               htmlFor="major"
-              className={`mb-2 block text-base font-medium text-gray-900`}
+              className={`mb-2 block text-base font-medium ${
+                formInput.faculty ? `text-gray-900` : `text-gray-400`
+              } `}
             >
               สาขาวิชา
             </label>
@@ -485,6 +487,12 @@ export default function PN11Form() {
         </div>
       </div>
       <div className="mt-6 flex justify-end gap-4">
+        <Link
+          href="/dashboard/activity-history/transcript/document/"
+          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        >
+          Test Document
+        </Link>
         <Link
           href="/dashboard/activity-history/"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"

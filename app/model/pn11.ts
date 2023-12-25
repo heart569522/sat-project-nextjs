@@ -9,7 +9,7 @@ export interface PN11 {
     major?: string;
     email?: string;
     deliveryMethod?: string;
-    recipientName?: string;
-    recipientAddress?: string;
-    recipientPhone?: string;
+    recipientName?: string | null;
+    recipientAddress?: string | null;
+    recipientPhone?: string | null;
 }
