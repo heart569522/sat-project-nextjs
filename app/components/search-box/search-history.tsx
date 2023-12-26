@@ -55,7 +55,6 @@ export default function SearchHistory() {
             placeholder="รหัสประจำตัวนักศึกษา"
             autoComplete="off"
             value={searchValue}
-            defaultValue={searchParams.get('query')?.toString()}
             onChange={handleInputChange}
             required
           />
