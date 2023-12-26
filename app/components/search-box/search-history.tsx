@@ -1,23 +1,43 @@
 'use client';
-
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 export default function SearchHistory() {
-  const [searchValue, setSearchValue] = useState("")
+  const [searchValue, setSearchValue] = useState('');
+  const searchParams = useSearchParams();
+  const { replace } = useRouter();
+  const pathname = usePathname();
 
   const handleInputChange = (event: any) => {
     const numericValue = event.target.value.replace(/\D/g, '').slice(0, 10);
     setSearchValue(numericValue);
   };
 
-  const searchButtonClick = () => {
+  const handleReset = () => {
+    const params = new URLSearchParams(searchParams);
+
+    setSearchValue('')
+    params.delete('query');
+    replace(`${pathname}?${params.toString()}`);
+  }
+
+  const handleSearch = () => {
     console.log(`Searching... ${searchValue}`);
+
+    const params = new URLSearchParams(searchParams);
+
+    if (searchValue) {
+      params.set('query', searchValue);
+    } else {
+      params.delete('query');
+    }
+    replace(`${pathname}?${params.toString()}`);
   };
 
   return (
     <div className="relative">
-      <h3 className="mb-3 block text-center text-2xl font-semibold text-blue-900">
+      <h3 className="mb-3 block text-center text-2xl max-sm:text-lg font-semibold text-blue-900">
         ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม
       </h3>
       <div className="flex flex-1 flex-shrink-0">
@@ -35,6 +55,7 @@ export default function SearchHistory() {
             placeholder="รหัสประจำตัวนักศึกษา"
             autoComplete="off"
             value={searchValue}
+            defaultValue={searchParams.get('query')?.toString()}
             onChange={handleInputChange}
             required
           />
@@ -45,13 +66,13 @@ export default function SearchHistory() {
         <button
           className="ml-2 rounded-md border border-blue-500 px-4 py-2 text-blue-500 hover:bg-blue-100"
           type="reset"
-          onClick={() => setSearchValue('')}
+          onClick={handleReset}
         >
           รีเซ็ท
         </button>
         <button
           className="ml-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
-          onClick={searchButtonClick}
+          onClick={handleSearch}
         >
           ค้นหา
         </button>

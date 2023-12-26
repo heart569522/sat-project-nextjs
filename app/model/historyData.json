@@ -1,0 +1,67 @@
+[
+    {
+        "id": 1,
+        "firstname": "ยาา",
+        "lastname": "บานานา",
+        "studentId": "6401260021",
+        "faculty": "คณะบริหารธุรกิจ",
+        "major": "สาขาวิชาวิศวกรรมซอฟต์แวร์",
+        "history": [
+            {
+                "id": 1,
+                "projectName": "โครงการกินแล้วดูด",
+                "projectHour": "6",
+                "year": "2566"
+            },
+            {
+                "id": 2,
+                "projectName": "โครงการยามยามยาม",
+                "projectHour": "3",
+                "year": "2565"
+            },
+            {
+                "id": 3,
+                "projectName": "กีฬาสี 2566",
+                "projectHour": "7",
+                "year": "2566"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "firstname": "อาทท",
+        "lastname": "อะไร",
+        "studentId": "6401260048",
+        "faculty": "คณะบริหารธุรกิจ",
+        "major": "สาขาวิชาการตลาด",
+        "history": [
+            {
+                "id": 1,
+                "projectName": "โครงการปลูกป่า",
+                "projectHour": "5",
+                "year": "2567"
+            },
+            {
+                "id": 2,
+                "projectName": "โครงการสุขภาพ",
+                "projectHour": "4",
+                "year": "2565"
+            },
+            {
+                "id": 3,
+                "projectName": "กีฬาสี 2565",
+                "projectHour": "8",
+                "year": "2565"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "firstname": "วาวาวาว",
+        "lastname": "บามามา",
+        "studentId": "6401260022",
+        "faculty": "คณะบริหารธุรกิจ",
+        "major": "สาขาวิชาวิศวกรรมซอฟต์แวร์",
+        "history": []
+    }
+]

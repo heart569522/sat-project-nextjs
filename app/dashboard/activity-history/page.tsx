@@ -9,7 +9,15 @@ export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
 };
 
-export default async function Page({}: {}) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+
   return (
     <div className="w-full">
       <Breadcrumbs
@@ -28,12 +36,11 @@ export default async function Page({}: {}) {
         <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
           <SearchHistory />
         </div>
-
-        {/* <Table /> */}
-        {/* <Table query={null} currentPage={currentPage} /> */}
-        {/* <div className="mt-5 flex w-full justify-center">
-          <Pagination totalPages={null} />
-        </div> */}
+        {query && (
+          <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
+            <Table query={query} />
+          </div>
+        )}
       </div>
     </div>
   );
