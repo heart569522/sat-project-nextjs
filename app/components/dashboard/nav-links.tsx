@@ -34,7 +34,7 @@ const links = [
     icon: ContactPageOutlinedIcon,
   },
   {
-    name: 'ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม',
+    name: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
     href: '/dashboard/activity-history',
     icon: FindInPageOutlinedIcon,
   },
