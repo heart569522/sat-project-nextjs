@@ -18,69 +18,70 @@ export default function ToolBox({
   };
 
   const handleDownloadPDF = async () => {
-      const getTargetElement = () => document.getElementById(rootElementId);
+    const getTargetElement = () => document.getElementById(rootElementId);
 
-      const originalTargetElement = getTargetElement();
-      if (!originalTargetElement) {
-        console.error(`Element with ID '${rootElementId}' not found.`);
-        return;
-      }
+    const originalTargetElement = getTargetElement();
+    if (!originalTargetElement) {
+      console.error(`Element with ID '${rootElementId}' not found.`);
+      return;
+    }
 
-      const clonedTargetElement = originalTargetElement.cloneNode(
-        true,
-      ) as HTMLElement;
+    const clonedTargetElement = originalTargetElement.cloneNode(
+      true,
+    ) as HTMLElement;
 
-      const boxElements = clonedTargetElement.querySelectorAll('#box');
-      const boxAreaElements = clonedTargetElement.querySelectorAll('#box-area');
-      const pageHeightElements = clonedTargetElement.querySelectorAll('#page-height');
-      const tablePaddingElements = clonedTargetElement.querySelectorAll('.table-p');
+    const boxElements = clonedTargetElement.querySelectorAll('#box');
+    const boxAreaElements = clonedTargetElement.querySelectorAll('#box-area');
+    const pageHeightElements =
+      clonedTargetElement.querySelectorAll('#page-height');
+    const tablePaddingElements =
+      clonedTargetElement.querySelectorAll('.table-p');
 
-      boxElements.forEach((boxElement) => {
-        boxElement.classList.remove('box', 'text-black');
-        boxElement.classList.add('box-pdf', 'text-black');
+    boxElements.forEach((boxElement) => {
+      boxElement.classList.remove('box', 'text-black');
+      boxElement.classList.add('box-pdf', 'text-black');
+    });
+
+    boxAreaElements.forEach((boxAreaElement) => {
+      boxAreaElement.classList.remove('box-area');
+      boxAreaElement.classList.add('box-area-pdf');
+    });
+
+    pageHeightElements.forEach((pageHeightElement) => {
+      pageHeightElement.classList.remove('page-height');
+      pageHeightElement.classList.add('page-height-pdf');
+    });
+
+    tablePaddingElements.forEach((tablePaddingElement) => {
+      tablePaddingElement.classList.remove('table-p');
+      tablePaddingElement.classList.add('table-p-pdf');
+    });
+
+    originalTargetElement.parentNode?.replaceChild(
+      clonedTargetElement,
+      originalTargetElement,
+    );
+
+    try {
+      await generatePDF(getTargetElement, {
+        resolution: Resolution.MEDIUM,
+        filename: `${downloadFileName}.pdf`,
+        page: {
+          margin: isPaperMargin ? Margin.MEDIUM : 0,
+        },
       });
 
-      boxAreaElements.forEach((boxAreaElement) => {
-        boxAreaElement.classList.remove('box-area');
-        boxAreaElement.classList.add('box-area-pdf');
-      });
-
-      pageHeightElements.forEach((pageHeightElement) => {
-        pageHeightElement.classList.remove('page-height');
-        pageHeightElement.classList.add('page-height-pdf');
-      });
-
-      tablePaddingElements.forEach((tablePaddingElement) => {
-        tablePaddingElement.classList.remove('table-p')
-        tablePaddingElement.classList.add('table-p-pdf')
-      })
-
-      originalTargetElement.parentNode?.replaceChild(
-        clonedTargetElement,
+      clonedTargetElement.parentNode?.replaceChild(
         originalTargetElement,
+        clonedTargetElement,
       );
-
-      try {
-        await generatePDF(getTargetElement, {
-          resolution: Resolution.MEDIUM,
-          filename: `${downloadFileName}.pdf`,
-          page: {
-            margin: isPaperMargin ? Margin.MEDIUM : 0,
-          },
-        });
-
-        clonedTargetElement.parentNode?.replaceChild(
-          originalTargetElement,
-          clonedTargetElement,
-        );
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-        clonedTargetElement.parentNode?.replaceChild(
-          originalTargetElement,
-          clonedTargetElement,
-        );
-      }
-    
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      clonedTargetElement.parentNode?.replaceChild(
+        originalTargetElement,
+        clonedTargetElement,
+      );
+    }
   };
 
   return (

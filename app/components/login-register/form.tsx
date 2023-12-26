@@ -171,33 +171,33 @@ export default function Form() {
                 validationError.formRadio ? 'border-red-600' : 'border-gray-200'
               } ps-4`}
             >
-            <div className="grid grid-cols-2">
-              <div>
-              <input
-                name="formRole"
-                type="radio"
-                value="teacher"
-                checked={formRadio.formRole === 'teacher'}
-                onChange={handleRadioChange}
-                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-              />
-              <label className="ms-2 w-full py-4 text-sm font-medium">
-                อาจารย์
-              </label>
-              </div>
-              <div>
-              <input
-                name="formRole"
-                type="radio"
-                value="student"
-                checked={formRadio.formRole === 'student'}
-                onChange={handleRadioChange}
-                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-              />
-              <label className="ms-2 w-full py-4 text-sm font-medium">
-                นักศึกษา
-              </label>
-              </div>
+              <div className="grid grid-cols-2">
+                <div>
+                  <input
+                    name="formRole"
+                    type="radio"
+                    value="teacher"
+                    checked={formRadio.formRole === 'teacher'}
+                    onChange={handleRadioChange}
+                    className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label className="ms-2 w-full py-4 text-sm font-medium">
+                    อาจารย์
+                  </label>
+                </div>
+                <div>
+                  <input
+                    name="formRole"
+                    type="radio"
+                    value="student"
+                    checked={formRadio.formRole === 'student'}
+                    onChange={handleRadioChange}
+                    className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label className="ms-2 w-full py-4 text-sm font-medium">
+                    นักศึกษา
+                  </label>
+                </div>
               </div>
             </div>
           </div>

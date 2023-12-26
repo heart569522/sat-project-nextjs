@@ -159,9 +159,9 @@ export default function pn11Paper({ data }: { data: PN11 }) {
               </label>
               <div className="flex justify-start py-1 pl-6">
                 {data.deliveryMethod == 'receive' ? (
-                  <CheckBoxSharpIcon className='mt-[4px]'/>
+                  <CheckBoxSharpIcon className="mt-[4px]" />
                 ) : (
-                  <CheckBoxOutlineBlankSharpIcon className='mt-[4px]'/>
+                  <CheckBoxOutlineBlankSharpIcon className="mt-[4px]" />
                 )}
                 <label className="whitespace-nowrap pl-1">
                   รับเอกสารด้วยตนเอง ที่ สำนักพัฒนานักศึกษา
@@ -169,9 +169,9 @@ export default function pn11Paper({ data }: { data: PN11 }) {
               </div>
               <div className="flex justify-start py-1 pl-6">
                 {data.deliveryMethod == 'send' ? (
-                  <CheckBoxSharpIcon className='mt-[4px]'/>
+                  <CheckBoxSharpIcon className="mt-[4px]" />
                 ) : (
-                  <CheckBoxOutlineBlankSharpIcon className='mt-[4px]'/>
+                  <CheckBoxOutlineBlankSharpIcon className="mt-[4px]" />
                 )}
                 <label className="whitespace-nowrap pl-1">
                   จัดส่งทางไปรษณีย์ (ลงทะเบียน) ค่าบริการไปรษณีย์ 33 บาท
@@ -205,7 +205,7 @@ export default function pn11Paper({ data }: { data: PN11 }) {
           </article>
           <article id="part" className="part">
             <div className="mt-16">
-              <p className="whitespace-nowrap font-semibold text-center">
+              <p className="whitespace-nowrap text-center font-semibold">
                 สำนักพัฒนานักศึกษา มหาวิทยาลัยพายัพ อาคารพันธกร หมายเลขโทรศัพท์
                 0-5385-1478 ต่อ 316
               </p>

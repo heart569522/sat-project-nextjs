@@ -6,9 +6,7 @@ export default function PN10Form() {
     [key: string]: string;
   }>({});
 
-  const [formInput, setFormInput] = useState({
-
-  });
+  const [formInput, setFormInput] = useState({});
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
@@ -27,9 +25,7 @@ export default function PN10Form() {
     <form onSubmit={handleSubmit} className="py-2">
       <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
         <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
-            <div>
-
-            </div>
+          <div></div>
         </div>
       </div>
     </form>

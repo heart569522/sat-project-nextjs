@@ -25,7 +25,9 @@ export default function Search({ placeholder }: { placeholder: string }) {
   }, 300);
 
   const searchButtonClick = () => {
-    const inputElement = document.getElementById('searchInput') as HTMLInputElement | null;
+    const inputElement = document.getElementById(
+      'searchInput',
+    ) as HTMLInputElement | null;
     const inputValue = inputElement?.value || '';
     handleSearch(inputValue);
   };
@@ -43,7 +45,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
       />
       <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
       <button
-        className="ml-2 rounded-md bg-blue-500 hover:bg-blue-400 px-4 py-2 text-white"
+        className="ml-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
         onClick={searchButtonClick}
       >
         ค้นหา

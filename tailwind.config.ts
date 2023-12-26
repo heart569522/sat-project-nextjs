@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    "./node_modules/flowbite-react/**/*.js",
+    './node_modules/flowbite-react/**/*.js',
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -28,6 +28,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms'), require("flowbite/plugin")],
+  plugins: [require('@tailwindcss/forms'), require('flowbite/plugin')],
 };
 export default config;

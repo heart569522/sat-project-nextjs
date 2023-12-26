@@ -1,4 +1,3 @@
-
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import PN01Form from '@/app/components/form/pn01-form';
 import { Metadata } from 'next';
@@ -22,7 +21,7 @@ export default async function Page({}: {}) {
           ]}
         />
       </div>
-      <div className="w-full mt-4">
+      <div className="mt-4 w-full">
         <PN01Form />
       </div>
     </>

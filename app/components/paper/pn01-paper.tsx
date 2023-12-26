@@ -40,7 +40,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
       if (paperRef.current) {
         const marginTop = 16;
         const marginBottom = 24;
-        const pageHeight = (1123 - marginTop) - marginBottom;
+        const pageHeight = 1123 - marginTop - marginBottom;
 
         let currentPage = createNewPage(paperRef.current);
         let currentPageHeight = 0;

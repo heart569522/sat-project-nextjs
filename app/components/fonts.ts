@@ -2,7 +2,7 @@ import {
   Inter,
   Lusitana,
   Noto_Sans_Thai_Looped,
-  Sarabun
+  Sarabun,
 } from 'next/font/google';
 
 export const inter = Inter({ subsets: ['latin'] });
@@ -21,4 +21,3 @@ export const sarabun = Sarabun({
   subsets: ['thai'],
   weight: ['400', '500', '600', '700'],
 });
-

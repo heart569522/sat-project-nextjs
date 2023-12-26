@@ -12,7 +12,10 @@ export default async function Page({}: {}) {
       <div>
         <Breadcrumbs
           breadcrumbs={[
-            { label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม', href: '/dashboard/activity-history' },
+            {
+              label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
+              href: '/dashboard/activity-history',
+            },
             {
               label: 'แบบร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
               href: '/dashboard/activity-history/transcript',
@@ -21,7 +24,7 @@ export default async function Page({}: {}) {
           ]}
         />
       </div>
-      <div className="w-full mt-4">
+      <div className="mt-4 w-full">
         <PN11Form />
       </div>
     </>
