@@ -40,3 +40,4 @@ export const convertToLocaleString = (value: any) => {
   const formattedAmount = Number(value).toLocaleString('en-US');
   return formattedAmount;
 };
+

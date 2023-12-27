@@ -4,7 +4,7 @@ import { convertISOStringToDateText } from '@/app/lib/services';
 import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
 
-export default function pn11Paper({ data }: { data: PN11 }) {
+export default function PN11Paper({ data }: { data: PN11 }) {
   const DotsPlaceholder = ({
     numOfDots,
     text,

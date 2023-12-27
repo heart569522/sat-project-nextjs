@@ -1,4 +1,5 @@
 {
+  "name": "sat-project",
   "private": true,
   "scripts": {
     "build": "next build",
