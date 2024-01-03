@@ -1,6 +1,20 @@
 import moment from 'moment-timezone';
 import { ThaiBaht } from 'thai-baht-text-ts';
 
+export const getCurrentDateAndTime = () => {
+  const now = new Date();
+  const year = now.getFullYear() + 543;
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+
+  return {
+    date: `${day}/${month}/${year}`,
+    time: `${hour}:${minute} น.`,
+  };
+};
+
 export const convertStringToThaiBathText = (value: string | undefined) => {
   const numberValue = Number(value?.replace(/,/g, ''));
   if (isNaN(numberValue)) {
@@ -40,4 +54,3 @@ export const convertToLocaleString = (value: any) => {
   const formattedAmount = Number(value).toLocaleString('en-US');
   return formattedAmount;
 };
-

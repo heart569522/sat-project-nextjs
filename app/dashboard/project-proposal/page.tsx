@@ -17,6 +17,8 @@ export default async function Page({
     page?: string;
   };
 }) {
+
+
   return (
     <div className="w-full">
       <Breadcrumbs

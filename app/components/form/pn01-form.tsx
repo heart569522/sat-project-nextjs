@@ -23,6 +23,24 @@ import { DateField, DateTimeField, TimeField } from '@mui/x-date-pickers';
 import { PN01 } from '@/app/model/pn01';
 import { Button } from '../button';
 import Link from 'next/link';
+import {
+  getStrategicIssue,
+  getObjective,
+  getUniversityStrategic,
+  getOperationPlanKPI,
+  getProjectKPI,
+  getProjectStatus,
+  getStrategicPlanKPI,
+} from '@/app/lib/api-service';
+import {
+  objective_list,
+  operational_plan_kpi_list,
+  project_kpi_list,
+  project_status_list,
+  strategic_issue_list,
+  strategic_plan_kpi_list,
+  university_strategic_list,
+} from '@/app/model/pn01-select-list';
 
 interface ValidationError {
   id: number;
@@ -34,6 +52,9 @@ interface ValidationErrors {
 }
 
 export default function PN01Form() {
+  // const projectCode = generateProjectCode();
+  // console.log('projectCode: ', projectCode);
+
   const [isButton, setIsButton] = useState({
     submit: false,
     draft: false,
@@ -61,6 +82,103 @@ export default function PN01Form() {
     lecturer: '',
     improvement: '',
   });
+
+  const [strategicIssueList, setStrategicIssueList] = useState<
+    strategic_issue_list[]
+  >([]);
+  const [objectiveList, setObjectiveList] = useState<objective_list[]>([]);
+  const [universityStrategicList, setUniversityStrategicList] = useState<
+    university_strategic_list[]
+  >([]);
+  const [strategicPlanKPIList, setStrategicPlanKPI] = useState<
+    strategic_plan_kpi_list[]
+  >([]);
+  const [operationPlanKPIList, setOperationPlanKPI] = useState<
+    operational_plan_kpi_list[]
+  >([]);
+  const [projectKPIList, setProjectKPI] = useState<project_kpi_list[]>([]);
+  const [projectStatusList, setProjectStatus] = useState<project_status_list[]>(
+    [],
+  );
+
+  const getStrategicIssueList = async () => {
+    try {
+      const data = await getStrategicIssue();
+      setStrategicIssueList(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getObjectiveList = async () => {
+    try {
+      const data = await getObjective();
+      setObjectiveList(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getUniversityStrategicList = async () => {
+    try {
+      const data = await getUniversityStrategic(); // Replace with your actual API function
+      setUniversityStrategicList(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getStrategicPlanKPIList = async () => {
+    try {
+      const data = await getStrategicPlanKPI(); // Replace with your actual API function
+      setStrategicPlanKPI(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getOperationPlanKPIList = async () => {
+    try {
+      const data = await getOperationPlanKPI(); // Replace with your actual API function
+      setOperationPlanKPI(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getProjectKPIList = async () => {
+    try {
+      const data = await getProjectKPI(); // Replace with your actual API function
+      setProjectKPI(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getProjectStatusList = async () => {
+    try {
+      const data = await getProjectStatus(); // Replace with your actual API function
+      setProjectStatus(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('fetch list pn01');
+
+    const fetchData = async () => {
+      await getStrategicIssueList();
+      await getObjectiveList();
+      await getUniversityStrategicList();
+      await getStrategicPlanKPIList();
+      await getOperationPlanKPIList();
+      await getProjectKPIList();
+      await getProjectStatusList();
+    };
+
+    fetchData();
+  }, []);
 
   const [selectedValues, setSelectedValues] = useState({
     strategicIssue: '',
@@ -974,7 +1092,7 @@ export default function PN01Form() {
     return isValid;
   };
 
-  const handleDraft = (event: any) => {
+  const handleDraft = async (event: any) => {
     event.preventDefault();
     isButton.draft = true;
 
@@ -984,11 +1102,9 @@ export default function PN01Form() {
     }
   };
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     isButton.submit = true;
-
-    // setValidationArrayError({});
 
     const isFormValid = validateForm();
 
@@ -996,26 +1112,30 @@ export default function PN01Form() {
       const formData = setFinalFormData();
       console.log('formData: ', formData);
 
-      const jsonData = JSON.stringify(formData, null, 2); // Convert JSON data to string with indentation
+      try {
+        const response = await fetch(
+          `${process.env.API_URL}/api/project-proposal`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          },
+        );
 
-      // Create a Blob from the JSON data
-      const blob = new Blob([jsonData], { type: 'application/json' });
-
-      // Create a link element
-      const link = document.createElement('a');
-
-      // Set the link's attributes
-      link.href = window.URL.createObjectURL(blob);
-      link.download = 'formData.json';
-
-      // Append the link to the document body
-      document.body.appendChild(link);
-
-      // Trigger a click on the link to start the download
-      link.click();
-
-      // Remove the link from the document body
-      document.body.removeChild(link);
+        if (response.ok) {
+          console.log('Data sent successfully');
+        } else {
+          console.error(
+            'Failed to send data. Server responded with:',
+            response.status,
+            response.statusText,
+          );
+        }
+      } catch (error) {
+        console.error('Error while sending data:', error);
+      }
     } else {
       console.error('Form validation failed. Please check the form fields.');
     }
@@ -1269,7 +1389,7 @@ export default function PN01Form() {
                         <TextField
                           type="text"
                           name="work"
-                          className="flex w-full"
+                          className="flex w-full "
                           placeholder=""
                           value={row.work}
                           onChange={(e) =>
@@ -1343,12 +1463,11 @@ export default function PN01Form() {
                 value={selectedValues.strategicIssue}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {strategicIssueList.map((list) => (
+                  <MenuItem key={list.id} divider={true} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.strategicIssue}
@@ -1374,12 +1493,11 @@ export default function PN01Form() {
                 value={selectedValues.objective}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {objectiveList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>{validationSelectError.objective}</FormHelperText>
             </FormControl>
@@ -1403,12 +1521,11 @@ export default function PN01Form() {
                 value={selectedValues.universityStrategic}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {universityStrategicList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.universityStrategic}
@@ -1434,12 +1551,11 @@ export default function PN01Form() {
                 value={selectedValues.strategicPlanKPI}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {strategicPlanKPIList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.strategicPlanKPI}
@@ -1465,12 +1581,11 @@ export default function PN01Form() {
                 value={selectedValues.operationPlanKPI}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {operationPlanKPIList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.operationPlanKPI}
@@ -1496,12 +1611,11 @@ export default function PN01Form() {
                 value={selectedValues.projectKPI}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {projectKPIList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.projectKPI}
@@ -1527,12 +1641,11 @@ export default function PN01Form() {
                 value={selectedValues.projectStatus}
                 onChange={handleSelectChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {projectStatusList.map((list) => (
+                  <MenuItem divider={true} key={list.id} value={list.id}>
+                    {list.name}
+                  </MenuItem>
+                ))}
               </Select>
               <FormHelperText>
                 {validationSelectError.projectStatus}
