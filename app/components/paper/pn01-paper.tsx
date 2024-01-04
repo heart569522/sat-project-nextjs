@@ -13,6 +13,8 @@ import {
 import { useEffect, useRef } from 'react';
 
 export default function PN01Paper({ data }: { data: PN01 }) {
+  console.log(data);
+  
   const paperRef = useRef<HTMLDivElement>(null);
 
   const createNewPage = (container: HTMLDivElement): HTMLDivElement => {

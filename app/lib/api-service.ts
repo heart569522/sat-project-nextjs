@@ -84,6 +84,15 @@ export async function getProjectStatus() {
   return res.json();
 }
 
-export async function createrojectProposalDraft() {
+export async function getProjectProposals() {
+  const res = await fetch(
+    `${process.env.API_URL}/api/project-proposal`,
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch data');
+  }
+
+  return res.json();
 
 }
