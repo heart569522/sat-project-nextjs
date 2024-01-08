@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default async function Page({}: {}) {
   return (
-    <div className="w-full">
+    <>
       <Breadcrumbs
         breadcrumbs={[
           {
@@ -18,9 +18,10 @@ export default async function Page({}: {}) {
           },
         ]}
       />
-      <div className="mt-4">
-        <PN10Form />
+      <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
+      <PN10Form />
       </div>
-    </div>
+    </>
+    
   );
 }

@@ -7,7 +7,7 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
-  strategic_issue_list
+  // strategic_issue_list
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
