@@ -108,7 +108,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </td>
                     <td className="w-[20%]">
                       <div className={`border border-black p-3 text-xs`}>
-                        <p>รหัสโครงการ</p>
+                        <p>รหัสโครงการ.........</p>
                         <br />
                         <div className="flex justify-between">
                           <p>วันที่ .....</p>

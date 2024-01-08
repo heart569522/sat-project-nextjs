@@ -14,12 +14,7 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import HelpIcon from '@mui/icons-material/Help';
 import { useEffect, useState } from 'react';
-
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateField, DateTimeField, TimeField } from '@mui/x-date-pickers';
 import { PN01 } from '@/app/model/pn01';
 import { Button } from '../button';
 import Link from 'next/link';
@@ -78,7 +73,7 @@ export default function PN01Form() {
     projectHeadPhone: '',
     principleReason: '',
     projectLocation: '',
-    projectDatetime: null,
+    projectDatetime: '',
     lecturer: '',
     improvement: '',
   });
@@ -207,7 +202,7 @@ export default function PN01Form() {
   ]);
 
   const [projectScheduleRows, setProjectScheduleRows] = useState([
-    { id: 1, date: null, time: null, detail: '' },
+    { id: 1, date: '', time: '', detail: '' },
   ]);
 
   const [targetTotal, setTargetTotal] = useState('');
@@ -410,7 +405,7 @@ export default function PN01Form() {
   const addProjectScheduleRow = () => {
     setProjectScheduleRows((prevRows) => [
       ...prevRows,
-      { id: prevRows.length + 1, date: null, time: null, detail: '' },
+      { id: prevRows.length + 1, date: '', time: '', detail: '' },
     ]);
   };
 
@@ -1028,7 +1023,7 @@ export default function PN01Form() {
     }
 
     // Validate Table arrays
-    const responsibleFields = ['firstname', 'lastname', 'position', 'work'];
+    const responsibleFields = ['firstname', 'lastname',];
     const isResponsibleValid = validateArray(
       responsibleRows,
       responsibleFields,
@@ -1071,7 +1066,7 @@ export default function PN01Form() {
       'budgetIncome',
     );
 
-    const budgetExpenseFields = ['detail', 'amount', 'note'];
+    const budgetExpenseFields = ['detail', 'amount',];
     const isBudgetExpenseValid = validateArray(
       budgetExpenseRows,
       budgetExpenseFields,
@@ -1144,12 +1139,6 @@ export default function PN01Form() {
   const setFinalFormData = () => {
     console.log('--set form--');
 
-    const formattedProjectScheduleRows = projectScheduleRows.map((row) => ({
-      ...row,
-      date: formatDateToISO(row.date),
-      time: formatDateToISO(row.time),
-    }));
-
     const finalFormData: PN01 = {
       faculty: formInput.faculty,
       projectName: formInput.projectName,
@@ -1157,7 +1146,7 @@ export default function PN01Form() {
       projectHeadPhone: formInput.projectHeadPhone,
       principleReason: formInput.principleReason,
       projectLocation: formInput.projectLocation,
-      projectDatetime: formatDateToISO(formInput.projectDatetime),
+      projectDatetime: formInput.projectDatetime,
       lecturer: formInput.lecturer,
       improvement: formInput.improvement,
       strategicIssue: selectedValues.strategicIssue,
@@ -1171,7 +1160,7 @@ export default function PN01Form() {
       OIVTRows: OIVTRows,
       expectedResultRows: expectedResultRows,
       operationDurationRows: operationDurationRows,
-      projectScheduleRows: formattedProjectScheduleRows,
+      projectScheduleRows: projectScheduleRows,
       targetTotal: targetTotal,
       targetRows: targetRows,
       budgetIncomeTotal: budgetIncomeTotal,
@@ -1196,7 +1185,7 @@ export default function PN01Form() {
                 validationError.faculty ? 'text-red-600' : 'text-gray-900'
               }`}
             >
-              1.ชื่อคณะ/วิทยาลัย/หน่วยงาน
+              1.ชื่อคณะ/วิทยาลัย/หน่วยงาน *
             </label>
             <TextField
               type="text"
@@ -1216,7 +1205,7 @@ export default function PN01Form() {
                 validationError.projectName ? 'text-red-600' : 'text-gray-900'
               }`}
             >
-              2.ชื่อโครงการ
+              2.ชื่อโครงการ *
             </label>
             <TextField
               type="text"
@@ -1236,7 +1225,7 @@ export default function PN01Form() {
                 validationError.projectHead ? 'text-red-600' : 'text-gray-900'
               }`}
             >
-              3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ
+              3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ *
             </label>
             <TextField
               type="text"
@@ -1258,7 +1247,7 @@ export default function PN01Form() {
                   : 'text-gray-900'
               }`}
             >
-              หมายเลขโทรศัพท์
+              หมายเลขโทรศัพท์ *
             </label>
             <TextField
               type="text"
@@ -1282,7 +1271,7 @@ export default function PN01Form() {
                     ลำดับที่
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    ชื่อ - สกุล
+                    ชื่อ - สกุล *
                   </th>
                   <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
                     ตำแหน่งโครงการ
@@ -1441,7 +1430,7 @@ export default function PN01Form() {
           </div>
         </div>
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ
+          4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ *
         </h3>
         <div className="mb-6">
           <div>
@@ -1659,7 +1648,7 @@ export default function PN01Form() {
             validationError.projectTypes ? 'text-red-600' : 'text-gray-900'
           }`}
         >
-          5.ประเภทโครงการ
+          5.ประเภทโครงการ *
         </h3>
         <div
           className={`mb-6 ${
@@ -2141,7 +2130,7 @@ export default function PN01Form() {
               : 'text-gray-900'
           }`}
         >
-          6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
+          6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ *
         </h3>
         <div
           className={`mb-6 ${
@@ -2248,7 +2237,7 @@ export default function PN01Form() {
             validationError.principleReason ? 'text-red-600' : 'text-gray-900'
           }`}
         >
-          7.หลักการและเหตุผล
+          7.หลักการและเหตุผล *
         </h3>
         <div className="mb-6">
           <div className="grid gap-6 md:grid-cols-1">
@@ -2273,7 +2262,7 @@ export default function PN01Form() {
 
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
           8.วัตถุประสงค์ ตัวชี้วัด ค่าเป้าหมาย/เกณฑ์ความสำเร็จ และ
-          เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+          เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด *
         </h3>
         <div className="mb-6">
           <div className="grid gap-6 md:grid-cols-1">
@@ -2436,7 +2425,7 @@ export default function PN01Form() {
         </div>
 
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          9.ประโยชน์ที่คาดว่าจะได้รับ
+          9.ประโยชน์ที่คาดว่าจะได้รับ *
         </h3>
         <div className="mb-6">
           <div className="grid gap-6 md:grid-cols-1">
@@ -2503,7 +2492,7 @@ export default function PN01Form() {
         </div>
 
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ
+          10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ *
         </h3>
         <div className="mb-6">
           <div className="grid gap-6 md:grid-cols-1">
@@ -2586,7 +2575,7 @@ export default function PN01Form() {
                     : 'text-gray-900'
                 }`}
               >
-                11.1 สถานที่จัดโครงการ
+                11.1 สถานที่จัดโครงการ *
               </label>
               <TextField
                 type="text"
@@ -2609,45 +2598,19 @@ export default function PN01Form() {
                 }`}
               >
                 <p className="flex items-center gap-1">
-                  11.2 วัน/เวลา ที่จัดโครงการ
-                  <Tooltip
-                    title="รูปแบบ วัน/เดือน/ปี(ค.ศ.) เวลา 24 ชั่วโมง"
-                    placement="top"
-                    arrow
-                  >
-                    <HelpIcon className="h-5 w-5 text-gray-500" />
-                  </Tooltip>
+                  11.2 วัน/เวลา ที่จัดโครงการ *
                 </p>
               </label>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimeField
-                  ampm={false}
-                  className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  value={formInput.projectDatetime || null}
-                  onChange={(value) =>
-                    handleInputChange({
-                      target: { name: 'projectDatetime', value },
-                    })
-                  }
-                  format="DD/MM/YYYY HH:mm"
-                  helperText={validationError.projectDatetime}
-                  sx={{
-                    color: validationError.projectDatetime
-                      ? '#D32F2F'
-                      : 'inherit',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: validationError.projectDatetime
-                        ? '#D32F2F'
-                        : 'inherit',
-                    },
-                    '& .MuiFormHelperText-root': {
-                      color: validationError.projectDatetime
-                        ? '#D32F2F'
-                        : 'inherit',
-                    },
-                  }}
-                />
-              </LocalizationProvider>
+              <TextField
+                type="text"
+                name="projectDatetime"
+                className="flex w-full"
+                value={formInput.projectDatetime}
+                onChange={handleInputChange}
+                placeholder="วัน/เดือน/ปี"
+                error={Boolean(validationError.projectDatetime)}
+                helperText={validationError.projectDatetime}
+              />
             </div>
           </div>
           <div className="grid gap-6 md:grid-cols-1">
@@ -2656,7 +2619,7 @@ export default function PN01Form() {
                 htmlFor="countries"
                 className="mb-2 block text-base font-medium text-gray-900"
               >
-                11.3 กำหนดการ (โดยละเอียด)
+                11.3 กำหนดการ (โดยละเอียด) *
               </label>
               <div className="mb-6">
                 <div className="grid gap-6 md:grid-cols-1">
@@ -2667,13 +2630,6 @@ export default function PN01Form() {
                           <th scope="col" className="w-[15%] px-6 py-3">
                             <p className="flex items-center justify-center gap-1">
                               วันที่
-                              <Tooltip
-                                title="รูปแบบ วัน/เดือน/ปี(ค.ศ.)"
-                                placement="top"
-                                arrow
-                              >
-                                <HelpIcon className="h-5 w-5 text-gray-500" />
-                              </Tooltip>
                             </p>
                           </th>
                           <th
@@ -2682,17 +2638,10 @@ export default function PN01Form() {
                           >
                             <p className="flex items-center justify-center gap-1">
                               เวลา
-                              <Tooltip
-                                title="รูปแบบ 24 ชั่วโมง"
-                                placement="top"
-                                arrow
-                              >
-                                <HelpIcon className="h-5 w-5 text-gray-500" />
-                              </Tooltip>
                             </p>
                           </th>
                           <th scope="col" className="px-6 py-3">
-                            รายการกิจกรรม
+                            รายการกิจกรรม *
                           </th>
                           <th
                             scope="col"
@@ -2707,45 +2656,32 @@ export default function PN01Form() {
                           <tr className="border-b bg-white" key={row.id}>
                             <td className="px-6 py-4">
                               <div className={`grid grid-cols-1 gap-6`}>
-                                <LocalizationProvider
-                                  dateAdapter={AdapterDayjs}
-                                >
-                                  <DateField
-                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                    value={row.date}
-                                    onChange={(value) =>
-                                      handleProjectScheduleChange(row.id, {
-                                        target: {
-                                          name: 'date',
-                                          value,
-                                        },
-                                      })
-                                    }
-                                    format="DD/MM/YYYY"
-                                  />
-                                </LocalizationProvider>
+                                <TextField
+                                  type="text"
+                                  name="date"
+                                  className="flex w-full"
+                                  variant="outlined"
+                                  placeholder="วัน/เดือน/ปี"
+                                  value={row.date}
+                                  onChange={(value) =>
+                                    handleProjectScheduleChange(row.id, value)
+                                  }
+                                />
                               </div>
                             </td>
                             <td className="bg-gray-50 px-6 py-4">
                               <div className={`grid grid-cols-1 gap-6`}>
-                                <LocalizationProvider
-                                  dateAdapter={AdapterDayjs}
-                                >
-                                  <TimeField
-                                    className="w-full text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                    value={row.time}
-                                    name="time"
-                                    onChange={(value) =>
-                                      handleProjectScheduleChange(row.id, {
-                                        target: {
-                                          name: 'time',
-                                          value,
-                                        },
-                                      })
-                                    }
-                                    format="HH:mm"
-                                  />
-                                </LocalizationProvider>
+                                <TextField
+                                  type="text"
+                                  name="time"
+                                  className="flex w-full"
+                                  variant="outlined"
+                                  placeholder="รูปแบบ 24 ชั่วโมง"
+                                  value={row.time}
+                                  onChange={(value) =>
+                                    handleProjectScheduleChange(row.id, value)
+                                  }
+                                />
                               </div>
                             </td>
                             <td className="px-6 py-4">
@@ -2827,7 +2763,7 @@ export default function PN01Form() {
         </div>
 
         <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
+          13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย *
         </h3>
         <div className="mb-6">
           <div className="grid gap-6 md:grid-cols-1">
@@ -2942,7 +2878,7 @@ export default function PN01Form() {
             validationError.improvement ? 'text-red-600' : 'text-gray-900'
           }`}
         >
-          14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
+          14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน *
         </h3>
         <div className="mb-6">
           <div>
@@ -2975,7 +2911,7 @@ export default function PN01Form() {
                 htmlFor="project_location"
                 className="mb-2 block text-base font-medium text-gray-900"
               >
-                15.1 งบประมาณรายรับ
+                15.1 งบประมาณรายรับ *
               </label>
               <table className="w-full rounded border text-left text-sm text-gray-500">
                 <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
@@ -3143,7 +3079,7 @@ export default function PN01Form() {
                 htmlFor="project_location"
                 className="mb-2 block text-base font-medium text-gray-900"
               >
-                15.2 งบประมาณรายจ่าย
+                15.2 งบประมาณรายจ่าย *
               </label>
               <table className="w-full rounded border text-left text-sm text-gray-500">
                 <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
