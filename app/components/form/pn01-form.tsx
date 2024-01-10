@@ -36,6 +36,8 @@ import {
   strategic_plan_kpi_list,
   university_strategic_list,
 } from '@/app/model/pn01-select-list';
+import { ModalQuestion } from '../modal';
+import { useRouter } from 'next/navigation'
 
 interface ValidationError {
   id: number;
@@ -47,13 +49,47 @@ interface ValidationErrors {
 }
 
 export default function PN01Form() {
-  // const projectCode = generateProjectCode();
-  // console.log('projectCode: ', projectCode);
+  const router = useRouter()
 
-  const [isButton, setIsButton] = useState({
-    submit: false,
-    draft: false,
-  });
+  const [openModal, setOpenModal] = useState(false);
+  const [titleModal, setTitleModal] = useState('');
+  const [detailModal, setDetailModal] = useState('');
+  const [handleAction, setHandleAction] = useState(''); 
+
+  const handleOpenModal = (isCancel?: boolean, isDraft?: boolean, isSubmit?: boolean) => {
+    console.log('handleOpenModal');
+
+    if (isCancel) {
+      setTitleModal('ยกเลิกการเสนอโครงการ/กิจกรรม');
+      setDetailModal('คุณยืนยันที่จะยกเลิกการเสนอโครงการ/กิจกรรม');
+      setHandleAction('cancel');
+      setOpenModal(true);
+    }
+
+    if (isDraft) {
+      setTitleModal('แบบร่างโครงการ/กิจกรรม');
+      setDetailModal('คุณยืนยันที่จะบันทึกแบบร่างการเสนอโครงการ/กิจกรรม');
+      setHandleAction('draft');
+      setOpenModal(true);
+    }
+
+    if (isSubmit) {
+      const isFormValid = validateForm();
+
+      if (isFormValid) {
+        setTitleModal('เสนอโครงการ/กิจกรรม');
+        setDetailModal('คุณยืนยันที่จะส่งข้อมูลการเสนอโครงการ/กิจกรรม');
+        setHandleAction('submit');
+        setOpenModal(true);
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  let userId = '8d2de365-1dea-4b3e-97ec-9f46b5b68ff1'; // test id super admin
 
   const [validationError, setValidationError] = useState<{
     [key: string]: string;
@@ -334,12 +370,7 @@ export default function PN01Form() {
 
     setFormInput((prevTypes) => ({
       ...prevTypes,
-      [name]:
-        name === 'projectDatetime'
-          ? value
-            ? new Date(value)
-            : ''
-          : value || '',
+      [name]: value,
     }));
 
     setValidationError((prevErrors) => ({
@@ -774,7 +805,7 @@ export default function PN01Form() {
         row.id === id
           ? {
               ...row,
-              [name]: name === 'detail' ? value : new Date(value),
+              [name]: value,
             }
           : row,
       ),
@@ -1023,7 +1054,7 @@ export default function PN01Form() {
     }
 
     // Validate Table arrays
-    const responsibleFields = ['firstname', 'lastname',];
+    const responsibleFields = ['firstname', 'lastname'];
     const isResponsibleValid = validateArray(
       responsibleRows,
       responsibleFields,
@@ -1066,7 +1097,7 @@ export default function PN01Form() {
       'budgetIncome',
     );
 
-    const budgetExpenseFields = ['detail', 'amount',];
+    const budgetExpenseFields = ['detail', 'amount'];
     const isBudgetExpenseValid = validateArray(
       budgetExpenseRows,
       budgetExpenseFields,
@@ -1087,59 +1118,51 @@ export default function PN01Form() {
     return isValid;
   };
 
-  const handleDraft = async (event: any) => {
-    event.preventDefault();
-    isButton.draft = true;
+  const handleDraft = async () => {
+    console.log('handleDraft');
 
-    if (isButton.draft) {
-      const formData = setFinalFormData();
-      console.log('formData: ', formData);
-    }
+    const formData = setFinalFormData(true);
+    console.log('formData: ', formData);
   };
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-    isButton.submit = true;
+  const handleSubmit = async () => {
+    console.log('handleSubmit');
 
-    const isFormValid = validateForm();
+    const formData = setFinalFormData(false);
+    console.log('formData: ', formData);
 
-    if (isButton.submit && isFormValid) {
-      const formData = setFinalFormData();
-      console.log('formData: ', formData);
+    // try {
+    //   const response = await fetch(
+    //     `${process.env.API_URL}/api/project-proposal`,
+    //     {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(formData),
+    //     },
+    //   );
 
-      try {
-        const response = await fetch(
-          `${process.env.API_URL}/api/project-proposal`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-          },
-        );
-
-        if (response.ok) {
-          console.log('Data sent successfully');
-        } else {
-          console.error(
-            'Failed to send data. Server responded with:',
-            response.status,
-            response.statusText,
-          );
-        }
-      } catch (error) {
-        console.error('Error while sending data:', error);
-      }
-    } else {
-      console.error('Form validation failed. Please check the form fields.');
-    }
+    //   if (!response.ok) {
+    //     console.error(
+    //       'Failed to send data. Server responded with:',
+    //       response.status,
+    //       response.statusText,
+    //     );
+    //   } else {
+    //     console.log('Create project proposal success ', response);
+    //   }
+    // } catch (error) {
+    //   console.error('Error while sending data:', error);
+    // }
   };
 
-  const setFinalFormData = () => {
+  const setFinalFormData = (isDraft: boolean) => {
     console.log('--set form--');
 
     const finalFormData: PN01 = {
+      userId: userId,
+      isDraft: isDraft,
       faculty: formInput.faculty,
       projectName: formInput.projectName,
       projectHead: formInput.projectHead,
@@ -1175,1112 +1198,110 @@ export default function PN01Form() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="py-2">
-      <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
-        <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
-          <div>
-            <label
-              htmlFor="faculty"
-              className={`mb-2 block text-base font-medium ${
-                validationError.faculty ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              1.ชื่อคณะ/วิทยาลัย/หน่วยงาน *
-            </label>
-            <TextField
-              type="text"
-              name="faculty"
-              className="flex w-full"
-              value={formInput.faculty}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.faculty)}
-              helperText={validationError.faculty}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="projectName"
-              className={`mb-2 block text-base font-medium ${
-                validationError.projectName ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              2.ชื่อโครงการ *
-            </label>
-            <TextField
-              type="text"
-              name="projectName"
-              className="flex w-full"
-              value={formInput.projectName}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.projectName)}
-              helperText={validationError.projectName}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="projectHead"
-              className={`mb-2 block text-base font-medium ${
-                validationError.projectHead ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ *
-            </label>
-            <TextField
-              type="text"
-              name="projectHead"
-              className="flex w-full"
-              value={formInput.projectHead}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.projectHead)}
-              helperText={validationError.projectHead}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="projectHeadPhone"
-              className={`mb-2 block text-base font-medium ${
-                validationError.projectHeadPhone
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              หมายเลขโทรศัพท์ *
-            </label>
-            <TextField
-              type="text"
-              name="projectHeadPhone"
-              className="flex w-full"
-              value={formInput.projectHeadPhone}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.projectHeadPhone)}
-              helperText={validationError.projectHeadPhone}
-            />
-          </div>
-          <div></div>
-        </div>
-        <div className={`mb-6 grid gap-6 md:grid-cols-1`}>
-          <div className="relative overflow-x-auto">
-            <table className="w-full rounded border text-left text-sm text-gray-500">
-              <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                <tr>
-                  <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                    ลำดับที่
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    ชื่อ - สกุล *
-                  </th>
-                  <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
-                    ตำแหน่งโครงการ
-                  </th>
-                  <th scope="col" className="w-[15%] px-6 py-3">
-                    ภาระงาน (ภารกิจ/สัปดาห์)
-                  </th>
-                  <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                    เพิ่ม/ลบแถว
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {responsibleRows.map((row) => (
-                  <tr className="border-b bg-white" key={row.id}>
-                    <th
-                      scope="row"
-                      className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
-                    >
-                      {row.id}
-                    </th>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-2 gap-6`}>
-                        <TextField
-                          type="text"
-                          name="firstname"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.firstname}
-                          onChange={(e) =>
-                            handleResponsibleChange(
-                              row.id,
-                              'firstname',
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError['responsible_firstname']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['responsible_firstname']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                        <TextField
-                          type="text"
-                          name="lastname"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.lastname}
-                          onChange={(e) =>
-                            handleResponsibleChange(
-                              row.id,
-                              'lastname',
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError['responsible_lastname']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['responsible_lastname']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="bg-gray-50 px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          name="position"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.position}
-                          onChange={(e) =>
-                            handleResponsibleChange(
-                              row.id,
-                              'position',
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError['responsible_position']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['responsible_position']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          name="work"
-                          className="flex w-full "
-                          placeholder=""
-                          value={row.work}
-                          onChange={(e) =>
-                            handleResponsibleChange(
-                              row.id,
-                              'work',
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError['responsible_work']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['responsible_work']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                      <Tooltip title="เพิ่มแถว">
-                        <IconButton
-                          aria-label="add_row"
-                          size="small"
-                          onClick={addResponsibleRow}
-                        >
-                          <PlusCircleIcon className="h-9 w-9" />
-                        </IconButton>
-                      </Tooltip>
-                      {responsibleRows.length > 1 && (
-                        <Tooltip title="ลบแถว">
-                          <IconButton
-                            aria-label="delete_row"
-                            size="small"
-                            onClick={() => deleteResponsibleRow(row.id)}
-                          >
-                            <XCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ *
-        </h3>
-        <div className="mb-6">
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.strategicIssue
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.1 ประเด็นยุทธศาสตร์ที่
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.strategicIssue)}
-            >
-              <Select
-                name="strategicIssue"
-                value={selectedValues.strategicIssue}
-                onChange={handleSelectChange}
-              >
-                {strategicIssueList.map((list) => (
-                  <MenuItem key={list.id} divider={true} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.strategicIssue}
-              </FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.objective
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.2 เป้าประสงค์ที่
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.objective)}
-            >
-              <Select
-                name="objective"
-                value={selectedValues.objective}
-                onChange={handleSelectChange}
-              >
-                {objectiveList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{validationSelectError.objective}</FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.universityStrategic
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.3 กลยุทธ์ระดับมหาวิทยาลัยที่
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.universityStrategic)}
-            >
-              <Select
-                name="universityStrategic"
-                value={selectedValues.universityStrategic}
-                onChange={handleSelectChange}
-              >
-                {universityStrategicList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.universityStrategic}
-              </FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.strategicPlanKPI
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.4 ตัวชี้วัดแผนกลยุทธ์ที่
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.strategicPlanKPI)}
-            >
-              <Select
-                name="strategicPlanKPI"
-                value={selectedValues.strategicPlanKPI}
-                onChange={handleSelectChange}
-              >
-                {strategicPlanKPIList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.strategicPlanKPI}
-              </FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.operationPlanKPI
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.5 ตัวชี้วัดแผนปฏิบัติการที่
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.operationPlanKPI)}
-            >
-              <Select
-                name="operationPlanKPI"
-                value={selectedValues.operationPlanKPI}
-                onChange={handleSelectChange}
-              >
-                {operationPlanKPIList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.operationPlanKPI}
-              </FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.projectKPI
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.6 ตัวชี้วัดโครงการ
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.projectKPI)}
-            >
-              <Select
-                name="projectKPI"
-                value={selectedValues.projectKPI}
-                onChange={handleSelectChange}
-              >
-                {projectKPIList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.projectKPI}
-              </FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              className={`mb-2 block text-base font-medium ${
-                validationSelectError.projectStatus
-                  ? 'text-red-600'
-                  : 'text-gray-900'
-              }`}
-            >
-              4.7 สถานะโครงการ
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationSelectError.projectStatus)}
-            >
-              <Select
-                name="projectStatus"
-                value={selectedValues.projectStatus}
-                onChange={handleSelectChange}
-              >
-                {projectStatusList.map((list) => (
-                  <MenuItem divider={true} key={list.id} value={list.id}>
-                    {list.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {validationSelectError.projectStatus}
-              </FormHelperText>
-            </FormControl>
-          </div>
-        </div>
-
-        <h3
-          className={`mb-2 block text-base font-medium ${
-            validationError.projectTypes ? 'text-red-600' : 'text-gray-900'
-          }`}
-        >
-          5.ประเภทโครงการ *
-        </h3>
-        <div
-          className={`mb-6 ${
-            validationError.projectTypes ? ' text-red-600' : 'text-gray-900'
-          }`}
-        >
-          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="maintenance"
-                type="checkbox"
-                checked={projectTypes.maintenance}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
+    <>
+      <form className="py-2">
+        <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
+          <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
+            <div>
               <label
-                htmlFor="maintenance"
-                className="ms-2 w-full py-4 text-sm font-medium"
+                htmlFor="faculty"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.faculty ? 'text-red-600' : 'text-gray-900'
+                }`}
               >
-                แผนทำนุบำรุงศิลปวัฒนธรรม
+                1.ชื่อคณะ/วิทยาลัย/หน่วยงาน *
               </label>
-            </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="academicService"
-                type="checkbox"
-                checked={projectTypes.academicService}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              <TextField
+                type="text"
+                name="faculty"
+                className="flex w-full"
+                value={formInput.faculty}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.faculty)}
+                helperText={validationError.faculty}
               />
-              <label
-                htmlFor="academicService"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนบริการวิชาการ
-              </label>
             </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="knowledgeManagement"
-                type="checkbox"
-                checked={projectTypes.knowledgeManagement}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            <div>
+              <label
+                htmlFor="projectName"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectName ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                2.ชื่อโครงการ *
+              </label>
+              <TextField
+                type="text"
+                name="projectName"
+                className="flex w-full"
+                value={formInput.projectName}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.projectName)}
+                helperText={validationError.projectName}
               />
-              <label
-                htmlFor="knowledgeManagement"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนการจัดการความรู้
-              </label>
             </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="researchPromotion"
-                type="checkbox"
-                checked={projectTypes.researchPromotion}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            <div>
+              <label
+                htmlFor="projectHead"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectHead ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ *
+              </label>
+              <TextField
+                type="text"
+                name="projectHead"
+                className="flex w-full"
+                value={formInput.projectHead}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.projectHead)}
+                helperText={validationError.projectHead}
               />
-              <label
-                htmlFor="researchPromotion"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนการส่งเสริมงานวิจัย
-              </label>
             </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="educationQualityAssurance"
-                type="checkbox"
-                checked={projectTypes.educationQualityAssurance}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            <div>
+              <label
+                htmlFor="projectHeadPhone"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectHeadPhone
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                หมายเลขโทรศัพท์ *
+              </label>
+              <TextField
+                type="text"
+                name="projectHeadPhone"
+                className="flex w-full"
+                value={formInput.projectHeadPhone}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.projectHeadPhone)}
+                helperText={validationError.projectHeadPhone}
               />
-              <label
-                htmlFor="educationQualityAssurance"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนการประกันคุณภาพการศึกษา
-              </label>
             </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="personnelDevelopment"
-                type="checkbox"
-                checked={projectTypes.personnelDevelopment}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="personnelDevelopment"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนพัฒนาบุคลากร
-              </label>
-            </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="riskManagement"
-                type="checkbox"
-                checked={projectTypes.riskManagement}
-                onChange={handleProjectTypeChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="riskManagement"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                แผนบริหารความเสี่ยง
-              </label>
-            </div>
+            <div></div>
           </div>
-          <div
-            className={`my-3 rounded border ${
-              validationError.projectTypes
-                ? 'border-red-600'
-                : 'border-gray-200'
-            }`}
-          >
-            <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
-              <div className="flex items-center ps-4">
-                <input
-                  name="studentDevelopment"
-                  type="checkbox"
-                  checked={projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="studentDevelopment"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ และกิจกรรมพัฒนานักศึกษา{' '}
-                  <b>(เลือกได้มากกว่า 1 ประเภท)</b>
-                </label>
-              </div>
-            </div>
-            <div
-              className={`${
-                !projectTypes.studentDevelopment
-                  ? 'bg-gray-100 text-gray-400'
-                  : 'text-gray-900'
-              } grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2`}
-            >
-              <div className="flex items-center ps-4">
-                <input
-                  name="moralEthical"
-                  type="checkbox"
-                  checked={
-                    projectTypes.moralEthical && projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="moralEthical"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  ด้านคุณธรรม จริยธรรม
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="academicPromotion"
-                  type="checkbox"
-                  checked={
-                    projectTypes.academicPromotion &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="academicPromotion"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="knowledge"
-                  type="checkbox"
-                  checked={
-                    projectTypes.knowledge && projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="knowledge"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  ด้านความรู้
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="environment"
-                  type="checkbox"
-                  checked={
-                    projectTypes.environment && projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="environment"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="intellectualSkill"
-                  type="checkbox"
-                  checked={
-                    projectTypes.intellectualSkill &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="intellectualSkill"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  ด้านทักษะทางปัญญา
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="sport"
-                  type="checkbox"
-                  checked={
-                    projectTypes.sport && projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="sport"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมกีฬา และการส่งเสริมสุขภาพ
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="knowledgeAnalysisCommunicationTechnology"
-                  type="checkbox"
-                  checked={
-                    projectTypes.knowledgeAnalysisCommunicationTechnology &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="knowledgeAnalysisCommunicationTechnology"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="artCultureDevelopment"
-                  type="checkbox"
-                  checked={
-                    projectTypes.artCultureDevelopment &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="artCultureDevelopment"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="numericalAnalysisCommunicationTechnology"
-                  type="checkbox"
-                  checked={
-                    projectTypes.numericalAnalysisCommunicationTechnology &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="numericalAnalysisCommunicationTechnology"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร และการใช้เทคโนโลยี
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="moralEthicalDevelopment"
-                  type="checkbox"
-                  checked={
-                    projectTypes.moralEthicalDevelopment &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="moralEthicalDevelopment"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
-                </label>
-              </div>
-              <div className="flex items-center ps-4">
-                <input
-                  name="leadershipDevelopment"
-                  type="checkbox"
-                  checked={
-                    projectTypes.leadershipDevelopment &&
-                    projectTypes.studentDevelopment
-                  }
-                  disabled={!projectTypes.studentDevelopment}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="leadershipDevelopment"
-                  className="ms-2 w-full py-4 text-sm font-medium"
-                >
-                  กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
-                </label>
-              </div>
-              <div className="ps-4">
-                <div className="flex items-center">
-                  <input
-                    name="subOther"
-                    type="checkbox"
-                    checked={
-                      projectTypes.subOther && projectTypes.studentDevelopment
-                    }
-                    disabled={!projectTypes.studentDevelopment}
-                    onChange={handleProjectTypeChange}
-                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <label
-                    htmlFor="subOther"
-                    className="ms-2 py-4 text-sm font-medium"
-                  >
-                    อื่นๆ
-                  </label>
-                  {projectTypes.subOther && projectTypes.studentDevelopment && (
-                    <div className="w-full border-b border-gray-300 px-2">
-                      <input
-                        type="text"
-                        name="subOtherDetail"
-                        className="flex w-full border-none "
-                        placeholder="โปรดระบุ"
-                        value={projectTypes.subOtherDetail || ''}
-                        onChange={handleProjectTypeChange}
-                        disabled={isSubOtherDisabled}
-                        required={!isSubOtherDisabled}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-            <div
-              className={`rounded border ${
-                validationError.projectTypes
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <div className="flex items-center">
-                <input
-                  name="other"
-                  type="checkbox"
-                  checked={projectTypes.other}
-                  onChange={handleProjectTypeChange}
-                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="other"
-                  className="ms-2 py-4 text-sm font-medium"
-                >
-                  อื่นๆ
-                </label>
-                {projectTypes.other && (
-                  <div className="w-full border-b border-gray-300 pl-2 pr-4">
-                    <input
-                      type="text"
-                      name="otherDetail"
-                      className="flex w-full border-none"
-                      placeholder="โปรดระบุ"
-                      value={projectTypes.otherDetail || ''}
-                      onChange={handleProjectTypeChange}
-                      disabled={isOtherDisabled}
-                      required={!isOtherDisabled}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          {validationError.projectTypes && (
-            <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
-              {validationError.projectTypes}
-            </p>
-          )}
-        </div>
-
-        <h3
-          className={`mb-2 block text-base font-medium ${
-            validationError.universityIndentity
-              ? 'text-red-600'
-              : 'text-gray-900'
-          }`}
-        >
-          6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ *
-        </h3>
-        <div
-          className={`mb-6 ${
-            validationError.universityIndentity
-              ? ' text-red-600'
-              : 'text-gray-900'
-          }`}
-        >
-          <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
-            <div
-              className={`flex items-center rounded border ${
-                validationError.universityIndentity
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="moral"
-                type="checkbox"
-                checked={universityIndentity.moral}
-                onChange={handleUniversityIndentityChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                คุณธรรมนำใจ
-              </label>
-            </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.universityIndentity
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="serve"
-                type="checkbox"
-                checked={universityIndentity.serve}
-                onChange={handleUniversityIndentityChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                รับใช้สังคม
-              </label>
-            </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.universityIndentity
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="academic"
-                type="checkbox"
-                checked={universityIndentity.academic}
-                onChange={handleUniversityIndentityChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                วิชาการก้าวหน้า
-              </label>
-            </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.universityIndentity
-                  ? 'border-red-600'
-                  : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="develop"
-                type="checkbox"
-                checked={universityIndentity.develop}
-                onChange={handleUniversityIndentityChange}
-                className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="bordered-checkbox-1"
-                className="ms-2 w-full py-4 text-sm font-medium"
-              >
-                พัฒนาสู่สากล
-              </label>
-            </div>
-          </div>
-          {validationError.universityIndentity && (
-            <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
-              {validationError.universityIndentity}
-            </p>
-          )}
-        </div>
-
-        <h3
-          className={`mb-2 block text-base font-medium ${
-            validationError.principleReason ? 'text-red-600' : 'text-gray-900'
-          }`}
-        >
-          7.หลักการและเหตุผล *
-        </h3>
-        <div className="mb-6">
-          <div className="grid gap-6 md:grid-cols-1">
-            <TextField
-              name="principleReason"
-              multiline
-              rows={5}
-              sx={{
-                '.MuiOutlinedInput-root': {
-                  padding: 1,
-                },
-              }}
-              className="flex w-full"
-              helperText={validationError.principleReason}
-              error={Boolean(validationError.principleReason)}
-              placeholder=""
-              value={formInput.principleReason}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          8.วัตถุประสงค์ ตัวชี้วัด ค่าเป้าหมาย/เกณฑ์ความสำเร็จ และ
-          เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด *
-        </h3>
-        <div className="mb-6">
-          <div className="grid gap-6 md:grid-cols-1">
+          <div className={`mb-6 grid gap-6 md:grid-cols-1`}>
             <div className="relative overflow-x-auto">
               <table className="w-full rounded border text-left text-sm text-gray-500">
                 <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
                   <tr>
-                    <th scope="col" className="bg-gray-300 px-6 py-3">
-                      วัตถุประสงค์โครงการ
+                    <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                      ลำดับที่
                     </th>
                     <th scope="col" className="px-6 py-3">
-                      ตัวชี้วัด
+                      ชื่อ - สกุล *
                     </th>
-                    <th scope="col" className="bg-gray-300 px-6 py-3">
-                      เป้าหมาย (เกณฑ์ความสำเร็จ)
+                    <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
+                      ตำแหน่งโครงการ
                     </th>
-                    <th scope="col" className="px-6 py-3">
-                      เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+                    <th scope="col" className="w-[15%] px-6 py-3">
+                      ภาระงาน (ภารกิจ/สัปดาห์)
                     </th>
                     <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
                       เพิ่ม/ลบแถว
@@ -2288,32 +1309,90 @@ export default function PN01Form() {
                   </tr>
                 </thead>
                 <tbody>
-                  {OIVTRows.map((row) => (
+                  {responsibleRows.map((row) => (
                     <tr className="border-b bg-white" key={row.id}>
-                      <td className="bg-gray-50 px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
+                      <th
+                        scope="row"
+                        className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
+                      >
+                        {row.id}
+                      </th>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-2 gap-6`}>
                           <TextField
                             type="text"
-                            name="objective"
+                            name="firstname"
                             className="flex w-full"
                             placeholder=""
-                            value={row.objective}
+                            value={row.firstname}
                             onChange={(e) =>
-                              handleOIVTChange(
+                              handleResponsibleChange(
                                 row.id,
-                                'objective',
+                                'firstname',
                                 e.target.value,
                               )
                             }
                             error={Boolean(
-                              validationArrayError['OIVT_objective']?.some(
-                                (item) => item.id === row.id,
-                              ),
+                              validationArrayError[
+                                'responsible_firstname'
+                              ]?.some((item) => item.id === row.id),
                             )}
                             helperText={
-                              validationArrayError['OIVT_objective']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
+                              validationArrayError[
+                                'responsible_firstname'
+                              ]?.find((item) => item.id === row.id)?.error || ''
+                            }
+                          />
+                          <TextField
+                            type="text"
+                            name="lastname"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.lastname}
+                            onChange={(e) =>
+                              handleResponsibleChange(
+                                row.id,
+                                'lastname',
+                                e.target.value,
+                              )
+                            }
+                            error={Boolean(
+                              validationArrayError[
+                                'responsible_lastname'
+                              ]?.some((item) => item.id === row.id),
+                            )}
+                            helperText={
+                              validationArrayError[
+                                'responsible_lastname'
+                              ]?.find((item) => item.id === row.id)?.error || ''
+                            }
+                          />
+                        </div>
+                      </td>
+                      <td className="bg-gray-50 px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            name="position"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.position}
+                            onChange={(e) =>
+                              handleResponsibleChange(
+                                row.id,
+                                'position',
+                                e.target.value,
+                              )
+                            }
+                            error={Boolean(
+                              validationArrayError[
+                                'responsible_position'
+                              ]?.some((item) => item.id === row.id),
+                            )}
+                            helperText={
+                              validationArrayError[
+                                'responsible_position'
+                              ]?.find((item) => item.id === row.id)?.error || ''
                             }
                           />
                         </div>
@@ -2322,72 +1401,24 @@ export default function PN01Form() {
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             type="text"
-                            name="indicator"
-                            className="flex w-full"
+                            name="work"
+                            className="flex w-full "
                             placeholder=""
-                            value={row.indicator}
+                            value={row.work}
                             onChange={(e) =>
-                              handleOIVTChange(
+                              handleResponsibleChange(
                                 row.id,
-                                'indicator',
+                                'work',
                                 e.target.value,
                               )
                             }
                             error={Boolean(
-                              validationArrayError['OIVT_indicator']?.some(
+                              validationArrayError['responsible_work']?.some(
                                 (item) => item.id === row.id,
                               ),
                             )}
                             helperText={
-                              validationArrayError['OIVT_indicator']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
-                            }
-                          />
-                        </div>
-                      </td>
-                      <td className="bg-gray-50 px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
-                          <TextField
-                            type="text"
-                            name="value"
-                            className="flex w-full"
-                            placeholder=""
-                            value={row.value}
-                            onChange={(e) =>
-                              handleOIVTChange(row.id, 'value', e.target.value)
-                            }
-                            error={Boolean(
-                              validationArrayError['OIVT_value']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                            helperText={
-                              validationArrayError['OIVT_value']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
-                            }
-                          />
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
-                          <TextField
-                            type="text"
-                            name="tool"
-                            className="flex w-full"
-                            placeholder=""
-                            value={row.tool}
-                            onChange={(e) =>
-                              handleOIVTChange(row.id, 'tool', e.target.value)
-                            }
-                            error={Boolean(
-                              validationArrayError['OIVT_tool']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                            helperText={
-                              validationArrayError['OIVT_tool']?.find(
+                              validationArrayError['responsible_work']?.find(
                                 (item) => item.id === row.id,
                               )?.error || ''
                             }
@@ -2399,17 +1430,17 @@ export default function PN01Form() {
                           <IconButton
                             aria-label="add_row"
                             size="small"
-                            onClick={addOIVTRow}
+                            onClick={addResponsibleRow}
                           >
                             <PlusCircleIcon className="h-9 w-9" />
                           </IconButton>
                         </Tooltip>
-                        {OIVTRows.length > 1 && (
+                        {responsibleRows.length > 1 && (
                           <Tooltip title="ลบแถว">
                             <IconButton
                               aria-label="delete_row"
                               size="small"
-                              onClick={() => deleteOIVTRow(row.id)}
+                              onClick={() => deleteResponsibleRow(row.id)}
                             >
                               <XCircleIcon className="h-9 w-9" />
                             </IconButton>
@@ -2422,803 +1453,1450 @@ export default function PN01Form() {
               </table>
             </div>
           </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          9.ประโยชน์ที่คาดว่าจะได้รับ *
-        </h3>
-        <div className="mb-6">
-          <div className="grid gap-6 md:grid-cols-1">
-            <table className="w-full rounded border text-left text-sm text-gray-500">
-              <tbody>
-                {expectedResultRows.map((row) => (
-                  <tr className="border-b bg-white" key={row.id}>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                      {row.id}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          id="expected_result"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.expected_result}
-                          onChange={(e) =>
-                            handleExpectedResultChange(row.id, e.target.value)
-                          }
-                          error={Boolean(
-                            validationArrayError[
-                              'expectedResult_expected_result'
-                            ]?.some((item) => item.id === row.id),
-                          )}
-                          helperText={
-                            validationArrayError[
-                              'expectedResult_expected_result'
-                            ]?.find((item) => item.id === row.id)?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4">
-                      <div className="flex items-center justify-center">
-                        <Tooltip title="เพิ่มแถว">
-                          <IconButton
-                            aria-label="add_row"
-                            size="small"
-                            onClick={addExpectedResultRow}
-                          >
-                            <PlusCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                        {expectedResultRows.length > 1 && (
-                          <Tooltip title="ลบแถว">
-                            <IconButton
-                              aria-label="delete_row"
-                              size="small"
-                              onClick={() => deleteExpectedResultRow(row.id)}
-                            >
-                              <XCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ *
-        </h3>
-        <div className="mb-6">
-          <div className="grid gap-6 md:grid-cols-1">
-            <table className="w-full rounded border text-left text-sm text-gray-500">
-              <tbody>
-                {operationDurationRows.map((row) => (
-                  <tr className="border-b bg-white" key={row.id}>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                      {row.id}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          type="text"
-                          id="operation_duration"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.operation_duration}
-                          onChange={(e) =>
-                            handleOperationDurationChange(
-                              row.id,
-                              e.target.value,
-                            )
-                          }
-                          error={Boolean(
-                            validationArrayError[
-                              'operationDuration_operation_duration'
-                            ]?.some((item) => item.id === row.id),
-                          )}
-                          helperText={
-                            validationArrayError[
-                              'operationDuration_operation_duration'
-                            ]?.find((item) => item.id === row.id)?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4">
-                      <div className="flex items-center justify-center">
-                        <Tooltip title="เพิ่มแถว">
-                          <IconButton
-                            aria-label="add_row"
-                            size="small"
-                            onClick={addOperationDurationRow}
-                          >
-                            <PlusCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                        {operationDurationRows.length > 1 && (
-                          <Tooltip title="ลบแถว">
-                            <IconButton
-                              aria-label="delete_row"
-                              size="small"
-                              onClick={() => deleteOperationDurationRow(row.id)}
-                            >
-                              <XCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          11.สถานที่จัดโครงการและกำหนดการ
-        </h3>
-        <div>
-          <div className="mb-3 grid gap-6 md:grid-cols-2">
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            4.ความสอดคล้องกับยุทธศาสตร์ของคณะวิชา/มหาวิทยาลัยพายัพ *
+          </h3>
+          <div className="mb-6">
             <div>
               <label
-                htmlFor="projectLocation"
                 className={`mb-2 block text-base font-medium ${
-                  validationError.projectLocation
+                  validationSelectError.strategicIssue
                     ? 'text-red-600'
                     : 'text-gray-900'
                 }`}
               >
-                11.1 สถานที่จัดโครงการ *
+                4.1 ประเด็นยุทธศาสตร์ที่
               </label>
-              <TextField
-                type="text"
-                name="projectLocation"
+              <FormControl
                 className="flex w-full"
-                value={formInput.projectLocation}
-                onChange={handleInputChange}
-                placeholder=""
-                error={Boolean(validationError.projectLocation)}
-                helperText={validationError.projectLocation}
-              />
+                error={Boolean(validationSelectError.strategicIssue)}
+              >
+                <Select
+                  name="strategicIssue"
+                  value={selectedValues.strategicIssue}
+                  onChange={handleSelectChange}
+                >
+                  {strategicIssueList.map((list) => (
+                    <MenuItem key={list.id} divider={true} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.strategicIssue}
+                </FormHelperText>
+              </FormControl>
             </div>
             <div>
               <label
-                htmlFor="project_datetime"
                 className={`mb-2 block text-base font-medium ${
-                  validationError.projectDatetime
+                  validationSelectError.objective
                     ? 'text-red-600'
                     : 'text-gray-900'
                 }`}
               >
-                <p className="flex items-center gap-1">
-                  11.2 วัน/เวลา ที่จัดโครงการ *
-                </p>
+                4.2 เป้าประสงค์ที่
               </label>
-              <TextField
-                type="text"
-                name="projectDatetime"
+              <FormControl
                 className="flex w-full"
-                value={formInput.projectDatetime}
-                onChange={handleInputChange}
-                placeholder="วัน/เดือน/ปี"
-                error={Boolean(validationError.projectDatetime)}
-                helperText={validationError.projectDatetime}
-              />
+                error={Boolean(validationSelectError.objective)}
+              >
+                <Select
+                  name="objective"
+                  value={selectedValues.objective}
+                  onChange={handleSelectChange}
+                >
+                  {objectiveList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.objective}
+                </FormHelperText>
+              </FormControl>
             </div>
-          </div>
-          <div className="grid gap-6 md:grid-cols-1">
             <div>
               <label
-                htmlFor="countries"
-                className="mb-2 block text-base font-medium text-gray-900"
+                className={`mb-2 block text-base font-medium ${
+                  validationSelectError.universityStrategic
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
               >
-                11.3 กำหนดการ (โดยละเอียด) *
+                4.3 กลยุทธ์ระดับมหาวิทยาลัยที่
               </label>
-              <div className="mb-6">
-                <div className="grid gap-6 md:grid-cols-1">
-                  <div className="relative overflow-x-auto">
-                    <table className="w-full rounded border text-left text-sm text-gray-500">
-                      <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                        <tr>
-                          <th scope="col" className="w-[15%] px-6 py-3">
-                            <p className="flex items-center justify-center gap-1">
-                              วันที่
-                            </p>
-                          </th>
-                          <th
-                            scope="col"
-                            className="w-[15%] bg-gray-300 px-6 py-3"
-                          >
-                            <p className="flex items-center justify-center gap-1">
-                              เวลา
-                            </p>
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            รายการกิจกรรม *
-                          </th>
-                          <th
-                            scope="col"
-                            className="w-[10%] bg-gray-300 px-6 py-3"
-                          >
-                            เพิ่ม/ลบแถว
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {projectScheduleRows.map((row) => (
-                          <tr className="border-b bg-white" key={row.id}>
-                            <td className="px-6 py-4">
-                              <div className={`grid grid-cols-1 gap-6`}>
-                                <TextField
-                                  type="text"
-                                  name="date"
-                                  className="flex w-full"
-                                  variant="outlined"
-                                  placeholder="วัน/เดือน/ปี"
-                                  value={row.date}
-                                  onChange={(value) =>
-                                    handleProjectScheduleChange(row.id, value)
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td className="bg-gray-50 px-6 py-4">
-                              <div className={`grid grid-cols-1 gap-6`}>
-                                <TextField
-                                  type="text"
-                                  name="time"
-                                  className="flex w-full"
-                                  variant="outlined"
-                                  placeholder="รูปแบบ 24 ชั่วโมง"
-                                  value={row.time}
-                                  onChange={(value) =>
-                                    handleProjectScheduleChange(row.id, value)
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className={`grid grid-cols-1 gap-6`}>
-                                <TextField
-                                  type="text"
-                                  name="detail"
-                                  className="flex w-full"
-                                  variant="outlined"
-                                  placeholder=""
-                                  value={row.detail}
-                                  onChange={(value) =>
-                                    handleProjectScheduleChange(row.id, value)
-                                  }
-                                  error={Boolean(
-                                    validationArrayError[
-                                      'projectSchedule_detail'
-                                    ]?.some((item) => item.id === row.id),
-                                  )}
-                                  helperText={
-                                    validationArrayError[
-                                      'projectSchedule_detail'
-                                    ]?.find((item) => item.id === row.id)
-                                      ?.error || ''
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                              <Tooltip title="เพิ่มแถว">
-                                <IconButton
-                                  aria-label="add_row"
-                                  size="small"
-                                  onClick={addProjectScheduleRow}
-                                >
-                                  <PlusCircleIcon className="h-9 w-9" />
-                                </IconButton>
-                              </Tooltip>
-                              {projectScheduleRows.length > 1 && (
-                                <Tooltip title="ลบแถว">
-                                  <IconButton
-                                    aria-label="delete_row"
-                                    size="small"
-                                    onClick={() =>
-                                      deleteProjectScheduleRow(row.id)
-                                    }
-                                  >
-                                    <XCircleIcon className="h-9 w-9" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationSelectError.universityStrategic)}
+              >
+                <Select
+                  name="universityStrategic"
+                  value={selectedValues.universityStrategic}
+                  onChange={handleSelectChange}
+                >
+                  {universityStrategicList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.universityStrategic}
+                </FormHelperText>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                className={`mb-2 block text-base font-medium ${
+                  validationSelectError.strategicPlanKPI
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                4.4 ตัวชี้วัดแผนกลยุทธ์ที่
+              </label>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationSelectError.strategicPlanKPI)}
+              >
+                <Select
+                  name="strategicPlanKPI"
+                  value={selectedValues.strategicPlanKPI}
+                  onChange={handleSelectChange}
+                >
+                  {strategicPlanKPIList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.strategicPlanKPI}
+                </FormHelperText>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                className={`mb-2 block text-base font-medium ${
+                  validationSelectError.operationPlanKPI
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                4.5 ตัวชี้วัดแผนปฏิบัติการที่
+              </label>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationSelectError.operationPlanKPI)}
+              >
+                <Select
+                  name="operationPlanKPI"
+                  value={selectedValues.operationPlanKPI}
+                  onChange={handleSelectChange}
+                >
+                  {operationPlanKPIList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.operationPlanKPI}
+                </FormHelperText>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                className={`mb-2 block text-base font-medium ${
+                  validationSelectError.projectKPI
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                4.6 ตัวชี้วัดโครงการ
+              </label>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationSelectError.projectKPI)}
+              >
+                <Select
+                  name="projectKPI"
+                  value={selectedValues.projectKPI}
+                  onChange={handleSelectChange}
+                >
+                  {projectKPIList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.projectKPI}
+                </FormHelperText>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                className={`mb-2 block text-base font-medium ${
+                  validationSelectError.projectStatus
+                    ? 'text-red-600'
+                    : 'text-gray-900'
+                }`}
+              >
+                4.7 สถานะโครงการ
+              </label>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationSelectError.projectStatus)}
+              >
+                <Select
+                  name="projectStatus"
+                  value={selectedValues.projectStatus}
+                  onChange={handleSelectChange}
+                >
+                  {projectStatusList.map((list) => (
+                    <MenuItem divider={true} key={list.id} value={list.id}>
+                      {list.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {validationSelectError.projectStatus}
+                </FormHelperText>
+              </FormControl>
+            </div>
+          </div>
+
+          <h3
+            className={`mb-2 block text-base font-medium ${
+              validationError.projectTypes ? 'text-red-600' : 'text-gray-900'
+            }`}
+          >
+            5.ประเภทโครงการ *
+          </h3>
+          <div
+            className={`mb-6 ${
+              validationError.projectTypes ? ' text-red-600' : 'text-gray-900'
+            }`}
+          >
+            <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="maintenance"
+                  type="checkbox"
+                  checked={projectTypes.maintenance}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="maintenance"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนทำนุบำรุงศิลปวัฒนธรรม
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="academicService"
+                  type="checkbox"
+                  checked={projectTypes.academicService}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="academicService"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนบริการวิชาการ
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="knowledgeManagement"
+                  type="checkbox"
+                  checked={projectTypes.knowledgeManagement}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="knowledgeManagement"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนการจัดการความรู้
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="researchPromotion"
+                  type="checkbox"
+                  checked={projectTypes.researchPromotion}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="researchPromotion"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนการส่งเสริมงานวิจัย
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="educationQualityAssurance"
+                  type="checkbox"
+                  checked={projectTypes.educationQualityAssurance}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="educationQualityAssurance"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนการประกันคุณภาพการศึกษา
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="personnelDevelopment"
+                  type="checkbox"
+                  checked={projectTypes.personnelDevelopment}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="personnelDevelopment"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนพัฒนาบุคลากร
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="riskManagement"
+                  type="checkbox"
+                  checked={projectTypes.riskManagement}
+                  onChange={handleProjectTypeChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="riskManagement"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  แผนบริหารความเสี่ยง
+                </label>
+              </div>
+            </div>
+            <div
+              className={`my-3 rounded border ${
+                validationError.projectTypes
+                  ? 'border-red-600'
+                  : 'border-gray-200'
+              }`}
+            >
+              <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
+                <div className="flex items-center ps-4">
+                  <input
+                    name="studentDevelopment"
+                    type="checkbox"
+                    checked={projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="studentDevelopment"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ
+                    และกิจกรรมพัฒนานักศึกษา <b>(เลือกได้มากกว่า 1 ประเภท)</b>
+                  </label>
+                </div>
+              </div>
+              <div
+                className={`${
+                  !projectTypes.studentDevelopment
+                    ? 'bg-gray-100 text-gray-400'
+                    : 'text-gray-900'
+                } grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2`}
+              >
+                <div className="flex items-center ps-4">
+                  <input
+                    name="moralEthical"
+                    type="checkbox"
+                    checked={
+                      projectTypes.moralEthical &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="moralEthical"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    ด้านคุณธรรม จริยธรรม
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="academicPromotion"
+                    type="checkbox"
+                    checked={
+                      projectTypes.academicPromotion &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="academicPromotion"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="knowledge"
+                    type="checkbox"
+                    checked={
+                      projectTypes.knowledge && projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="knowledge"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    ด้านความรู้
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="environment"
+                    type="checkbox"
+                    checked={
+                      projectTypes.environment &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="environment"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมบำเพ็ญประโยชน์หรือรักษาสิ่งแวดล้อม
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="intellectualSkill"
+                    type="checkbox"
+                    checked={
+                      projectTypes.intellectualSkill &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="intellectualSkill"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    ด้านทักษะทางปัญญา
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="sport"
+                    type="checkbox"
+                    checked={
+                      projectTypes.sport && projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="sport"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมกีฬา และการส่งเสริมสุขภาพ
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="knowledgeAnalysisCommunicationTechnology"
+                    type="checkbox"
+                    checked={
+                      projectTypes.knowledgeAnalysisCommunicationTechnology &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="knowledgeAnalysisCommunicationTechnology"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="artCultureDevelopment"
+                    type="checkbox"
+                    checked={
+                      projectTypes.artCultureDevelopment &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="artCultureDevelopment"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="numericalAnalysisCommunicationTechnology"
+                    type="checkbox"
+                    checked={
+                      projectTypes.numericalAnalysisCommunicationTechnology &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="numericalAnalysisCommunicationTechnology"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร
+                    และการใช้เทคโนโลยี
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="moralEthicalDevelopment"
+                    type="checkbox"
+                    checked={
+                      projectTypes.moralEthicalDevelopment &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="moralEthicalDevelopment"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
+                  </label>
+                </div>
+                <div className="flex items-center ps-4">
+                  <input
+                    name="leadershipDevelopment"
+                    type="checkbox"
+                    checked={
+                      projectTypes.leadershipDevelopment &&
+                      projectTypes.studentDevelopment
+                    }
+                    disabled={!projectTypes.studentDevelopment}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="leadershipDevelopment"
+                    className="ms-2 w-full py-4 text-sm font-medium"
+                  >
+                    กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
+                  </label>
+                </div>
+                <div className="ps-4">
+                  <div className="flex items-center">
+                    <input
+                      name="subOther"
+                      type="checkbox"
+                      checked={
+                        projectTypes.subOther && projectTypes.studentDevelopment
+                      }
+                      disabled={!projectTypes.studentDevelopment}
+                      onChange={handleProjectTypeChange}
+                      className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label
+                      htmlFor="subOther"
+                      className="ms-2 py-4 text-sm font-medium"
+                    >
+                      อื่นๆ
+                    </label>
+                    {projectTypes.subOther &&
+                      projectTypes.studentDevelopment && (
+                        <div className="w-full border-b border-gray-300 px-2">
+                          <input
+                            type="text"
+                            name="subOtherDetail"
+                            className="flex w-full border-none "
+                            placeholder="โปรดระบุ"
+                            value={projectTypes.subOtherDetail || ''}
+                            onChange={handleProjectTypeChange}
+                            disabled={isSubOtherDisabled}
+                            required={!isSubOtherDisabled}
+                          />
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          12.วิทยากร (ถ้ามี)
-        </h3>
-        <div className="mb-6">
-          <div className="mb-3 grid grid-cols-1 gap-6">
-            <TextField
-              type="text"
-              name="lecturer"
-              className="flex w-full"
-              value={formInput.lecturer}
-              onChange={handleInputChange}
-              placeholder=""
-              // required
-            />
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย *
-        </h3>
-        <div className="mb-6">
-          <div className="grid gap-6 md:grid-cols-1">
-            <table className="w-full rounded border text-left text-sm text-gray-500">
-              <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                <tr>
-                  <th scope="col" className="w-[75%] bg-gray-300 px-6 py-3">
-                    รายละเอียด
-                  </th>
-                  <th scope="col" className="w-[15%] px-6 py-3">
-                    จำนวน/คน
-                  </th>
-                  <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
-                    เพิ่ม/ลบแถว
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {targetRows.map((row) => (
-                  <tr className="border-b bg-white" key={row.id}>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          hiddenLabel
-                          type="text"
-                          id="detail"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.detail}
-                          onChange={(e) =>
-                            handleTargetChange(row.id, 'detail', e.target.value)
-                          }
-                          error={Boolean(
-                            validationArrayError['target_detail']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['target_detail']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`grid grid-cols-1 gap-6`}>
-                        <TextField
-                          hiddenLabel
-                          type="number"
-                          name="count"
-                          className="flex w-full"
-                          placeholder=""
-                          value={row.count}
-                          onChange={(e) =>
-                            handleTargetChange(row.id, 'count', e.target.value)
-                          }
-                          onBlur={calculateTargetTotal}
-                          error={Boolean(
-                            validationArrayError['target_count']?.some(
-                              (item) => item.id === row.id,
-                            ),
-                          )}
-                          helperText={
-                            validationArrayError['target_count']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className="w-[10%] bg-gray-50 px-6 py-4">
-                      <div className="flex items-center justify-center">
-                        <Tooltip title="เพิ่มแถว">
-                          <IconButton
-                            aria-label="add_row"
-                            size="small"
-                            onClick={addTargetRow}
-                          >
-                            <PlusCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                        {targetRows.length > 1 && (
-                          <Tooltip title="ลบแถว">
-                            <IconButton
-                              aria-label="delete_row"
-                              size="small"
-                              onClick={() => deleteTargetRow(row.id)}
-                            >
-                              <XCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="py-2 text-right font-bold">รวมจำนวน</td>
-                  <td className="px-6 py-2 text-right font-bold">
-                    {targetTotal}
-                  </td>
-                  <td className="py-2 text-left font-bold">คน</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <h3
-          className={`mb-2 block text-base font-medium ${
-            validationError.improvement ? 'text-red-600' : 'text-gray-900'
-          }`}
-        >
-          14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน *
-        </h3>
-        <div className="mb-6">
-          <div>
-            <TextField
-              name="improvement"
-              rows={5}
-              multiline
-              className={`flex w-full`}
-              sx={{
-                '.MuiOutlinedInput-root': {
-                  padding: 1,
-                },
-              }}
-              placeholder=""
-              helperText={validationError.improvement}
-              error={Boolean(validationError.improvement)}
-              value={formInput.improvement}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <h3 className="mb-2 block text-base font-medium text-gray-900 ">
-          15.งบประมาณ
-        </h3>
-        <div className="mb-6">
-          <div className="mb-3 grid gap-6 md:grid-cols-1">
-            <div>
-              <label
-                htmlFor="project_location"
-                className="mb-2 block text-base font-medium text-gray-900"
+            <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+              <div
+                className={`rounded border ${
+                  validationError.projectTypes
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
               >
-                15.1 งบประมาณรายรับ *
-              </label>
-              <table className="w-full rounded border text-left text-sm text-gray-500">
-                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                  <tr>
-                    <th scope="col" className="w-[10%] px-6 py-3">
-                      ลำดับที่
-                    </th>
-                    <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
-                      รายการ
-                    </th>
-                    <th scope="col" className="w-[20%] px-6 py-3">
-                      จำนวนเงิน
-                    </th>
-                    <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
-                      แหล่งที่มาของรายรับ
-                    </th>
-                    <th scope="col" className="w-[10%] px-6 py-3">
-                      เพิ่ม/ลบแถว
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {budgetIncomeRows.map((row) => (
-                    <tr className="border-b bg-white" key={row.id}>
-                      <th
-                        scope="row"
-                        className="px-6 py-4 text-center text-lg font-medium"
-                      >
-                        {row.id}
+                <div className="flex items-center">
+                  <input
+                    name="other"
+                    type="checkbox"
+                    checked={projectTypes.other}
+                    onChange={handleProjectTypeChange}
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    htmlFor="other"
+                    className="ms-2 py-4 text-sm font-medium"
+                  >
+                    อื่นๆ
+                  </label>
+                  {projectTypes.other && (
+                    <div className="w-full border-b border-gray-300 pl-2 pr-4">
+                      <input
+                        type="text"
+                        name="otherDetail"
+                        className="flex w-full border-none"
+                        placeholder="โปรดระบุ"
+                        value={projectTypes.otherDetail || ''}
+                        onChange={handleProjectTypeChange}
+                        disabled={isOtherDisabled}
+                        required={!isOtherDisabled}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {validationError.projectTypes && (
+              <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
+                {validationError.projectTypes}
+              </p>
+            )}
+          </div>
+
+          <h3
+            className={`mb-2 block text-base font-medium ${
+              validationError.universityIndentity
+                ? 'text-red-600'
+                : 'text-gray-900'
+            }`}
+          >
+            6.การตอบสนองต่อคุณลักษณะของบัณฑิตที่พึงประสงค์/อัตลักษณ์ของมหาวิทยาลัยพายัพ
+            *
+          </h3>
+          <div
+            className={`mb-6 ${
+              validationError.universityIndentity
+                ? ' text-red-600'
+                : 'text-gray-900'
+            }`}
+          >
+            <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.universityIndentity
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="moral"
+                  type="checkbox"
+                  checked={universityIndentity.moral}
+                  onChange={handleUniversityIndentityChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="bordered-checkbox-1"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  คุณธรรมนำใจ
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.universityIndentity
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="serve"
+                  type="checkbox"
+                  checked={universityIndentity.serve}
+                  onChange={handleUniversityIndentityChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="bordered-checkbox-1"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  รับใช้สังคม
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.universityIndentity
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="academic"
+                  type="checkbox"
+                  checked={universityIndentity.academic}
+                  onChange={handleUniversityIndentityChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="bordered-checkbox-1"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  วิชาการก้าวหน้า
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.universityIndentity
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="develop"
+                  type="checkbox"
+                  checked={universityIndentity.develop}
+                  onChange={handleUniversityIndentityChange}
+                  className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                />
+                <label
+                  htmlFor="bordered-checkbox-1"
+                  className="ms-2 w-full py-4 text-sm font-medium"
+                >
+                  พัฒนาสู่สากล
+                </label>
+              </div>
+            </div>
+            {validationError.universityIndentity && (
+              <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
+                {validationError.universityIndentity}
+              </p>
+            )}
+          </div>
+
+          <h3
+            className={`mb-2 block text-base font-medium ${
+              validationError.principleReason ? 'text-red-600' : 'text-gray-900'
+            }`}
+          >
+            7.หลักการและเหตุผล *
+          </h3>
+          <div className="mb-6">
+            <div className="grid gap-6 md:grid-cols-1">
+              <TextField
+                name="principleReason"
+                multiline
+                rows={5}
+                sx={{
+                  '.MuiOutlinedInput-root': {
+                    padding: 1,
+                  },
+                }}
+                className="flex w-full"
+                helperText={validationError.principleReason}
+                error={Boolean(validationError.principleReason)}
+                placeholder=""
+                value={formInput.principleReason}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            8.วัตถุประสงค์ ตัวชี้วัด ค่าเป้าหมาย/เกณฑ์ความสำเร็จ และ
+            เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด *
+          </h3>
+          <div className="mb-6">
+            <div className="grid gap-6 md:grid-cols-1">
+              <div className="relative overflow-x-auto">
+                <table className="w-full rounded border text-left text-sm text-gray-500">
+                  <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                    <tr>
+                      <th scope="col" className="bg-gray-300 px-6 py-3">
+                        วัตถุประสงค์โครงการ
                       </th>
-                      <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
-                        <div className={`grid grid-cols-1 gap-6`}>
-                          <TextField
-                            hiddenLabel
-                            type="text"
-                            name="detail"
-                            className="flex w-full"
-                            placeholder=""
-                            value={row.detail}
-                            onChange={(e) =>
-                              handleBudgetIncomeChange(
-                                row.id,
-                                'detail',
-                                e.target.value,
-                              )
-                            }
-                            error={Boolean(
-                              validationArrayError['budgetIncome_detail']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                            helperText={
-                              validationArrayError['budgetIncome_detail']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
-                            }
-                          />
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-0`}>
-                          <OutlinedInput
-                            // hiddenLabel
-                            type="number"
-                            name="amount"
-                            endAdornment={
-                              <InputAdornment position="end">
-                                บาท
-                              </InputAdornment>
-                            }
-                            className="flex w-full"
-                            placeholder=""
-                            value={row.amount}
-                            onChange={(e) =>
-                              handleBudgetIncomeChange(
-                                row.id,
-                                'amount',
-                                e.target.value,
-                              )
-                            }
-                            error={Boolean(
-                              validationArrayError['budgetIncome_amount']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                          />
-                          <FormHelperText className="ml-3 text-red-700">
-                            {validationArrayError['budgetIncome_amount']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''}
-                          </FormHelperText>
-                        </div>
-                      </td>
-                      <td className="bg-gray-50 px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
-                          <TextField
-                            hiddenLabel
-                            type="text"
-                            name="source"
-                            className="flex w-full"
-                            placeholder="งบประมาณ หมวด"
-                            value={row.source}
-                            onChange={(e) =>
-                              handleBudgetIncomeChange(
-                                row.id,
-                                'source',
-                                e.target.value,
-                              )
-                            }
-                            error={Boolean(
-                              validationArrayError['budgetIncome_source']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                            helperText={
-                              validationArrayError['budgetIncome_source']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
-                            }
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <div className="flex items-center justify-center">
+                      <th scope="col" className="px-6 py-3">
+                        ตัวชี้วัด
+                      </th>
+                      <th scope="col" className="bg-gray-300 px-6 py-3">
+                        เป้าหมาย (เกณฑ์ความสำเร็จ)
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        เครื่องมือ/วิธีการเก็บรวบรวมข้อมูลตามตัวชี้วัด
+                      </th>
+                      <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                        เพิ่ม/ลบแถว
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {OIVTRows.map((row) => (
+                      <tr className="border-b bg-white" key={row.id}>
+                        <td className="bg-gray-50 px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              type="text"
+                              name="objective"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.objective}
+                              onChange={(e) =>
+                                handleOIVTChange(
+                                  row.id,
+                                  'objective',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError['OIVT_objective']?.some(
+                                  (item) => item.id === row.id,
+                                ),
+                              )}
+                              helperText={
+                                validationArrayError['OIVT_objective']?.find(
+                                  (item) => item.id === row.id,
+                                )?.error || ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              type="text"
+                              name="indicator"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.indicator}
+                              onChange={(e) =>
+                                handleOIVTChange(
+                                  row.id,
+                                  'indicator',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError['OIVT_indicator']?.some(
+                                  (item) => item.id === row.id,
+                                ),
+                              )}
+                              helperText={
+                                validationArrayError['OIVT_indicator']?.find(
+                                  (item) => item.id === row.id,
+                                )?.error || ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="bg-gray-50 px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              type="text"
+                              name="value"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.value}
+                              onChange={(e) =>
+                                handleOIVTChange(
+                                  row.id,
+                                  'value',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError['OIVT_value']?.some(
+                                  (item) => item.id === row.id,
+                                ),
+                              )}
+                              helperText={
+                                validationArrayError['OIVT_value']?.find(
+                                  (item) => item.id === row.id,
+                                )?.error || ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              type="text"
+                              name="tool"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.tool}
+                              onChange={(e) =>
+                                handleOIVTChange(row.id, 'tool', e.target.value)
+                              }
+                              error={Boolean(
+                                validationArrayError['OIVT_tool']?.some(
+                                  (item) => item.id === row.id,
+                                ),
+                              )}
+                              helperText={
+                                validationArrayError['OIVT_tool']?.find(
+                                  (item) => item.id === row.id,
+                                )?.error || ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
                           <Tooltip title="เพิ่มแถว">
                             <IconButton
                               aria-label="add_row"
                               size="small"
-                              onClick={addBudgetIncomeRow}
+                              onClick={addOIVTRow}
                             >
                               <PlusCircleIcon className="h-9 w-9" />
                             </IconButton>
                           </Tooltip>
-                          {budgetIncomeRows.length > 1 && (
+                          {OIVTRows.length > 1 && (
                             <Tooltip title="ลบแถว">
                               <IconButton
                                 aria-label="delete_row"
                                 size="small"
-                                onClick={() => deleteBudgetIncomeRow(row.id)}
+                                onClick={() => deleteOIVTRow(row.id)}
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
                             </Tooltip>
                           )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <td colSpan={2} className="py-2 text-right font-bold">
-                      รวมงบประมาณรายรับ
-                    </td>
-                    <td className="px-6 py-2 text-right font-bold">
-                      {budgetIncomeTotal}
-                    </td>
-                    <td colSpan={2} className="py-2 text-left font-bold">
-                      บาท
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div>
-              <label
-                htmlFor="project_location"
-                className="mb-2 block text-base font-medium text-gray-900"
-              >
-                15.2 งบประมาณรายจ่าย *
-              </label>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            9.ประโยชน์ที่คาดว่าจะได้รับ *
+          </h3>
+          <div className="mb-6">
+            <div className="grid gap-6 md:grid-cols-1">
               <table className="w-full rounded border text-left text-sm text-gray-500">
-                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                  <tr>
-                    <th scope="col" className="w-[10%] px-6 py-3">
-                      ลำดับที่
-                    </th>
-                    <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
-                      รายการ
-                    </th>
-                    <th scope="col" className="w-[20%] px-6 py-3">
-                      จำนวนเงิน
-                    </th>
-                    <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
-                      หมายเหตุ
-                    </th>
-                    <th scope="col" className="w-[10%] px-6 py-3">
-                      เพิ่ม/ลบแถว
-                    </th>
-                  </tr>
-                </thead>
                 <tbody>
-                  {budgetExpenseRows.map((row) => (
+                  {expectedResultRows.map((row) => (
                     <tr className="border-b bg-white" key={row.id}>
-                      <th
-                        scope="row"
-                        className="px-6 py-4 text-center text-lg font-medium"
-                      >
-                        {row.id}
-                      </th>
                       <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                        {row.id}
+                      </td>
+                      <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
-                            hiddenLabel
                             type="text"
-                            name="detail"
+                            id="expected_result"
                             className="flex w-full"
                             placeholder=""
-                            value={row.detail}
+                            value={row.expected_result}
                             onChange={(e) =>
-                              handleBudgetExpenseChange(
-                                row.id,
-                                'detail',
-                                e.target.value,
-                              )
+                              handleExpectedResultChange(row.id, e.target.value)
                             }
                             error={Boolean(
                               validationArrayError[
-                                'budgetExpense_detail'
+                                'expectedResult_expected_result'
                               ]?.some((item) => item.id === row.id),
                             )}
                             helperText={
                               validationArrayError[
-                                'budgetExpense_detail'
+                                'expectedResult_expected_result'
                               ]?.find((item) => item.id === row.id)?.error || ''
                             }
                           />
                         </div>
                       </td>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4">
+                        <div className="flex items-center justify-center">
+                          <Tooltip title="เพิ่มแถว">
+                            <IconButton
+                              aria-label="add_row"
+                              size="small"
+                              onClick={addExpectedResultRow}
+                            >
+                              <PlusCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                          {expectedResultRows.length > 1 && (
+                            <Tooltip title="ลบแถว">
+                              <IconButton
+                                aria-label="delete_row"
+                                size="small"
+                                onClick={() => deleteExpectedResultRow(row.id)}
+                              >
+                                <XCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            10.วิธีดำเนินงานและระยะเวลาดำเนินโครงการ *
+          </h3>
+          <div className="mb-6">
+            <div className="grid gap-6 md:grid-cols-1">
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <tbody>
+                  {operationDurationRows.map((row) => (
+                    <tr className="border-b bg-white" key={row.id}>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                        {row.id}
+                      </td>
                       <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-0`}>
-                          <OutlinedInput
-                            // hiddenLabel
-                            type="number"
-                            name="amount"
-                            endAdornment={
-                              <InputAdornment position="end">
-                                บาท
-                              </InputAdornment>
-                            }
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            id="operation_duration"
                             className="flex w-full"
                             placeholder=""
-                            value={row.amount}
+                            value={row.operation_duration}
                             onChange={(e) =>
-                              handleBudgetExpenseChange(
+                              handleOperationDurationChange(
                                 row.id,
-                                'amount',
                                 e.target.value,
                               )
                             }
                             error={Boolean(
                               validationArrayError[
-                                'budgetExpense_amount'
+                                'operationDuration_operation_duration'
                               ]?.some((item) => item.id === row.id),
                             )}
+                            helperText={
+                              validationArrayError[
+                                'operationDuration_operation_duration'
+                              ]?.find((item) => item.id === row.id)?.error || ''
+                            }
                           />
-                          <FormHelperText className="ml-3 text-red-700">
-                            {validationArrayError['budgetExpense_amount']?.find(
-                              (item) => item.id === row.id,
-                            )?.error || ''}
-                          </FormHelperText>
                         </div>
                       </td>
-                      <td className="bg-gray-50 px-6 py-4">
+                      <td className="w-[10%] bg-gray-50 px-6 py-4">
+                        <div className="flex items-center justify-center">
+                          <Tooltip title="เพิ่มแถว">
+                            <IconButton
+                              aria-label="add_row"
+                              size="small"
+                              onClick={addOperationDurationRow}
+                            >
+                              <PlusCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                          {operationDurationRows.length > 1 && (
+                            <Tooltip title="ลบแถว">
+                              <IconButton
+                                aria-label="delete_row"
+                                size="small"
+                                onClick={() =>
+                                  deleteOperationDurationRow(row.id)
+                                }
+                              >
+                                <XCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            11.สถานที่จัดโครงการและกำหนดการ
+          </h3>
+          <div>
+            <div className="mb-3 grid gap-6 md:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="projectLocation"
+                  className={`mb-2 block text-base font-medium ${
+                    validationError.projectLocation
+                      ? 'text-red-600'
+                      : 'text-gray-900'
+                  }`}
+                >
+                  11.1 สถานที่จัดโครงการ *
+                </label>
+                <TextField
+                  type="text"
+                  name="projectLocation"
+                  className="flex w-full"
+                  value={formInput.projectLocation}
+                  onChange={handleInputChange}
+                  placeholder=""
+                  error={Boolean(validationError.projectLocation)}
+                  helperText={validationError.projectLocation}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="project_datetime"
+                  className={`mb-2 block text-base font-medium ${
+                    validationError.projectDatetime
+                      ? 'text-red-600'
+                      : 'text-gray-900'
+                  }`}
+                >
+                  <p className="flex items-center gap-1">
+                    11.2 วัน/เวลา ที่จัดโครงการ *
+                  </p>
+                </label>
+                <TextField
+                  type="text"
+                  name="projectDatetime"
+                  className="flex w-full"
+                  value={formInput.projectDatetime}
+                  onChange={handleInputChange}
+                  placeholder="วัน/เดือน/ปี"
+                  error={Boolean(validationError.projectDatetime)}
+                  helperText={validationError.projectDatetime}
+                />
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-1">
+              <div>
+                <label
+                  htmlFor="countries"
+                  className="mb-2 block text-base font-medium text-gray-900"
+                >
+                  11.3 กำหนดการ (โดยละเอียด) *
+                </label>
+                <div className="mb-6">
+                  <div className="grid gap-6 md:grid-cols-1">
+                    <div className="relative overflow-x-auto">
+                      <table className="w-full rounded border text-left text-sm text-gray-500">
+                        <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                          <tr>
+                            <th scope="col" className="w-[15%] px-6 py-3">
+                              <p className="flex items-center justify-center gap-1">
+                                วันที่
+                              </p>
+                            </th>
+                            <th
+                              scope="col"
+                              className="w-[15%] bg-gray-300 px-6 py-3"
+                            >
+                              <p className="flex items-center justify-center gap-1">
+                                เวลา
+                              </p>
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                              รายการกิจกรรม *
+                            </th>
+                            <th
+                              scope="col"
+                              className="w-[10%] bg-gray-300 px-6 py-3"
+                            >
+                              เพิ่ม/ลบแถว
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {projectScheduleRows.map((row) => (
+                            <tr className="border-b bg-white" key={row.id}>
+                              <td className="px-6 py-4">
+                                <div className={`grid grid-cols-1 gap-6`}>
+                                  <TextField
+                                    type="text"
+                                    name="date"
+                                    className="flex w-full"
+                                    variant="outlined"
+                                    placeholder="วัน/เดือน/ปี"
+                                    value={row.date}
+                                    onChange={(value) =>
+                                      handleProjectScheduleChange(row.id, value)
+                                    }
+                                  />
+                                </div>
+                              </td>
+                              <td className="bg-gray-50 px-6 py-4">
+                                <div className={`grid grid-cols-1 gap-6`}>
+                                  <TextField
+                                    type="text"
+                                    name="time"
+                                    className="flex w-full"
+                                    variant="outlined"
+                                    placeholder="รูปแบบ 24 ชั่วโมง"
+                                    value={row.time}
+                                    onChange={(value) =>
+                                      handleProjectScheduleChange(row.id, value)
+                                    }
+                                  />
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className={`grid grid-cols-1 gap-6`}>
+                                  <TextField
+                                    type="text"
+                                    name="detail"
+                                    className="flex w-full"
+                                    variant="outlined"
+                                    placeholder=""
+                                    value={row.detail}
+                                    onChange={(value) =>
+                                      handleProjectScheduleChange(row.id, value)
+                                    }
+                                    error={Boolean(
+                                      validationArrayError[
+                                        'projectSchedule_detail'
+                                      ]?.some((item) => item.id === row.id),
+                                    )}
+                                    helperText={
+                                      validationArrayError[
+                                        'projectSchedule_detail'
+                                      ]?.find((item) => item.id === row.id)
+                                        ?.error || ''
+                                    }
+                                  />
+                                </div>
+                              </td>
+                              <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                                <Tooltip title="เพิ่มแถว">
+                                  <IconButton
+                                    aria-label="add_row"
+                                    size="small"
+                                    onClick={addProjectScheduleRow}
+                                  >
+                                    <PlusCircleIcon className="h-9 w-9" />
+                                  </IconButton>
+                                </Tooltip>
+                                {projectScheduleRows.length > 1 && (
+                                  <Tooltip title="ลบแถว">
+                                    <IconButton
+                                      aria-label="delete_row"
+                                      size="small"
+                                      onClick={() =>
+                                        deleteProjectScheduleRow(row.id)
+                                      }
+                                    >
+                                      <XCircleIcon className="h-9 w-9" />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            12.วิทยากร (ถ้ามี)
+          </h3>
+          <div className="mb-6">
+            <div className="mb-3 grid grid-cols-1 gap-6">
+              <TextField
+                type="text"
+                name="lecturer"
+                className="flex w-full"
+                value={formInput.lecturer}
+                onChange={handleInputChange}
+                placeholder=""
+                // required
+              />
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            13.ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย *
+          </h3>
+          <div className="mb-6">
+            <div className="grid gap-6 md:grid-cols-1">
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                  <tr>
+                    <th scope="col" className="w-[75%] bg-gray-300 px-6 py-3">
+                      รายละเอียด
+                    </th>
+                    <th scope="col" className="w-[15%] px-6 py-3">
+                      จำนวน/คน
+                    </th>
+                    <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                      เพิ่ม/ลบแถว
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {targetRows.map((row) => (
+                    <tr className="border-b bg-white" key={row.id}>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             hiddenLabel
                             type="text"
-                            name="note"
+                            id="detail"
                             className="flex w-full"
                             placeholder=""
-                            value={row.note}
+                            value={row.detail}
                             onChange={(e) =>
-                              handleBudgetExpenseChange(
+                              handleTargetChange(
                                 row.id,
-                                'note',
+                                'detail',
                                 e.target.value,
                               )
                             }
                             error={Boolean(
-                              validationArrayError['budgetExpense_note']?.some(
+                              validationArrayError['target_detail']?.some(
                                 (item) => item.id === row.id,
                               ),
                             )}
                             helperText={
-                              validationArrayError['budgetExpense_note']?.find(
+                              validationArrayError['target_detail']?.find(
                                 (item) => item.id === row.id,
                               )?.error || ''
                             }
                           />
                         </div>
                       </td>
-                      <td>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            hiddenLabel
+                            type="number"
+                            name="count"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.count}
+                            onChange={(e) =>
+                              handleTargetChange(
+                                row.id,
+                                'count',
+                                e.target.value,
+                              )
+                            }
+                            onBlur={calculateTargetTotal}
+                            error={Boolean(
+                              validationArrayError['target_count']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['target_count']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
+                          />
+                        </div>
+                      </td>
+                      <td className="w-[10%] bg-gray-50 px-6 py-4">
                         <div className="flex items-center justify-center">
                           <Tooltip title="เพิ่มแถว">
                             <IconButton
                               aria-label="add_row"
                               size="small"
-                              onClick={addBudgetExpenseRow}
+                              onClick={addTargetRow}
                             >
                               <PlusCircleIcon className="h-9 w-9" />
                             </IconButton>
                           </Tooltip>
-                          {budgetExpenseRows.length > 1 && (
+                          {targetRows.length > 1 && (
                             <Tooltip title="ลบแถว">
                               <IconButton
                                 aria-label="delete_row"
                                 size="small"
-                                onClick={() => deleteBudgetExpenseRow(row.id)}
+                                onClick={() => deleteTargetRow(row.id)}
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
@@ -3229,22 +2907,397 @@ export default function PN01Form() {
                     </tr>
                   ))}
                   <tr>
-                    <td colSpan={2} className="py-2 text-right font-bold">
-                      รวมงบประมาณรายจ่าย
-                    </td>
+                    <td className="py-2 text-right font-bold">รวมจำนวน</td>
                     <td className="px-6 py-2 text-right font-bold">
-                      {budgetExpenseTotal}
+                      {targetTotal}
                     </td>
-                    <td colSpan={2} className="py-2 text-left font-bold">
-                      บาท
-                    </td>
+                    <td className="py-2 text-left font-bold">คน</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
+
+          <h3
+            className={`mb-2 block text-base font-medium ${
+              validationError.improvement ? 'text-red-600' : 'text-gray-900'
+            }`}
+          >
+            14.การปรับปรุงจากข้อเสนอแนะของโครงการที่ผ่านมา/โครงการที่มีลักษณะใกล้เคียงกัน
+            *
+          </h3>
+          <div className="mb-6">
+            <div>
+              <TextField
+                name="improvement"
+                rows={5}
+                multiline
+                className={`flex w-full`}
+                sx={{
+                  '.MuiOutlinedInput-root': {
+                    padding: 1,
+                  },
+                }}
+                placeholder=""
+                helperText={validationError.improvement}
+                error={Boolean(validationError.improvement)}
+                value={formInput.improvement}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          <h3 className="mb-2 block text-base font-medium text-gray-900 ">
+            15.งบประมาณ
+          </h3>
+          <div className="mb-6">
+            <div className="mb-3 grid gap-6 md:grid-cols-1">
+              <div>
+                <label
+                  htmlFor="project_location"
+                  className="mb-2 block text-base font-medium text-gray-900"
+                >
+                  15.1 งบประมาณรายรับ *
+                </label>
+                <table className="w-full rounded border text-left text-sm text-gray-500">
+                  <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                    <tr>
+                      <th scope="col" className="w-[10%] px-6 py-3">
+                        ลำดับที่
+                      </th>
+                      <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
+                        รายการ
+                      </th>
+                      <th scope="col" className="w-[20%] px-6 py-3">
+                        จำนวนเงิน
+                      </th>
+                      <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
+                        แหล่งที่มาของรายรับ
+                      </th>
+                      <th scope="col" className="w-[10%] px-6 py-3">
+                        เพิ่ม/ลบแถว
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {budgetIncomeRows.map((row) => (
+                      <tr className="border-b bg-white" key={row.id}>
+                        <th
+                          scope="row"
+                          className="px-6 py-4 text-center text-lg font-medium"
+                        >
+                          {row.id}
+                        </th>
+                        <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              hiddenLabel
+                              type="text"
+                              name="detail"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.detail}
+                              onChange={(e) =>
+                                handleBudgetIncomeChange(
+                                  row.id,
+                                  'detail',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetIncome_detail'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                              helperText={
+                                validationArrayError[
+                                  'budgetIncome_detail'
+                                ]?.find((item) => item.id === row.id)?.error ||
+                                ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-0`}>
+                            <OutlinedInput
+                              // hiddenLabel
+                              type="number"
+                              name="amount"
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  บาท
+                                </InputAdornment>
+                              }
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.amount}
+                              onChange={(e) =>
+                                handleBudgetIncomeChange(
+                                  row.id,
+                                  'amount',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetIncome_amount'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                            />
+                            <FormHelperText className="ml-3 text-red-700">
+                              {validationArrayError[
+                                'budgetIncome_amount'
+                              ]?.find((item) => item.id === row.id)?.error ||
+                                ''}
+                            </FormHelperText>
+                          </div>
+                        </td>
+                        <td className="bg-gray-50 px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              hiddenLabel
+                              type="text"
+                              name="source"
+                              className="flex w-full"
+                              placeholder="งบประมาณ หมวด"
+                              value={row.source}
+                              onChange={(e) =>
+                                handleBudgetIncomeChange(
+                                  row.id,
+                                  'source',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetIncome_source'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                              helperText={
+                                validationArrayError[
+                                  'budgetIncome_source'
+                                ]?.find((item) => item.id === row.id)?.error ||
+                                ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <Tooltip title="เพิ่มแถว">
+                              <IconButton
+                                aria-label="add_row"
+                                size="small"
+                                onClick={addBudgetIncomeRow}
+                              >
+                                <PlusCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                            {budgetIncomeRows.length > 1 && (
+                              <Tooltip title="ลบแถว">
+                                <IconButton
+                                  aria-label="delete_row"
+                                  size="small"
+                                  onClick={() => deleteBudgetIncomeRow(row.id)}
+                                >
+                                  <XCircleIcon className="h-9 w-9" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan={2} className="py-2 text-right font-bold">
+                        รวมงบประมาณรายรับ
+                      </td>
+                      <td className="px-6 py-2 text-right font-bold">
+                        {budgetIncomeTotal}
+                      </td>
+                      <td colSpan={2} className="py-2 text-left font-bold">
+                        บาท
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <label
+                  htmlFor="project_location"
+                  className="mb-2 block text-base font-medium text-gray-900"
+                >
+                  15.2 งบประมาณรายจ่าย *
+                </label>
+                <table className="w-full rounded border text-left text-sm text-gray-500">
+                  <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                    <tr>
+                      <th scope="col" className="w-[10%] px-6 py-3">
+                        ลำดับที่
+                      </th>
+                      <th scope="col" className="w-[40%] bg-gray-300 px-6 py-3">
+                        รายการ
+                      </th>
+                      <th scope="col" className="w-[20%] px-6 py-3">
+                        จำนวนเงิน
+                      </th>
+                      <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
+                        หมายเหตุ
+                      </th>
+                      <th scope="col" className="w-[10%] px-6 py-3">
+                        เพิ่ม/ลบแถว
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {budgetExpenseRows.map((row) => (
+                      <tr className="border-b bg-white" key={row.id}>
+                        <th
+                          scope="row"
+                          className="px-6 py-4 text-center text-lg font-medium"
+                        >
+                          {row.id}
+                        </th>
+                        <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              hiddenLabel
+                              type="text"
+                              name="detail"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.detail}
+                              onChange={(e) =>
+                                handleBudgetExpenseChange(
+                                  row.id,
+                                  'detail',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetExpense_detail'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                              helperText={
+                                validationArrayError[
+                                  'budgetExpense_detail'
+                                ]?.find((item) => item.id === row.id)?.error ||
+                                ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-0`}>
+                            <OutlinedInput
+                              // hiddenLabel
+                              type="number"
+                              name="amount"
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  บาท
+                                </InputAdornment>
+                              }
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.amount}
+                              onChange={(e) =>
+                                handleBudgetExpenseChange(
+                                  row.id,
+                                  'amount',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetExpense_amount'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                            />
+                            <FormHelperText className="ml-3 text-red-700">
+                              {validationArrayError[
+                                'budgetExpense_amount'
+                              ]?.find((item) => item.id === row.id)?.error ||
+                                ''}
+                            </FormHelperText>
+                          </div>
+                        </td>
+                        <td className="bg-gray-50 px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              hiddenLabel
+                              type="text"
+                              name="note"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.note}
+                              onChange={(e) =>
+                                handleBudgetExpenseChange(
+                                  row.id,
+                                  'note',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError[
+                                  'budgetExpense_note'
+                                ]?.some((item) => item.id === row.id),
+                              )}
+                              helperText={
+                                validationArrayError[
+                                  'budgetExpense_note'
+                                ]?.find((item) => item.id === row.id)?.error ||
+                                ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <Tooltip title="เพิ่มแถว">
+                              <IconButton
+                                aria-label="add_row"
+                                size="small"
+                                onClick={addBudgetExpenseRow}
+                              >
+                                <PlusCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                            {budgetExpenseRows.length > 1 && (
+                              <Tooltip title="ลบแถว">
+                                <IconButton
+                                  aria-label="delete_row"
+                                  size="small"
+                                  onClick={() => deleteBudgetExpenseRow(row.id)}
+                                >
+                                  <XCircleIcon className="h-9 w-9" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td colSpan={2} className="py-2 text-right font-bold">
+                        รวมงบประมาณรายจ่าย
+                      </td>
+                      <td className="px-6 py-2 text-right font-bold">
+                        {budgetExpenseTotal}
+                      </td>
+                      <td colSpan={2} className="py-2 text-left font-bold">
+                        บาท
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </form>
       <div className="mt-6 flex justify-end gap-4">
         <Link
           href="/dashboard/project-proposal/document/"
@@ -3252,20 +3305,37 @@ export default function PN01Form() {
         >
           Test Document
         </Link>
-        <Link
-          href="/dashboard/project-proposal/"
+        <button
+          onClick={() => handleOpenModal(true, false, false)}
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           ยกเลิก
-        </Link>
+        </button>
         <button
-          onClick={handleDraft}
+          onClick={() => handleOpenModal(false, true, false)}
           className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
         >
           แบบร่าง
         </button>
-        <Button type="submit">ตกลง</Button>
+        <Button onClick={() => handleOpenModal(false, false, true)}>ตกลง</Button>
+
+        <ModalQuestion
+          openModal={openModal}
+          onCloseModal={handleCloseModal}
+          title={titleModal}
+          detail={detailModal}
+          okAction={handleAction}
+          onOk={(action) => {
+            if (action === 'draft') {
+              handleDraft();
+            } else if (action === 'submit') {
+              handleSubmit();
+            } else if (action === 'cancel') {
+              router.push('/dashboard/project-proposal', { scroll: false })
+            }
+          }}
+        />
       </div>
-    </form>
+    </>
   );
 }

@@ -4,6 +4,8 @@ import { CreateRequestTranscript } from '@/app/components/buttons';
 import Pagination from '@/app/components/pagination';
 import Table from '@/app/components/history-activity/table';
 import Breadcrumbs from '@/app/components/breadcrumbs';
+import { Suspense } from 'react';
+import ActivityHistoryLoading from '@/app/components/loading-screen';
 
 export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
@@ -38,7 +40,9 @@ export default async function Page({
         </div>
         {query && (
           <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
-            <Table query={query} />
+            <Suspense key={query} fallback={<ActivityHistoryLoading/>}>
+              <Table query={query} />
+            </Suspense>
           </div>
         )}
       </div>

@@ -1,16 +1,24 @@
+export interface OriginalDataHistory {
+  data: OriginalHistory[]
+}
+
+export interface OriginalHistory {
+  name: string;
+  studentId: number;
+  projectName: string;
+  academicYear: number;
+  serviceHour: number;
+}
+
 export interface HistoryActivity {
-  id: number;
-  firstname: string;
-  lastname: string;
+  name: string
   studentId: string;
-  faculty: string;
-  major: string;
   history: Project[];
 }
 
-interface Project {
+export interface Project {
   id: number;
   projectName: string;
-  projectHour: string;
-  year: string;
+  academicYear: string;
+  serviceHour: string;
 }

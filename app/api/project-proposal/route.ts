@@ -31,11 +31,18 @@ export async function GET() {
     const res = await pool.query(
       `SELECT * FROM project_proposal_pn01 ORDER BY id`,
     );
-    return NextResponse.json(res.rows);
+
+    const data = JSON.stringify(res.rows);
+
+    return new NextResponse(data, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
-    return NextResponse.json({
-      message: 'Can not get data!!',
-      error,
+    return new NextResponse(`Server error please try again later`, {
+      status: 500,
     });
   }
 }
@@ -45,6 +52,7 @@ export async function POST(req: NextRequest) {
     const projectCode = await generateProjectCode();
     const formData = await req.json();
 
+    const userId = formData.userId;
     const faculty = formData.faculty;
     const project_name = formData.projectName;
     const project_head = formData.projectHead;
@@ -81,7 +89,7 @@ export async function POST(req: NextRequest) {
     const date = datetime.date;
     const time = datetime.time;
 
-    const res = await pool.query(`
+    const response = await pool.query(`
         INSERT INTO project_proposal_pn01 (
             project_code, date, time, faculty, project_name, project_head, project_head_phone,
             project_responsible, strategic_issue_id, objective_id, university_strategic_id,
@@ -89,7 +97,7 @@ export async function POST(req: NextRequest) {
             project_type, university_identity, principle_reason, objective_indicator_value_tool,
             expected_result, operation_duration, project_location, project_datetime,
             project_schedule, lecturer, target_total, target, improvement, budget_income_total, budget_income, budget_expense_total, budget_expense,
-            is_delete, created_at, update_at, status
+            status, created_by
         )
         VALUES (
             '${projectCode}', '${date}', '${time}', '${faculty}',
@@ -102,16 +110,17 @@ export async function POST(req: NextRequest) {
             '${operation_duration_rows}', '${project_location}', '${project_datetime}',
             '${project_schedule_rows}', '${lecturer}', '${target_total}', '${target_rows}',
             '${improvement}', '${budget_income_total}', '${budget_income_rows}', '${budget_expense_total}', '${budget_expense_rows}',
-            false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'รอการยืนยัน'
+            'รอการยืนยัน', (SELECT id FROM users WHERE id = '${userId}')
         )
     `);
 
-    return NextResponse.json({ message: 'Create Project Proposal Success' });
+    return new NextResponse('Success!', {
+      status: 200,
+    });
   } catch (error) {
     console.error('Error creating project proposal:', error);
-    return NextResponse.json({
-      message: 'Can not create project proposal!!',
-      error,
+    return new NextResponse(`Server error please try again later`, {
+      status: 500,
     });
   }
 }

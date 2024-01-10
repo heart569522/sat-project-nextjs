@@ -6,10 +6,15 @@ export async function GET() {
     const res = await pool.query('SELECT * FROM NOW()');
     if (res) {
       console.log('Connected to the database');
-      return NextResponse.json({ message: 'Connect Database Success' });
+
+      return new NextResponse('Connect Database Success!', {
+        status: 200,
+      });
     }
   } catch (error) {
     console.log('Connect Failed!!');
-    return NextResponse.json({ message: 'Connect Failed!!', error });
+    return new Response(`Connect database error: ${error}`, {
+      status: 500,
+    });
   }
 }

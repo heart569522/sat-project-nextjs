@@ -1,12 +1,69 @@
-import historyData from '@/app/model/historyData.json';
-import { HistoryActivity } from '@/app/model/history-activity';
-import { Alert } from '@mui/material';
 
-const fetchHistoryActivity = (query: string): HistoryActivity[] => {
-  const resultData = historyData.filter(
-    (student) => student.studentId == query,
-  );
-  return resultData;
+import { Alert } from '@mui/material';
+import {
+  HistoryActivity,
+  OriginalDataHistory,
+  OriginalHistory,
+} from '@/app/model/history-activity';
+
+const fetchHistoryActivity = async (
+  query: string,
+): Promise<HistoryActivity[]> => {
+  try {
+    const res = await fetch(
+      `${process.env.APP_SCRIPT_SHEET}?studentId=${query}`,
+    );
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+
+    const originalData: OriginalDataHistory = await res.json();
+
+    if (!originalData.data || originalData.data.length === 0) {
+      return [];
+    }
+
+    const dataArray = originalData.data;
+
+    const transformedData: HistoryActivity[] = dataArray.reduce(
+      (acc: HistoryActivity[], project: OriginalHistory) => {
+        const existingEntry = acc.find(
+          (entry) => entry.studentId === project.studentId.toString(),
+        );
+
+        if (existingEntry) {
+          existingEntry.history.push({
+            id: existingEntry.history.length + 1,
+            projectName: project.projectName,
+            academicYear: project.academicYear.toString(),
+            serviceHour: project.serviceHour.toString(),
+          });
+        } else {
+          acc.push({
+            name: project.name,
+            studentId: project.studentId.toString(),
+            history: [
+              {
+                id: 1,
+                projectName: project.projectName,
+                academicYear: project.academicYear.toString(),
+                serviceHour: project.serviceHour.toString(),
+              },
+            ],
+          });
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    return transformedData;
+  } catch (error: any) {
+    console.error('Error fetching data:', error.message);
+    return [];
+  }
 };
 
 export default async function HistoryActivityTable({
@@ -14,7 +71,7 @@ export default async function HistoryActivityTable({
 }: {
   query: string;
 }) {
-  const resultData: HistoryActivity[] = await fetchHistoryActivity(query);
+  const resultData = await fetchHistoryActivity(query);
   console.log(resultData);
 
   return (
@@ -29,26 +86,18 @@ export default async function HistoryActivityTable({
                 </Alert>
               </div>
             ) : (
-              resultData.map((data, i) => (
+              resultData.map((data: any, i: any) => (
                 <div key={i}>
                   <div className="mb-2 grid grid-cols-2 max-md:grid-cols-1">
                     <div className="flex justify-start gap-x-1 py-1">
                       <label className="font-semibold">ชื่อ :</label>
                       <p className="whitespace-nowrap">
-                        {data.firstname}&nbsp;{data.lastname}
+                        {data.name}
                       </p>
                     </div>
                     <div className="flex justify-start gap-x-1 py-1">
                       <label className="font-semibold">รหัสประจำตัว :</label>
                       <p className="whitespace-nowrap">{data.studentId}</p>
-                    </div>
-                    <div className="flex justify-start gap-x-1 py-1">
-                      <label className="font-semibold">คณะ/วิทยาลัย :</label>
-                      <p className="whitespace-nowrap">{data.faculty}</p>
-                    </div>
-                    <div className="flex justify-start gap-x-1 py-1">
-                      <label className="font-semibold">สาขาวิชา :</label>
-                      <p className="whitespace-nowrap">{data.major}</p>
                     </div>
                   </div>
 
@@ -63,24 +112,24 @@ export default async function HistoryActivityTable({
                           </div>
                         </div>
                       ) : (
-                        data.history.map((row) => (
+                        data.history.map((row: any) => (
                           <div
                             key={row.id}
                             className="mb-2 w-full rounded-md bg-white p-4"
                           >
-                            <div className='flex w-full border-b pb-3 items-center'>
-                              <h3 className='text-lg'>
-                                {row.projectName}
-                              </h3>
+                            <div className="flex w-full items-center border-b pb-3">
+                              <h3 className="text-lg">{row.projectName}</h3>
                             </div>
                             <div className="flex w-full items-center justify-between border-b py-3">
                               <div className="flex w-1/2 flex-col">
                                 <p className="text-xs">ปีการศึกษา</p>
-                                <p className="font-medium">{row.year}</p>
+                                <p className="font-medium">{row.academicYear}</p>
                               </div>
                               <div className="flex w-1/2 flex-col">
                                 <p className="text-xs">จำนวนชั่วโมง</p>
-                                <p className="font-medium">{row.projectHour}&nbsp;ชั่วโมง</p>
+                                <p className="font-medium">
+                                  {row.serviceHour}&nbsp;ชั่วโมง
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -130,19 +179,19 @@ export default async function HistoryActivityTable({
                             </td>
                           </tr>
                         ) : (
-                          data.history.map((row) => (
+                          data.history.map((row: any) => (
                             <tr key={row.id} className="group text-center">
                               <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                                 {row.id}
                               </td>
-                              <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                              <td className="whitespace-nowrap bg-white px-4 py-5 text-sm text-left">
                                 {row.projectName}
                               </td>
                               <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                                {row.year}
+                                {row.academicYear}
                               </td>
                               <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
-                                {row.projectHour}
+                                {row.serviceHour}
                               </td>
                             </tr>
                           ))

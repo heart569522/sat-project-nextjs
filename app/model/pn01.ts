@@ -1,5 +1,6 @@
 export interface PN01 {
-  id?: string;
+  userId?: string;
+  isDraft? : boolean;
   faculty?: string;
   projectName?: string;
   projectHead?: string;

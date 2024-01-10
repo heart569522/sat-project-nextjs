@@ -24,7 +24,9 @@ export async function POST(req: NextRequest) {
     const responsible_rows = JSON.stringify(formData.responsibleRows);
     const OIVT_rows = JSON.stringify(formData.OIVTRows);
     const expected_result_rows = JSON.stringify(formData.expectedResultRows);
-    const operation_duration_rows = JSON.stringify(formData.operationDurationRows);
+    const operation_duration_rows = JSON.stringify(
+      formData.operationDurationRows,
+    );
     const project_schedule_rows = JSON.stringify(formData.projectScheduleRows);
     const target_total = formData.targetTotal;
     const target_rows = JSON.stringify(formData.targetRows);
@@ -43,7 +45,7 @@ export async function POST(req: NextRequest) {
                 project_type, university_identity, principle_reason, objective_indicator_value_tool,
                 expected_result, operation_duration, project_location, project_datetime,
                 project_schedule, lecturer, target_total, target, improvement, budget_income_total, budget_income, budget_expense_total, budget_expense,
-                is_delete, created_at, update_at, status
+                status
             )
             VALUES (
                 ${faculty},
@@ -56,16 +58,17 @@ export async function POST(req: NextRequest) {
                 ${operation_duration_rows}, ${project_location}, ${project_datetime},
                 ${project_schedule_rows}, ${lecturer}, ${target_total}, ${target_rows},
                 ${improvement}, ${budget_income_total}, ${budget_income_rows}, ${budget_expense_total}, ${budget_expense_rows},
-                false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'แบบร่าง'
+                'แบบร่าง'
             )
         `;
 
-    return NextResponse.json({ message: 'Create Project Proposal Success' });
+    return new NextResponse('Success!', {
+      status: 200,
+    });
   } catch (error) {
     console.error('Error creating project proposal:', error);
-    return NextResponse.json({
-      message: 'Can not create project proposal!!',
-      error,
+    return new NextResponse(`Server error please try again later`, {
+      status: 500,
     });
   }
 }
