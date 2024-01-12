@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'แบบฟอร์มลงชื่อเข้าร่วมโครงการ/กิจกรรม (พน.10)',
 };
 
-export default function Page() {
+export default async function Page() {
   return (
     <div className="flex justify-center">
       <div id="pdf-content" className={`${sarabun.className}`}>

@@ -29,21 +29,19 @@ async function generateProjectCode() {
 export async function GET() {
   try {
     const res = await pool.query(
-      `SELECT * FROM project_proposal_pn01 ORDER BY id`,
+      `SELECT * FROM project_proposal_pn01 WHERE is_delete = false ORDER BY id`,
     );
 
-    const data = JSON.stringify(res.rows);
+    const data = res.rows;
 
-    return new NextResponse(data, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    return new NextResponse(`Server error please try again later`, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: `Server error please try again later` },
+      {
+        status: 500,
+      },
+    );
   }
 }
 
@@ -114,13 +112,17 @@ export async function POST(req: NextRequest) {
         )
     `);
 
-    return new NextResponse('Success!', {
-      status: 200,
-    });
+    return NextResponse.json(
+      { message: 'Create new project proposal success' },
+      { status: 201 },
+    );
   } catch (error) {
     console.error('Error creating project proposal:', error);
-    return new NextResponse(`Server error please try again later`, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: `Server error please try again later` },
+      {
+        status: 500,
+      },
+    );
   }
 }

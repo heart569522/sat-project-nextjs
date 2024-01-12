@@ -17,49 +17,48 @@ const style = {
   boxShadow: 5,
 };
 
-export function ModalQuestion({
-  openModal,
-  onCloseModal,
-  title,
-  detail,
-  onOk,
-  okAction,
-}: {
+interface ModalQuestionProps {
   openModal: boolean;
   onCloseModal: () => void;
   title: string;
   detail: string;
   onOk: (action: string) => void;
   okAction: string;
-}) {
+}
+
+export function ModalQuestion(props: ModalQuestionProps) {
   return (
     <Modal
-      open={openModal}
+      open={props.openModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box sx={{ ...style, width: 450 }}>
         <div className="absolute right-0 top-0 mr-1 mt-1">
-          <IconButton aria-label="close" size="small" onClick={onCloseModal}>
+          <IconButton
+            aria-label="close"
+            size="small"
+            onClick={props.onCloseModal}
+          >
             <CloseIcon />
           </IconButton>
         </div>
 
         <div className="mb-2 flex items-center justify-between px-6 pt-6">
           <h3 id="modal-modal-title" className="text-xl font-semibold">
-            {title}
+            {props.title}
           </h3>
         </div>
 
         <div className="mb-4 px-6">
-          <p id="modal-modal-description">{detail}</p>
+          <p id="modal-modal-description">{props.detail}</p>
         </div>
 
         <div className="flex items-center justify-end gap-x-1 bg-gray-50 px-4 py-3">
           <button
             type="button"
             className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm"
-            onClick={onCloseModal}
+            onClick={props.onCloseModal}
           >
             ยกเลิก
           </button>
@@ -67,8 +66,8 @@ export function ModalQuestion({
             type="button"
             className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
             onClick={() => {
-              onOk(okAction);
-              onCloseModal();
+              props.onOk(props.okAction);
+              props.onCloseModal();
             }}
           >
             ตกลง

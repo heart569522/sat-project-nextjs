@@ -62,13 +62,14 @@ export async function POST(req: NextRequest) {
             )
         `;
 
-    return new NextResponse('Success!', {
-      status: 200,
-    });
+        return NextResponse.json({ message: 'Create draft project proposal success' }, { status: 201 });
   } catch (error) {
     console.error('Error creating project proposal:', error);
-    return new NextResponse(`Server error please try again later`, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: `Server error please try again later` },
+      {
+        status: 500,
+      },
+    );
   }
 }

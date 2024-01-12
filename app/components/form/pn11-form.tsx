@@ -7,14 +7,48 @@ import {
   TextField,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import faculties from '@/app/model/faculties';
-import majors from '@/app/model/majors';
 import Link from 'next/link';
 import { Button } from '../button';
 import { PN11 } from '@/app/model/pn11';
-import { getCurrentDateAndTime } from '@/app/lib/services';
+import { Faculties, Majors } from '@/app/model/faculties-majors';
+import { createData, getAllData } from '@/app/lib/api-service';
+import { useRouter } from 'next/navigation';
+import { ModalQuestion } from '../modal';
 
 export default function PN11Form() {
+  const router = useRouter();
+
+  const [openModal, setOpenModal] = useState(false);
+  const [titleModal, setTitleModal] = useState('');
+  const [detailModal, setDetailModal] = useState('');
+  const [handleAction, setHandleAction] = useState('');
+
+  const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
+    console.log('handleOpenModal');
+
+    if (isCancel) {
+      setTitleModal('ยกเลิกการร้องขอระเบียนกิจกรรม');
+      setDetailModal('คุณยืนยันที่จะยกเลิกคำร้องขอระเบียนกิจกรรม');
+      setHandleAction('cancel');
+      setOpenModal(true);
+    }
+
+    if (isSubmit) {
+      const isFormValid = validateForm();
+
+      if (isFormValid) {
+        setTitleModal('ร้องขอระเบียนกิจกรรม');
+        setDetailModal('คุณยืนยันที่จะส่งข้อมูลคำร้องขอระเบียนกิจกรรม');
+        setHandleAction('submit');
+        setOpenModal(true);
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
   const [formInput, setFormInput] = useState({
     firstname: '',
     lastname: '',
@@ -27,6 +61,38 @@ export default function PN11Form() {
     recipientAddress: '',
     recipientPhone: '',
   });
+
+  const [faculties, setFaculties] = useState<Faculties[]>([]);
+  const [majors, setMajors] = useState<Majors[]>([]);
+
+  const getFaculties = async () => {
+    try {
+      const data = await getAllData('faculties');
+      setFaculties(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMajors = async () => {
+    try {
+      const data = await getAllData('majors');
+      setMajors(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('fetch list fac/major');
+
+    const fetchData = async () => {
+      await getFaculties();
+      await getMajors();
+    };
+
+    fetchData();
+  }, []);
 
   const [formRadio, setFormRadio] = useState({
     deliveryMethod: '',
@@ -156,16 +222,27 @@ export default function PN11Form() {
     return isValid;
   };
 
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
+    const formData = setFinalFormData();
+    console.log('formData: ', formData);
 
-    const isFormValid = validateForm();
+    let apiPath = 'activity-transcript'
 
-    if (isFormValid) {
-      const formData = setFinalFormData();
-      console.log('formData: ', formData);
-    } else {
-      console.error('Form validation failed. Please check the form fields.');
+    try {
+      const res = await createData(apiPath, formData);
+
+      if (res && res.status === 201) {
+        console.log('Create success!');
+        console.log('id: ', res.data.id);
+        
+        router.push(`/dashboard/activity-history/transcript/document/${res.data.id}`);
+
+      } else {
+        console.error('Create failed, please try again later');
+        // Additional handling for failure
+      }
+    } catch (error) {
+      console.error('Error while submitting data:', error);
     }
   };
 
@@ -173,7 +250,6 @@ export default function PN11Form() {
     console.log('--set form--');
 
     const finalFormData: PN11 = {
-      date: new Date().toISOString(),
       firstname: formInput.firstname,
       lastname: formInput.lastname,
       studentId: formInput.studentId,
@@ -191,302 +267,318 @@ export default function PN11Form() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="py-2">
-      <div className="mb-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
-        <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
-          <div>
-            <label
-              htmlFor="firstname"
-              className={`mb-2 block text-base font-medium ${
-                validationError.firstname ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              ชื่อจริง
-            </label>
-            <TextField
-              type="text"
-              name="firstname"
-              className="flex w-full"
-              value={formInput.firstname}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.firstname)}
-              helperText={validationError.firstname}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="lastname"
-              className={`mb-2 block text-base font-medium ${
-                validationError.lastname ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              นามสกุล
-            </label>
-            <TextField
-              type="text"
-              name="lastname"
-              className="flex w-full"
-              value={formInput.lastname}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.lastname)}
-              helperText={validationError.lastname}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="studentId"
-              className={`mb-2 block text-base font-medium ${
-                validationError.studentId ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              รหัสประจำตัวนักศึกษา
-            </label>
-            <TextField
-              type="text"
-              name="studentId"
-              className="flex w-full"
-              value={formInput.studentId}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.studentId)}
-              helperText={validationError.studentId}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="phone"
-              className={`mb-2 block text-base font-medium ${
-                validationError.phone ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              หมายเลขโทรศัพท์
-            </label>
-            <TextField
-              type="text"
-              name="phone"
-              className="flex w-full"
-              value={formInput.phone}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.phone)}
-              helperText={validationError.phone}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="faculty"
-              className={`mb-2 block text-base font-medium ${
-                validationError.faculty ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              คณะ/วิทยาลัย
-            </label>
-            <FormControl
-              className="flex w-full"
-              error={Boolean(validationError.faculty)}
-            >
-              <Select
-                name="faculty"
-                value={formInput.faculty}
-                onChange={handleFacultyChange}
+    <>
+      <form className="py-2">
+        <div className="mb-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
+          <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
+            <div>
+              <label
+                htmlFor="firstname"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.firstname ? 'text-red-600' : 'text-gray-900'
+                }`}
               >
-                {faculties.map((faculty) => (
-                  <MenuItem key={faculty} value={faculty}>
-                    {faculty}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{validationError.faculty}</FormHelperText>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              htmlFor="major"
-              className={`mb-2 block text-base font-medium ${
-                formInput.faculty ? `text-gray-900` : `text-gray-400`
-              } `}
-            >
-              สาขาวิชา
-            </label>
-            <FormControl className="flex w-full">
-              <Select
-                name="major"
-                value={formInput.major}
-                onChange={handleMajorChange}
-                disabled={!formInput.faculty}
+                ชื่อจริง
+              </label>
+              <TextField
+                type="text"
+                name="firstname"
+                className="flex w-full"
+                value={formInput.firstname}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.firstname)}
+                helperText={validationError.firstname}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="lastname"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.lastname ? 'text-red-600' : 'text-gray-900'
+                }`}
               >
-                {majors[formInput.faculty as keyof typeof majors]?.map(
-                  (major) => (
-                    <MenuItem key={major} value={major}>
-                      {major}
+                นามสกุล
+              </label>
+              <TextField
+                type="text"
+                name="lastname"
+                className="flex w-full"
+                value={formInput.lastname}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.lastname)}
+                helperText={validationError.lastname}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="studentId"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.studentId ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                รหัสประจำตัวนักศึกษา
+              </label>
+              <TextField
+                type="text"
+                name="studentId"
+                className="flex w-full"
+                value={formInput.studentId}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.studentId)}
+                helperText={validationError.studentId}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="phone"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.phone ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                หมายเลขโทรศัพท์
+              </label>
+              <TextField
+                type="text"
+                name="phone"
+                className="flex w-full"
+                value={formInput.phone}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.phone)}
+                helperText={validationError.phone}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="faculty"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.faculty ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                คณะ/วิทยาลัย
+              </label>
+              <FormControl
+                className="flex w-full"
+                error={Boolean(validationError.faculty)}
+              >
+                <Select
+                  name="faculty"
+                  value={formInput.faculty}
+                  onChange={handleFacultyChange}
+                >
+                  {faculties.map((faculty) => (
+                    <MenuItem
+                      divider={true}
+                      key={faculty.id}
+                      value={faculty.id}
+                    >
+                      {faculty.name}
                     </MenuItem>
-                  ),
-                )}
-              </Select>
-            </FormControl>
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className={`mb-2 block text-base font-medium ${
-                validationError.email ? 'text-red-600' : 'text-gray-900'
-              }`}
-            >
-              Email (สำหรับส่งการแจ้งเตือนเพื่อรับเอกสาร)
-            </label>
-            <TextField
-              type="email"
-              name="email"
-              className="flex w-full"
-              value={formInput.email}
-              onChange={handleInputChange}
-              placeholder=""
-              error={Boolean(validationError.email)}
-              helperText={validationError.email}
-            />
+                  ))}
+                </Select>
+                <FormHelperText>{validationError.faculty}</FormHelperText>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                htmlFor="major"
+                className={`mb-2 block text-base font-medium ${
+                  formInput.faculty ? `text-gray-900` : `text-gray-400`
+                } `}
+              >
+                สาขาวิชา
+              </label>
+              <FormControl className="flex w-full">
+                <Select
+                  name="major"
+                  value={formInput.major}
+                  onChange={handleMajorChange}
+                  disabled={!formInput.faculty}
+                >
+                  {majors
+                    .filter(
+                      (major) => major.faculty_id === Number(formInput.faculty),
+                    )
+                    .map((filteredMajor) => (
+                      <MenuItem
+                        divider={true}
+                        key={filteredMajor.id}
+                        value={filteredMajor.id}
+                      >
+                        {filteredMajor.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </div>
+            <div>
+              <label
+                htmlFor="email"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.email ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                Email (สำหรับส่งการแจ้งเตือนเพื่อรับเอกสาร)
+              </label>
+              <TextField
+                type="email"
+                name="email"
+                className="flex w-full"
+                value={formInput.email}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.email)}
+                helperText={validationError.email}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
-        <h3
-          className={`mb-3 block text-lg font-medium ${
-            validationError.formRadio ? 'text-red-600' : 'text-gray-900'
-          }`}
-        >
-          การรับเอกสาร
-        </h3>
-        <div
-          className={`mb-6 ${
-            validationError.formRadio ? ' text-red-600' : 'text-gray-900'
-          }`}
-        >
+        <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
+          <h3
+            className={`mb-3 block text-lg font-medium ${
+              validationError.formRadio ? 'text-red-600' : 'text-gray-900'
+            }`}
+          >
+            การรับเอกสาร
+          </h3>
           <div
-            className={`${
-              validationError.formRadio ? 'mb-0' : 'mb-6'
-            } grid gap-x-6 gap-y-3 md:grid-cols-2`}
+            className={`mb-6 ${
+              validationError.formRadio ? ' text-red-600' : 'text-gray-900'
+            }`}
           >
             <div
-              className={`flex items-center rounded border ${
-                validationError.formRadio ? 'border-red-600' : 'border-gray-200'
-              } ps-4`}
+              className={`${
+                validationError.formRadio ? 'mb-0' : 'mb-6'
+              } grid gap-x-6 gap-y-3 md:grid-cols-2`}
             >
-              <input
-                name="deliveryMethod"
-                type="radio"
-                value="receive"
-                checked={formRadio.deliveryMethod === 'receive'}
-                onChange={handleRadioChange}
-                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-              />
-              <label className="ms-2 w-full py-4 text-sm font-medium">
-                รับเอกสารด้วยตนเอง ที่ สำนักพัฒนานักศึกษา
-              </label>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.formRadio
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="deliveryMethod"
+                  type="radio"
+                  value="receive"
+                  checked={formRadio.deliveryMethod === 'receive'}
+                  onChange={handleRadioChange}
+                  className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                />
+                <label className="ms-2 w-full py-4 text-sm font-medium">
+                  รับเอกสารด้วยตนเอง ที่ สำนักพัฒนานักศึกษา
+                </label>
+              </div>
+              <div
+                className={`flex items-center rounded border ${
+                  validationError.formRadio
+                    ? 'border-red-600'
+                    : 'border-gray-200'
+                } ps-4`}
+              >
+                <input
+                  name="deliveryMethod"
+                  type="radio"
+                  value="send"
+                  checked={formRadio.deliveryMethod === 'send'}
+                  onChange={handleRadioChange}
+                  className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                />
+                <label className="ms-2 w-full py-4 text-sm font-medium">
+                  จัดส่งทางไปรษณีย์ ค่าบริการไปรษณีย์ 33 บาท
+                </label>
+              </div>
             </div>
-            <div
-              className={`flex items-center rounded border ${
-                validationError.formRadio ? 'border-red-600' : 'border-gray-200'
-              } ps-4`}
-            >
-              <input
-                name="deliveryMethod"
-                type="radio"
-                value="send"
-                checked={formRadio.deliveryMethod === 'send'}
-                onChange={handleRadioChange}
-                className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-              />
-              <label className="ms-2 w-full py-4 text-sm font-medium">
-                จัดส่งทางไปรษณีย์ ค่าบริการไปรษณีย์ 33 บาท
-              </label>
-            </div>
-          </div>
-          {validationError.formRadio && (
-            <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
-              {validationError.formRadio}
-            </p>
-          )}
+            {validationError.formRadio && (
+              <p className="ml-3 pt-[4px] text-xs tracking-wider text-red-600">
+                {validationError.formRadio}
+              </p>
+            )}
 
-          {isSending && (
-            <div className={`mb-0 grid gap-3 md:grid-cols-1`}>
-              <div>
-                <label
-                  htmlFor="recipientName"
-                  className={`mb-2 block text-base font-medium ${
-                    validationError.recipientName
-                      ? 'text-red-600'
-                      : 'text-gray-900'
-                  }`}
-                >
-                  ชื่อ-นามสกุล (ผู้รับ)
-                </label>
-                <TextField
-                  type="text"
-                  name="recipientName"
-                  className="flex w-full"
-                  value={formInput.recipientName}
-                  onChange={handleInputChange}
-                  placeholder=""
-                  error={Boolean(validationError.recipientName)}
-                  helperText={validationError.recipientName}
-                />
+            {isSending && (
+              <div className={`mb-0 grid gap-3 md:grid-cols-1`}>
+                <div>
+                  <label
+                    htmlFor="recipientName"
+                    className={`mb-2 block text-base font-medium ${
+                      validationError.recipientName
+                        ? 'text-red-600'
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    ชื่อ-นามสกุล (ผู้รับ)
+                  </label>
+                  <TextField
+                    type="text"
+                    name="recipientName"
+                    className="flex w-full"
+                    value={formInput.recipientName}
+                    onChange={handleInputChange}
+                    placeholder=""
+                    error={Boolean(validationError.recipientName)}
+                    helperText={validationError.recipientName}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="recipientAddress"
+                    className={`mb-2 block text-base font-medium ${
+                      validationError.recipientAddress
+                        ? 'text-red-600'
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    ที่อยู่ในการจัดส่ง (ผู้รับ)
+                  </label>
+                  <TextField
+                    type="text"
+                    name="recipientAddress"
+                    className="flex w-full"
+                    value={formInput.recipientAddress}
+                    onChange={handleInputChange}
+                    placeholder=""
+                    multiline
+                    rows={4}
+                    sx={{
+                      '.MuiOutlinedInput-root': {
+                        padding: 1,
+                      },
+                    }}
+                    error={Boolean(validationError.recipientAddress)}
+                    helperText={validationError.recipientAddress}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="recipientPhone"
+                    className={`mb-2 block text-base font-medium ${
+                      validationError.recipientPhone
+                        ? 'text-red-600'
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    หมายเลขโทรศัพท์ (ผู้รับ)
+                  </label>
+                  <TextField
+                    type="text"
+                    name="recipientPhone"
+                    className="flex w-full"
+                    value={formInput.recipientPhone}
+                    onChange={handleInputChange}
+                    placeholder=""
+                    error={Boolean(validationError.recipientPhone)}
+                    helperText={validationError.recipientPhone}
+                  />
+                </div>
               </div>
-              <div>
-                <label
-                  htmlFor="recipientAddress"
-                  className={`mb-2 block text-base font-medium ${
-                    validationError.recipientAddress
-                      ? 'text-red-600'
-                      : 'text-gray-900'
-                  }`}
-                >
-                  ที่อยู่ในการจัดส่ง (ผู้รับ)
-                </label>
-                <TextField
-                  type="text"
-                  name="recipientAddress"
-                  className="flex w-full"
-                  value={formInput.recipientAddress}
-                  onChange={handleInputChange}
-                  placeholder=""
-                  multiline
-                  rows={4}
-                  sx={{
-                    '.MuiOutlinedInput-root': {
-                      padding: 1,
-                    },
-                  }}
-                  error={Boolean(validationError.recipientAddress)}
-                  helperText={validationError.recipientAddress}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="recipientPhone"
-                  className={`mb-2 block text-base font-medium ${
-                    validationError.recipientPhone
-                      ? 'text-red-600'
-                      : 'text-gray-900'
-                  }`}
-                >
-                  หมายเลขโทรศัพท์ (ผู้รับ)
-                </label>
-                <TextField
-                  type="text"
-                  name="recipientPhone"
-                  className="flex w-full"
-                  value={formInput.recipientPhone}
-                  onChange={handleInputChange}
-                  placeholder=""
-                  error={Boolean(validationError.recipientPhone)}
-                  helperText={validationError.recipientPhone}
-                />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </form>
       <div className="mt-6 flex justify-end gap-4">
         <Link
           href="/dashboard/activity-history/transcript/document/"
@@ -494,14 +586,30 @@ export default function PN11Form() {
         >
           Test Document
         </Link>
-        <Link
-          href="/dashboard/activity-history/"
+        <button
+          onClick={() => handleOpenModal(true, false)}
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           ยกเลิก
-        </Link>
-        <Button type="submit">ตกลง</Button>
+        </button>
+        <Button onClick={() => handleOpenModal(false, true)}>ตกลง</Button>
       </div>
-    </form>
+
+      <ModalQuestion
+        openModal={openModal}
+        onCloseModal={handleCloseModal}
+        title={titleModal}
+        detail={detailModal}
+        okAction={handleAction}
+        onOk={(action) => {
+          console.log(action);
+          if (action === 'submit') {
+            handleSubmit();
+          } else if (action === 'cancel') {
+            router.push('/dashboard/activity-history/', { scroll: false });
+          }
+        }}
+      />
+    </>
   );
 }

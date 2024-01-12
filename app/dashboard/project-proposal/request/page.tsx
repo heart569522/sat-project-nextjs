@@ -12,7 +12,7 @@ export default async function Page({}: {}) {
       <div>
         <Breadcrumbs
           breadcrumbs={[
-            { label: 'โครงการ/กิจกรรม', href: '/dashboard/project-proposal' },
+            { label: 'โครงการ/กิจกรรม', href: '', active: false, },
             {
               label: 'แบบฟอร์มเสนอโครงการ/กิจกรรม (พน.01)',
               href: '/dashboard/project-proposal/request',

@@ -4,17 +4,17 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { FormHelperText, MenuItem, Select } from '@mui/material';
-import faculties from '@/app/model/faculties';
-import majors from '@/app/model/majors';
 import Link from 'next/link';
 import { Button } from '../button';
+import { Faculties, Majors } from '@/app/model/faculties-majors';
+import { getAllData } from '@/app/lib/api-service';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -66,6 +66,38 @@ export default function Form() {
     username: '',
     password: '',
   });
+
+  const [faculties, setFaculties] = useState<Faculties[]>([]);
+  const [majors, setMajors] = useState<Majors[]>([]);
+
+  const getFaculties = async () => {
+    try {
+      const data = await getAllData('faculties');
+      setFaculties(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMajors = async () => {
+    try {
+      const data = await getAllData('majors');
+      setMajors(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('fetch list fac/major');
+
+    const fetchData = async () => {
+      await getFaculties();
+      await getMajors();
+    };
+
+    fetchData();
+  }, []);
 
   const [formRadio, setFormRadio] = useState({
     formRole: '',
@@ -338,8 +370,8 @@ export default function Form() {
                   onChange={handleFacultyChange}
                 >
                   {faculties.map((faculty) => (
-                    <MenuItem key={faculty} value={faculty}>
-                      {faculty}
+                    <MenuItem key={faculty.id} value={faculty.id}>
+                      {faculty.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -361,13 +393,15 @@ export default function Form() {
                   onChange={handleMajorChange}
                   disabled={!formInput.faculty}
                 >
-                  {majors[formInput.faculty as keyof typeof majors]?.map(
-                    (major) => (
-                      <MenuItem key={major} value={major}>
-                        {major}
+                  {majors
+                    .filter(
+                      (major) => major.faculty_id === Number(formInput.faculty),
+                    )
+                    .map((filteredMajor) => (
+                      <MenuItem key={filteredMajor.id} value={filteredMajor.id}>
+                        {filteredMajor.name}
                       </MenuItem>
-                    ),
-                  )}
+                    ))}
                 </Select>
               </FormControl>
             </div>

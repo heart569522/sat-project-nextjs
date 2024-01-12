@@ -1,10 +1,15 @@
 import { PN11 } from '@/app/model/pn11';
 import Image from 'next/image';
-import { convertISOStringToDateText } from '@/app/lib/services';
 import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
+import { getDataById } from '@/app/lib/api-service';
 
-export default function PN11Paper({ data }: { data: PN11 }) {
+export default async function PN11Paper({ docData }: { docData: PN11 }) {
+  const data = Array.isArray(docData) ? docData[0] : docData;
+
+  const faculty = await getDataById('faculties', data.faculty)
+  const major = await getDataById('majors', data.major)
+  
   const DotsPlaceholder = ({
     numOfDots,
     text,
@@ -74,7 +79,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
               <label className={`font-semibold`}>วันที่</label>
               <DotsPlaceholder
                 numOfDots={30}
-                text={convertISOStringToDateText(data.date)}
+                text={data.date}
                 position="center"
               />
             </div>
@@ -104,7 +109,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
               </label>
               <DotsPlaceholder
                 numOfDots={60}
-                text={data.studentId}
+                text={data.student_id}
                 position="center"
               />
               <label className={`whitespace-nowrap font-semibold`}>
@@ -122,7 +127,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
               </label>
               <DotsPlaceholder
                 numOfDots={170}
-                text={data.major}
+                text={major[0].name}
                 position="left"
               />
             </div>
@@ -132,7 +137,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
               </label>
               <DotsPlaceholder
                 numOfDots={162}
-                text={data.faculty}
+                text={faculty[0].name}
                 position="left"
               />
             </div>
@@ -158,7 +163,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
                 การรับเอกสาร
               </label>
               <div className="flex justify-start py-1 pl-6">
-                {data.deliveryMethod == 'receive' ? (
+                {data.delivery_method == 'receive' ? (
                   <CheckBoxSharpIcon className="mt-[4px]" />
                 ) : (
                   <CheckBoxOutlineBlankSharpIcon className="mt-[4px]" />
@@ -168,7 +173,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
                 </label>
               </div>
               <div className="flex justify-start py-1 pl-6">
-                {data.deliveryMethod == 'send' ? (
+                {data.delivery_method == 'send' ? (
                   <CheckBoxSharpIcon className="mt-[4px]" />
                 ) : (
                   <CheckBoxOutlineBlankSharpIcon className="mt-[4px]" />
@@ -181,7 +186,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
                 <p className="whitespace-nowrap">ชื่อ-นามสกุล (ผู้รับ)</p>
                 <DotsPlaceholder
                   numOfDots={140}
-                  text={data.recipientName || null}
+                  text={data.recipient_name || null}
                   position="left"
                 />
               </div>
@@ -189,7 +194,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
                 <p className="whitespace-nowrap">ที่อยู่ในการจัดส่ง (ผู้รับ)</p>
                 <DotsPlaceholder
                   numOfDots={134}
-                  text={data.recipientAddress || null}
+                  text={data.recipient_address || null}
                   position="center"
                 />
               </div>
@@ -197,7 +202,7 @@ export default function PN11Paper({ data }: { data: PN11 }) {
                 <p className="whitespace-nowrap">หมายเลขโทรศัพท์ (ผู้รับ)</p>
                 <DotsPlaceholder
                   numOfDots={131}
-                  text={data.recipientPhone || null}
+                  text={data.recipient_phone || null}
                   position="left"
                 />
               </div>

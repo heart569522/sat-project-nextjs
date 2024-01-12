@@ -1,14 +1,17 @@
 import { pool } from '@/app/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
-// import { unstable_noStore as noStore } from 'next/cache';
-import { project_status_list } from '@/app/model/pn01-select-list';
+import { Majors } from '@/app/model/faculties-majors';
 
-export async function GET() {
-  //   noStore();
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } },
+) {
+  const { id } = context.params;
 
   try {
-    const res = await pool.query<project_status_list>(
-      `SELECT * FROM project_status_list ORDER BY id`,
+    const res = await pool.query<Majors>(
+      `SELECT * FROM majors WHERE id = $1`,
+      [id],
     );
 
     return NextResponse.json(res.rows, { status: 200 });
