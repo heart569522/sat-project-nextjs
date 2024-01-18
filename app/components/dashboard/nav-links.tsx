@@ -39,6 +39,26 @@ const links = [
     icon: FindInPageOutlinedIcon,
   },
   {
+    name: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม (พน.01)',
+    href: '/dashboard/management/pn01',
+    icon: FindInPageOutlinedIcon,
+  },
+  {
+    name: 'จัดการข้อมูลบันทึกการเข้าร่วมโครงการกิจกรรม (พน.10)',
+    href: '/dashboard/management/pn10',
+    icon: FindInPageOutlinedIcon,
+  },
+  {
+    name: 'จัดการคำร้องขอระเบียนกิจกรรม (พน.11)',
+    href: '/dashboard/management/pn11',
+    icon: FindInPageOutlinedIcon,
+  },
+  {
+    name: 'จัดการข้อมูลผู้ใช้งานระบบ',
+    href: '/dashboard/management/user-management',
+    icon: FindInPageOutlinedIcon,
+  },
+  {
     name: 'เข้าสู่ระบบ/สมัครสมาชิก',
     href: '/dashboard/login-register',
     icon: LoginOutlinedIcon,

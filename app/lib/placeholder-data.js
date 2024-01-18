@@ -12,7 +12,7 @@ const users = [
 const customers = [
   {
     id: '3958dc9e-712f-4377-85e9-fec4b6a6442a',
-    name: 'Delba de Oliveira',
+    name: 'Delba de lord Oliveira',
     email: 'delba@oliveira.com',
     image_url: '/customers/delba-de-oliveira.png',
   },
@@ -76,13 +76,13 @@ const invoices = [
   {
     customer_id: customers[0].id,
     amount: 15795,
-    status: 'pending',
+    status: 'ดำเนินการ',
     date: '2022-12-06',
   },
   {
     customer_id: customers[1].id,
     amount: 20348,
-    status: 'pending',
+    status: 'ยืนยัน',
     date: '2022-11-14',
   },
   {

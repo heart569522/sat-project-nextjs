@@ -56,28 +56,28 @@ export default async function InvoicesTable({
           </div>
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
-              <tr>
+              <tr className="text-center font-bold">
                 <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
+                  ลำดับ
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Email
+                  รหัสโครงการ
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Amount
+                  ชื่อโครงการ
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Date
+                  วันที่
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Status
+                  สถานะการส่งคำร้อง
                 </th>
-                <th scope="col" className="relative py-3 pl-6 pr-3">
-                  <span className="sr-only">Edit</span>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  แก้ไข / ลบ
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white">
+            <tbody className="bg-white justify-center text-center">
               {invoices?.map((invoice) => (
                 <tr
                   key={invoice.id}
@@ -108,7 +108,7 @@ export default async function InvoicesTable({
                     <InvoiceStatus status={invoice.status} />
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex justify-end gap-3">
+                    <div className="flex gap-2 justify-center">
                       <UpdateInvoice id={invoice.id} />
                       <DeleteInvoice id={invoice.id} />
                     </div>
