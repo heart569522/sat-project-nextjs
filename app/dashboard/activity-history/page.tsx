@@ -5,7 +5,7 @@ import Pagination from '@/app/components/pagination';
 import Table from '@/app/components/history-activity/table';
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import { Suspense } from 'react';
-import ActivityHistoryLoading from '@/app/components/loading-screen';
+import { ActivityHistoryLoading } from '@/app/components/loading-screen';
 
 export const metadata: Metadata = {
   title: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',

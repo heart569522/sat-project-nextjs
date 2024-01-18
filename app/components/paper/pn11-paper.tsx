@@ -2,13 +2,9 @@ import { PN11 } from '@/app/model/pn11';
 import Image from 'next/image';
 import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
-import { getDataById } from '@/app/lib/api-service';
 
 export default async function PN11Paper({ docData }: { docData: PN11 }) {
   const data = Array.isArray(docData) ? docData[0] : docData;
-
-  const faculty = await getDataById('faculties', data.faculty)
-  const major = await getDataById('majors', data.major)
   
   const DotsPlaceholder = ({
     numOfDots,
@@ -127,7 +123,7 @@ export default async function PN11Paper({ docData }: { docData: PN11 }) {
               </label>
               <DotsPlaceholder
                 numOfDots={170}
-                text={major[0].name}
+                text={data.major}
                 position="left"
               />
             </div>
@@ -137,7 +133,7 @@ export default async function PN11Paper({ docData }: { docData: PN11 }) {
               </label>
               <DotsPlaceholder
                 numOfDots={162}
-                text={faculty[0].name}
+                text={data.faculty}
                 position="left"
               />
             </div>

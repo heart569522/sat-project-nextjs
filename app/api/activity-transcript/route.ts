@@ -50,17 +50,20 @@ export async function POST(req: NextRequest) {
       )
       VALUES (
         '${date}', '${firstname}', '${lastname}', '${studentId}', '${phone}',
-        '${faculty}', '${major}', '${email}', '${deliveryMethod}', '${recipientName}',
+        (SELECT name FROM faculties WHERE id = '${faculty}'), (SELECT name FROM majors WHERE id = '${major}'), 
+        '${email}', '${deliveryMethod}', '${recipientName}',
         '${recipientAddress}', '${recipientPhone}', 'ตรวจสอบข้อมูล'
       )
       RETURNING id;
     `);
 
     console.log(response);
-    
 
     return NextResponse.json(
-      { message: 'Create request activity transcript success', id: response.rows[0].id },
+      {
+        message: 'Create request activity transcript success',
+        id: response.rows[0].id,
+      },
       { status: 201 },
     );
   } catch (error) {
