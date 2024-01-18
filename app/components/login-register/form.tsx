@@ -189,51 +189,6 @@ export default function Form() {
         </div>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <FormControl>
-          <FormLabel id="demo-row-radio-buttons-group-label">
-            เลือกตำแหน่ง
-          </FormLabel>
-          <div
-            className={`${
-              validationError.formRadio ? 'mb-0' : 'mb-6'
-            } grid gap-x-6 gap-y-3 md:grid-cols-2`}
-          >
-            <div
-              className={`flex items-center rounded border ${
-                validationError.formRadio ? 'border-red-600' : 'border-gray-200'
-              } ps-4`}
-            >
-              <div className="grid grid-cols-2">
-                <div>
-                  <input
-                    name="formRole"
-                    type="radio"
-                    value="teacher"
-                    checked={formRadio.formRole === 'teacher'}
-                    onChange={handleRadioChange}
-                    className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label className="ms-2 w-full py-4 text-sm font-medium">
-                    อาจารย์
-                  </label>
-                </div>
-                <div>
-                  <input
-                    name="formRole"
-                    type="radio"
-                    value="student"
-                    checked={formRadio.formRole === 'student'}
-                    onChange={handleRadioChange}
-                    className="h-5 w-5 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label className="ms-2 w-full py-4 text-sm font-medium">
-                    นักศึกษา
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </FormControl>
         <form action="" className="grid grid-cols-2">
           <div className="grid grid-cols-2">
             <div className="mb-6 w-full md:mb-0 md:ps-2">
@@ -264,22 +219,6 @@ export default function Form() {
                 placeholder="นามสกุลจริง"
               />
             </div>
-            {isStudent && (
-              <div className="col-span-2 mb-6 w-full md:mb-0 md:ps-2">
-                <label
-                  className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
-                  htmlFor="username"
-                >
-                  รหัสนักศึกษา
-                </label>
-                <input
-                  className="mb-3 block w-full appearance-none rounded border bg-white py-3 leading-tight text-gray-700 focus:bg-white focus:outline-none"
-                  id="username"
-                  type="number"
-                  placeholder="รหัสนักศึกษา 10 ตัว"
-                />
-              </div>
-            )}
             <div className="col-span-2 mb-6 w-full md:mb-0 md:ps-2">
               <label
                 className="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-700"
