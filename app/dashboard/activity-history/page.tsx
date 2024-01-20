@@ -22,15 +22,7 @@ export default async function Page({
 
   return (
     <div className="w-full">
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
-            href: '/dashboard/activity-history',
-            active: true,
-          },
-        ]}
-      />
+      <div className='flex text-xl md:text-2xl'>ประวัติการเข้าร่วมโครงการ/กิจกรรม</div>
       <div className="mt-4">
         <div className="flex items-center justify-start gap-2 md:mt-8">
           <CreateRequestTranscript />

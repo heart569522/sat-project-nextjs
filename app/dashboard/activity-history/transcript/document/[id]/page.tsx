@@ -1,3 +1,4 @@
+import Breadcrumbs from '@/app/components/breadcrumbs';
 import { sarabun } from '@/app/components/fonts';
 import { DocumentLoading } from '@/app/components/loading-screen';
 import PN11Paper from '@/app/components/paper/pn11-paper';
@@ -10,22 +11,48 @@ export const metadata: Metadata = {
   title: 'คำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
 };
 
-export default async function Page(context: { params: { id: string } },) {
+export default async function Page(context: { params: { id: string } }) {
   const { id } = context.params;
   const pn11Data = await getDataById('activity-transcript', id);
-  
+
   return (
-    <div className="flex justify-center">
-      <div id="pdf-content" className={`${sarabun.className}`}>
-        <Suspense fallback={<DocumentLoading />}>
-          <PN11Paper docData={pn11Data} />
-        </Suspense>
+    <main>
+      <div className='mb-6 print:hidden'>
+        <Breadcrumbs
+          breadcrumbs={[
+            {
+              label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
+              href: '/dashboard/activity-history',
+              active: false,
+            },
+            {
+              label: '...',
+              href: '',
+              active: false,
+            },
+            {
+              label: 'เอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
+              href: '#',
+              active: true,
+            },
+          ]}
+        />
+        <div className="flex text-xl md:text-2xl">
+          เอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)
+        </div>
       </div>
-      <ToolBox
-        downloadFileName="คำร้องขอหลักฐานการเข้าร่วมโครงการ(พน.11)"
-        rootElementId="pdf-content"
-        isPaperMargin={true}
-      />
-    </div>
+      <div className="flex justify-center">
+        <div id="pdf-content" className={`${sarabun.className}`}>
+          <Suspense fallback={<DocumentLoading />}>
+            <PN11Paper docData={pn11Data} />
+          </Suspense>
+        </div>
+        <ToolBox
+          downloadFileName="คำร้องขอหลักฐานการเข้าร่วมโครงการ(พน.11)"
+          rootElementId="pdf-content"
+          isPaperMargin={true}
+        />
+      </div>
+    </main>
   );
 }

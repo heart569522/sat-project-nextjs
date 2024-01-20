@@ -21,15 +21,7 @@ export default async function Page({
 
   return (
     <div className="w-full">
-      <Breadcrumbs
-        breadcrumbs={[
-          {
-            label: 'โครงการ/กิจกรรม',
-            href: '/dashboard/project-proposal',
-            active: true,
-          },
-        ]}
-      />
+      <div className='flex text-xl md:text-2xl'>โครงการ/กิจกรรม</div>
       <div className="mt-4">
         <div className="flex items-center justify-between gap-2 md:mt-8">
           <CreateRequestProjectProposal />

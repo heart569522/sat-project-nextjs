@@ -15,14 +15,16 @@ export default async function Page({}: {}) {
             {
               label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
               href: '/dashboard/activity-history',
+              active: false,
             },
             {
-              label: 'แบบร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)',
+              label: 'ร้องขอเอกสารระเบียนกิจกรรม',
               href: '/dashboard/activity-history/transcript',
               active: true,
             },
           ]}
         />
+        <div className='flex text-xl md:text-2xl'>ร้องขอเอกสารระเบียนกิจกรรม</div>
       </div>
       <div className="mt-4 w-full">
         <PN11Form />

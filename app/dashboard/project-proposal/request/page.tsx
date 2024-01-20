@@ -12,14 +12,21 @@ export default async function Page({}: {}) {
       <div>
         <Breadcrumbs
           breadcrumbs={[
-            { label: 'โครงการ/กิจกรรม', href: '', active: false, },
             {
-              label: 'แบบฟอร์มเสนอโครงการ/กิจกรรม (พน.01)',
+              label: 'โครงการ/กิจกรรม',
+              href: '/dashboard/project-proposal',
+              active: false,
+            },
+            {
+              label: 'เสนอโครงการ/กิจกรรม (พน.01)',
               href: '/dashboard/project-proposal/request',
               active: true,
             },
           ]}
         />
+        <div className="flex text-xl md:text-2xl">
+          เสนอโครงการ/กิจกรรม (พน.01)
+        </div>
       </div>
       <div className="mt-4 w-full">
         <PN01Form />
