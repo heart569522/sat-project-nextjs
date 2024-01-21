@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { UpdateInvoice, DeleteInvoice } from '@/app/components/buttons';
+import { UpdateInvoice, DeleteInvoice, EditButton, DeleteButton } from '@/app/components/buttons';
 import InvoiceStatus from '@/app/components/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredInvoices } from '@/app/lib/data';
@@ -79,8 +79,8 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
-                      <UpdateInvoice />
-                      <DeleteInvoice />
+                      <EditButton />
+                      <DeleteButton />
                     </div>
                   </td>
                 </tr>
@@ -114,8 +114,8 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
-                      <UpdateInvoice />
-                      <DeleteInvoice />
+                      <EditButton />
+                      <DeleteButton />
                     </div>
                   </td>
                 </tr>
@@ -149,8 +149,8 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
-                      <UpdateInvoice />
-                      <DeleteInvoice />
+                      <EditButton />
+                      <DeleteButton />
                     </div>
                   </td>
                 </tr>
@@ -184,8 +184,8 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
-                      <UpdateInvoice />
-                      <DeleteInvoice />
+                      <EditButton />
+                      <DeleteButton />
                     </div>
                   </td>
                 </tr>
