@@ -1,6 +1,7 @@
 import Pagination from '@/app/components/pagination';
 import SearchAuto from '@/app/components/search-box/search-auto';
 import Table from '@/app/components/management-com/userManagement/table';
+import { CreateInvoice } from '@/app/components/buttons';
 import { InvoicesTableSkeleton } from '@/app/components/skeletons';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
@@ -26,6 +27,7 @@ export default async function Page({
         <h1 className={`text-2xl`}>รายการผู้ใช้งานระบบ</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+        <CreateInvoice />
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
