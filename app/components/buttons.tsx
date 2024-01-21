@@ -39,11 +39,7 @@ export function CreateInvoice() {
   );
 }
 
-<<<<<<< Updated upstream
-export function UpdateInvoice({ id }: { id: string }) {
-=======
 export function MoreDetialInvoice() {
-
   return (
     <form action="">
       <button className="rounded-md border p-2 hover:bg-gray-100">
@@ -54,8 +50,7 @@ export function MoreDetialInvoice() {
   );
 }
 
-export function UpdateInvoice() {
->>>>>>> Stashed changes
+export function UpdateInvoice({ id }: { id: string }) {
   return (
     <Link
       href={`/dashboard/invoices/${id}/edit`}
