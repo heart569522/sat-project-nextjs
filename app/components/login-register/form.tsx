@@ -124,22 +124,6 @@ export default function Form() {
     setValidationError((prevError) => ({ ...prevError, major: '' }));
   };
 
-  const handleRadioChange = (event: {
-    target: { name: string; value: string };
-  }) => {
-    const { name, value } = event.target;
-
-    setFormRadio((prevTypes) => ({
-      ...prevTypes,
-      [name]: value,
-    }));
-
-    setValidationError((prevErrors) => ({
-      ...prevErrors,
-      formRadio: '',
-    }));
-  };
-
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

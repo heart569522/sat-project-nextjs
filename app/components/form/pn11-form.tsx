@@ -239,7 +239,6 @@ export default function PN11Form() {
 
       } else {
         console.error('Create failed, please try again later');
-        // Additional handling for failure
       }
     } catch (error) {
       console.error('Error while submitting data:', error);

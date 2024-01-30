@@ -15,7 +15,17 @@ import {
   Tooltip,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { PN01 } from '@/app/model/pn01';
+import {
+  BudgetExpenseRow,
+  BudgetIncomeRow,
+  ExpectedResultRow,
+  OIVTRow,
+  OperationDurationRow,
+  PN01,
+  ProjectScheduleRow,
+  ResponsibleRow,
+  TargetRow,
+} from '@/app/model/pn01';
 import { Button } from '../button';
 import Link from 'next/link';
 import {
@@ -26,6 +36,8 @@ import {
   getProjectKPI,
   getProjectStatus,
   getStrategicPlanKPI,
+  createData,
+  updateData,
 } from '@/app/lib/api-service';
 import {
   objective_list,
@@ -36,8 +48,10 @@ import {
   strategic_plan_kpi_list,
   university_strategic_list,
 } from '@/app/model/pn01-select-list';
-import { ModalQuestion } from '../modal';
-import { useRouter } from 'next/navigation'
+import { ModalQuestion, ModalResponse } from '../modal';
+import { usePathname, useRouter } from 'next/navigation';
+import { OverlayLoading } from '../loading-screen';
+import { revalidatePath } from 'next/cache';
 
 interface ValidationError {
   id: number;
@@ -48,45 +62,90 @@ interface ValidationErrors {
   [key: string]: ValidationError[];
 }
 
-export default function PN01Form() {
-  const router = useRouter()
+export default function PN01Form({
+  editData,
+  isEditing,
+}: {
+  editData?: any;
+  isEditing?: boolean;
+}) {
+  const router = useRouter();
 
-  const [openModal, setOpenModal] = useState(false);
+  if (!editData.is_edit) {
+    router.replace('/dashboard/project-proposal');
+  }
+
+  const [loading, setLoading] = useState(false);
+
+  const [openQuestionModal, setOpenQuestionModal] = useState(false);
+  const [openResponseModal, setOpenResponseModal] = useState(false);
   const [titleModal, setTitleModal] = useState('');
   const [detailModal, setDetailModal] = useState('');
-  const [handleAction, setHandleAction] = useState(''); 
+  const [handleAction, setHandleAction] = useState('');
+  const [modalSuccess, setModalSuccess] = useState(false);
+  const [modalError, setModalError] = useState(false);
+  const [buttonLink, setButtonLink] = useState('');
+  const [buttonText, setButtonText] = useState('');
 
-  const handleOpenModal = (isCancel?: boolean, isDraft?: boolean, isSubmit?: boolean) => {
+  const handleOpenModal = (
+    isCancel?: boolean,
+    isDraft?: boolean,
+    isSubmit?: boolean,
+  ) => {
     console.log('handleOpenModal');
 
     if (isCancel) {
-      setTitleModal('ยกเลิกการเสนอโครงการ/กิจกรรม');
-      setDetailModal('คุณยืนยันที่จะยกเลิกการเสนอโครงการ/กิจกรรม');
+      setTitleModal(
+        isEditing
+          ? 'ยกเลิกการแก้ไขโครงการ/กิจกรรม'
+          : 'ยกเลิกการเสนอโครงการ/กิจกรรม',
+      );
+      setDetailModal(
+        isEditing
+          ? 'คุณยืนยันที่จะยกเลิกการแก้ไขโครงการ/กิจกรรม'
+          : 'คุณยืนยันที่จะยกเลิกการเสนอโครงการ/กิจกรรม',
+      );
       setHandleAction('cancel');
-      setOpenModal(true);
+      setOpenQuestionModal(true);
     }
 
     if (isDraft) {
       setTitleModal('แบบร่างโครงการ/กิจกรรม');
       setDetailModal('คุณยืนยันที่จะบันทึกแบบร่างการเสนอโครงการ/กิจกรรม');
       setHandleAction('draft');
-      setOpenModal(true);
+      setOpenQuestionModal(true);
     }
 
     if (isSubmit) {
       const isFormValid = validateForm();
 
       if (isFormValid) {
-        setTitleModal('เสนอโครงการ/กิจกรรม');
-        setDetailModal('คุณยืนยันที่จะส่งข้อมูลการเสนอโครงการ/กิจกรรม');
+        setTitleModal(
+          isEditing ? 'แก้ไขโครงการ/กิจกรรม' : 'เสนอโครงการ/กิจกรรม',
+        );
+        setDetailModal(
+          isEditing
+            ? 'คุณยืนยันที่จะบันทึกข้อมูลการเสนอโครงการ/กิจกรรม, หลังจากยืนยันจะไม่สามารถแก้ไขข้อมูลได้'
+            : 'คุณยืนยันที่จะส่งข้อมูลการเสนอโครงการ/กิจกรรม, หลังจากยืนยันจะไม่สามารถแก้ไขข้อมูลได้',
+        );
         setHandleAction('submit');
-        setOpenModal(true);
+        setOpenQuestionModal(true);
       }
     }
   };
 
+  const resetResponseModal = () => {
+    setModalSuccess(false);
+    setModalError(false);
+    setTitleModal('');
+    setDetailModal('');
+    setButtonLink('');
+    setButtonText('');
+  };
+
   const handleCloseModal = () => {
-    setOpenModal(false);
+    setOpenQuestionModal(false);
+    setOpenResponseModal(false);
   };
 
   let userId = '8d2de365-1dea-4b3e-97ec-9f46b5b68ff1'; // test id super admin
@@ -103,15 +162,16 @@ export default function PN01Form() {
   }>({});
 
   const [formInput, setFormInput] = useState({
-    faculty: '',
-    projectName: '',
-    projectHead: '',
-    projectHeadPhone: '',
-    principleReason: '',
-    projectLocation: '',
-    projectDatetime: '',
-    lecturer: '',
-    improvement: '',
+    faculty: isEditing ? editData?.faculty || '' : '',
+    projectName: isEditing ? editData?.project_name || '' : '',
+    projectYear: isEditing ? editData?.project_year || '' : '',
+    projectHead: isEditing ? editData?.project_head || '' : '',
+    projectHeadPhone: isEditing ? editData?.project_head_phone || '' : '',
+    principleReason: isEditing ? editData?.principle_reason || '' : '',
+    projectLocation: isEditing ? editData?.project_location || '' : '',
+    projectDatetime: isEditing ? editData?.project_datetime || '' : '',
+    lecturer: isEditing ? editData?.lecturer || '' : '',
+    improvement: isEditing ? editData?.improvement || '' : '',
   });
 
   const [strategicIssueList, setStrategicIssueList] = useState<
@@ -133,8 +193,12 @@ export default function PN01Form() {
   );
 
   const getStrategicIssueList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
       const data = await getStrategicIssue();
+      setLoading(false);
       setStrategicIssueList(data);
     } catch (error) {
       console.error(error);
@@ -142,8 +206,12 @@ export default function PN01Form() {
   };
 
   const getObjectiveList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
       const data = await getObjective();
+      setLoading(false);
       setObjectiveList(data);
     } catch (error) {
       console.error(error);
@@ -151,8 +219,12 @@ export default function PN01Form() {
   };
 
   const getUniversityStrategicList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
-      const data = await getUniversityStrategic(); // Replace with your actual API function
+      const data = await getUniversityStrategic();
+      setLoading(false);
       setUniversityStrategicList(data);
     } catch (error) {
       console.error(error);
@@ -160,8 +232,12 @@ export default function PN01Form() {
   };
 
   const getStrategicPlanKPIList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
-      const data = await getStrategicPlanKPI(); // Replace with your actual API function
+      const data = await getStrategicPlanKPI();
+      setLoading(false);
       setStrategicPlanKPI(data);
     } catch (error) {
       console.error(error);
@@ -169,8 +245,12 @@ export default function PN01Form() {
   };
 
   const getOperationPlanKPIList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
-      const data = await getOperationPlanKPI(); // Replace with your actual API function
+      const data = await getOperationPlanKPI();
+      setLoading(false);
       setOperationPlanKPI(data);
     } catch (error) {
       console.error(error);
@@ -178,8 +258,12 @@ export default function PN01Form() {
   };
 
   const getProjectKPIList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
-      const data = await getProjectKPI(); // Replace with your actual API function
+      const data = await getProjectKPI();
+      setLoading(false);
       setProjectKPI(data);
     } catch (error) {
       console.error(error);
@@ -187,8 +271,12 @@ export default function PN01Form() {
   };
 
   const getProjectStatusList = async () => {
+    if (isEditing) {
+      setLoading(true);
+    }
     try {
-      const data = await getProjectStatus(); // Replace with your actual API function
+      const data = await getProjectStatus();
+      setLoading(false);
       setProjectStatus(data);
     } catch (error) {
       console.error(error);
@@ -197,8 +285,9 @@ export default function PN01Form() {
 
   useEffect(() => {
     console.log('fetch list pn01');
+    console.log('🚀 ~ editData:', editData);
 
-    const fetchData = async () => {
+    const fetchListData = async () => {
       await getStrategicIssueList();
       await getObjectiveList();
       await getUniversityStrategicList();
@@ -208,120 +297,229 @@ export default function PN01Form() {
       await getProjectStatusList();
     };
 
-    fetchData();
+    fetchListData();
   }, []);
 
   const [selectedValues, setSelectedValues] = useState({
-    strategicIssue: '',
-    objective: '',
-    universityStrategic: '',
-    strategicPlanKPI: '',
-    operationPlanKPI: '',
-    projectKPI: '',
-    projectStatus: '',
+    strategicIssue: isEditing ? editData?.strategic_issue_id || '' : '',
+    objective: isEditing ? editData?.objective_id || '' : '',
+    universityStrategic: isEditing
+      ? editData?.university_strategic_id || ''
+      : '',
+    strategicPlanKPI: isEditing ? editData?.strategic_plan_kpi_id || '' : '',
+    operationPlanKPI: isEditing ? editData?.operational_plan_kpi_id || '' : '',
+    projectKPI: isEditing ? editData?.project_kpi_id || '' : '',
+    projectStatus: isEditing ? editData?.project_status_id || '' : '',
   });
 
-  const [responsibleRows, setResponsibleRows] = useState([
-    { id: 1, firstname: '', lastname: '', position: '', work: '' },
-  ]);
+  const [responsibleRows, setResponsibleRows] = useState(
+    isEditing
+      ? editData?.project_responsible || [
+          { id: 1, firstname: '', lastname: '', position: '', work: '' },
+        ]
+      : [{ id: 1, firstname: '', lastname: '', position: '', work: '' }],
+  );
 
-  const [OIVTRows, setOIVTRows] = useState([
-    { id: 1, objective: '', indicator: '', value: '', tool: '' },
-  ]);
+  const [OIVTRows, setOIVTRows] = useState(
+    isEditing
+      ? editData?.objective_indicator_value_tool || [
+          { id: 1, objective: '', indicator: '', value: '', tool: '' },
+        ]
+      : [{ id: 1, objective: '', indicator: '', value: '', tool: '' }],
+  );
 
-  const [expectedResultRows, setExpectedResultRows] = useState([
-    { id: 1, expected_result: '' },
-  ]);
+  const [expectedResultRows, setExpectedResultRows] = useState(
+    isEditing
+      ? editData?.expected_result || [{ id: 1, expected_result: '' }]
+      : [{ id: 1, expected_result: '' }],
+  );
 
-  const [operationDurationRows, setOperationDurationRows] = useState([
-    { id: 1, operation_duration: '' },
-  ]);
+  const [operationDurationRows, setOperationDurationRows] = useState(
+    isEditing
+      ? editData?.operation_duration || [{ id: 1, operation_duration: '' }]
+      : [{ id: 1, operation_duration: '' }],
+  );
 
-  const [projectScheduleRows, setProjectScheduleRows] = useState([
-    { id: 1, date: '', time: '', detail: '' },
-  ]);
+  const [projectScheduleRows, setProjectScheduleRows] = useState(
+    isEditing
+      ? editData?.project_schedule || [
+          { id: 1, date: '', time: '', detail: '' },
+        ]
+      : [{ id: 1, date: '', time: '', detail: '' }],
+  );
 
-  const [targetTotal, setTargetTotal] = useState('');
-  const [targetRows, setTargetRows] = useState([
-    { id: 1, detail: '', count: '' },
-  ]);
+  const [targetTotal, setTargetTotal] = useState(
+    isEditing ? editData?.target_total || '' : '',
+  );
 
-  const [budgetIncomeTotal, setBudgetIncomeTotal] = useState('');
-  const [budgetIncomeRows, setBudgetIncomeRows] = useState([
-    { id: 1, detail: '', amount: '', source: '' },
-  ]);
+  const [targetRows, setTargetRows] = useState(
+    isEditing
+      ? editData?.target || [{ id: 1, detail: '', count: '' }]
+      : [{ id: 1, detail: '', count: '' }],
+  );
 
-  const [budgetExpenseTotal, setBudgetExpenseTotal] = useState('');
-  const [budgetExpenseRows, setBudgetExpenseRows] = useState([
-    { id: 1, detail: '', amount: '', note: '' },
-  ]);
+  const [budgetIncomeTotal, setBudgetIncomeTotal] = useState(
+    isEditing ? editData?.budget_income_total || '' : '',
+  );
 
-  const [projectTypes, setProjectTypes] = useState({
-    maintenance: false,
-    academicService: false,
-    knowledgeManagement: false,
-    researchPromotion: false,
-    educationQualityAssurance: false,
-    personnelDevelopment: false,
-    riskManagement: false,
-    studentDevelopment: false,
-    moralEthical: false,
-    academicPromotion: false,
-    knowledge: false,
-    environment: false,
-    intellectualSkill: false,
-    sport: false,
-    knowledgeAnalysisCommunicationTechnology: false,
-    artCultureDevelopment: false,
-    numericalAnalysisCommunicationTechnology: false,
-    moralEthicalDevelopment: false,
-    leadershipDevelopment: false,
-    subOther: false,
-    subOtherDetail: '',
-    other: false,
-    otherDetail: '',
+  const [budgetIncomeRows, setBudgetIncomeRows] = useState(
+    isEditing
+      ? editData?.budget_income || [
+          { id: 1, detail: '', amount: '', source: '' },
+        ]
+      : [{ id: 1, detail: '', amount: '', source: '' }],
+  );
+
+  const [budgetExpenseTotal, setBudgetExpenseTotal] = useState(
+    isEditing ? editData?.budget_expense_total || '' : '',
+  );
+
+  const [budgetExpenseRows, setBudgetExpenseRows] = useState(
+    isEditing
+      ? editData?.budget_expense || [
+          { id: 1, detail: '', amount: '', note: '' },
+        ]
+      : [{ id: 1, detail: '', amount: '', note: '' }],
+  );
+
+  const [projectTypes, setProjectTypes] = useState(() => {
+    if (isEditing) {
+      const {
+        maintenance,
+        academic_service,
+        knowledge_management,
+        research_promotion,
+        education_quality_assurance,
+        personnel_development,
+        risk_management,
+        student_development,
+        moral_ethical,
+        academic_promotion,
+        knowledge,
+        environment,
+        intellectual_skill,
+        sport,
+        knowledge_analysis_communication_technology,
+        art_culture_development,
+        numerical_analysis_communication_technology,
+        moral_ethical_development,
+        leadership_development,
+        sub_other,
+        sub_other_detail,
+        other,
+        other_detail,
+      } = editData?.project_type || {};
+
+      return {
+        maintenance: maintenance || false,
+        academic_service: academic_service || false,
+        knowledge_management: knowledge_management || false,
+        research_promotion: research_promotion || false,
+        education_quality_assurance: education_quality_assurance || false,
+        personnel_development: personnel_development || false,
+        risk_management: risk_management || false,
+        student_development: student_development || false,
+        moral_ethical: moral_ethical || false,
+        academic_promotion: academic_promotion || false,
+        knowledge: knowledge || false,
+        environment: environment || false,
+        intellectual_skill: intellectual_skill || false,
+        sport: sport || false,
+        knowledge_analysis_communication_technology:
+          knowledge_analysis_communication_technology || false,
+        art_culture_development: art_culture_development || false,
+        numerical_analysis_communication_technology:
+          numerical_analysis_communication_technology || false,
+        moral_ethical_development: moral_ethical_development || false,
+        leadership_development: leadership_development || false,
+        sub_other: sub_other || false,
+        sub_other_detail: sub_other_detail || '',
+        other: other || false,
+        other_detail: other_detail || '',
+      };
+    } else {
+      return {
+        maintenance: false,
+        academic_service: false,
+        knowledge_management: false,
+        research_promotion: false,
+        education_quality_assurance: false,
+        personnel_development: false,
+        risk_management: false,
+        student_development: false,
+        moral_ethical: false,
+        academic_promotion: false,
+        knowledge: false,
+        environment: false,
+        intellectual_skill: false,
+        sport: false,
+        knowledge_analysis_communication_technology: false,
+        art_culture_development: false,
+        numerical_analysis_communication_technology: false,
+        moral_ethical_development: false,
+        leadership_development: false,
+        sub_other: false,
+        sub_other_detail: '',
+        other: false,
+        other_detail: '',
+      };
+    }
   });
 
-  const [universityIndentity, setUniversityIndentity] = useState({
-    moral: false,
-    serve: false,
-    academic: false,
-    develop: false,
+  const [universityIndentity, setUniversityIndentity] = useState(() => {
+    if (isEditing) {
+      const { moral, serve, academic, develop } =
+        editData?.university_identity || {};
+
+      return {
+        moral: moral || false,
+        serve: serve || false,
+        academic: academic || false,
+        develop: develop || false,
+      };
+    } else {
+      return {
+        moral: false,
+        serve: false,
+        academic: false,
+        develop: false,
+      };
+    }
   });
 
   const isSubOtherDisabled =
-    !projectTypes.studentDevelopment || !projectTypes.subOther;
+    !projectTypes.student_development || !projectTypes.sub_other;
   const isOtherDisabled = !projectTypes.other;
-  const isStudentDevelopmentDisabled = !projectTypes.studentDevelopment;
+  const isStudentDevelopmentDisabled = !projectTypes.student_development;
 
   const checkDisableCheckBox = () => {
     if (isSubOtherDisabled) {
       setProjectTypes((prevTypes) => ({
         ...prevTypes,
-        subOtherDetail: '',
+        sub_other_detail: '',
       }));
     }
     if (isOtherDisabled) {
       setProjectTypes((prevTypes) => ({
         ...prevTypes,
-        otherDetail: '',
+        other_detail: '',
       }));
     }
     if (isStudentDevelopmentDisabled) {
       setProjectTypes((prevTypes) => ({
         ...prevTypes,
-        intellectualSkill: false,
-        academicPromotion: false,
-        artCultureDevelopment: false,
+        intellectual_skill: false,
+        academic_promotion: false,
+        art_culture_development: false,
         environment: false,
         knowledge: false,
-        knowledgeAnalysisCommunicationTechnology: false,
-        leadershipDevelopment: false,
-        moralEthical: false,
-        moralEthicalDevelopment: false,
-        numericalAnalysisCommunicationTechnology: false,
+        knowledge_analysis_communication_technology: false,
+        leadership_development: false,
+        moral_ethical: false,
+        moral_ethical_development: false,
+        numerical_analysis_communication_technology: false,
         sport: false,
-        subOther: false,
+        sub_other: false,
       }));
     }
   };
@@ -334,7 +532,7 @@ export default function PN01Form() {
     setProjectTypes((prevTypes) => ({
       ...prevTypes,
       [name]:
-        name == 'otherDetail' || name == 'subOtherDetail' ? value : checked,
+        name == 'other_detail' || name == 'sub_other_detail' ? value : checked,
     }));
 
     setValidationError((prevErrors) => ({
@@ -394,7 +592,7 @@ export default function PN01Form() {
   };
 
   const addResponsibleRow = () => {
-    setResponsibleRows((prevRows) => [
+    setResponsibleRows((prevRows: ResponsibleRow[]) => [
       ...prevRows,
       {
         id: prevRows.length + 1,
@@ -407,7 +605,7 @@ export default function PN01Form() {
   };
 
   const addOIVTRow = () => {
-    setOIVTRows((prevRows) => [
+    setOIVTRows((prevRows: OIVTRow[]) => [
       ...prevRows,
       {
         id: prevRows.length + 1,
@@ -420,49 +618,49 @@ export default function PN01Form() {
   };
 
   const addExpectedResultRow = () => {
-    setExpectedResultRows((prevRows) => [
+    setExpectedResultRows((prevRows: ExpectedResultRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, expected_result: '' },
     ]);
   };
 
   const addOperationDurationRow = () => {
-    setOperationDurationRows((prevRows) => [
+    setOperationDurationRows((prevRows: OperationDurationRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, operation_duration: '' },
     ]);
   };
 
   const addProjectScheduleRow = () => {
-    setProjectScheduleRows((prevRows) => [
+    setProjectScheduleRows((prevRows: ProjectScheduleRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, date: '', time: '', detail: '' },
     ]);
   };
 
   const addTargetRow = () => {
-    setTargetRows((prevRows) => [
+    setTargetRows((prevRows: TargetRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, detail: '', count: '' },
     ]);
   };
 
   const addBudgetIncomeRow = () => {
-    setBudgetIncomeRows((prevRows) => [
+    setBudgetIncomeRows((prevRows: BudgetIncomeRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, detail: '', amount: '', source: '' },
     ]);
   };
 
   const addBudgetExpenseRow = () => {
-    setBudgetExpenseRows((prevRows) => [
+    setBudgetExpenseRows((prevRows: BudgetExpenseRow[]) => [
       ...prevRows,
       { id: prevRows.length + 1, detail: '', amount: '', note: '' },
     ]);
   };
 
   const deleteResponsibleRow = (id: number) => {
-    setResponsibleRows((prevRows) => {
+    setResponsibleRows((prevRows: ResponsibleRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -496,7 +694,7 @@ export default function PN01Form() {
   };
 
   const deleteOIVTRow = (id: number) => {
-    setOIVTRows((prevRows) => {
+    setOIVTRows((prevRows: OIVTRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -530,7 +728,7 @@ export default function PN01Form() {
   };
 
   const deleteExpectedResultRow = (id: number) => {
-    setExpectedResultRows((prevRows) => {
+    setExpectedResultRows((prevRows: ExpectedResultRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -564,7 +762,7 @@ export default function PN01Form() {
   };
 
   const deleteOperationDurationRow = (id: number) => {
-    setOperationDurationRows((prevRows) => {
+    setOperationDurationRows((prevRows: OperationDurationRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -598,7 +796,7 @@ export default function PN01Form() {
   };
 
   const deleteProjectScheduleRow = (id: number) => {
-    setProjectScheduleRows((prevRows) => {
+    setProjectScheduleRows((prevRows: ProjectScheduleRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -632,7 +830,7 @@ export default function PN01Form() {
   };
 
   const deleteTargetRow = (id: number) => {
-    setTargetRows((prevRows) => {
+    setTargetRows((prevRows: TargetRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -666,7 +864,7 @@ export default function PN01Form() {
   };
 
   const deleteBudgetIncomeRow = (id: number) => {
-    setBudgetIncomeRows((prevRows) => {
+    setBudgetIncomeRows((prevRows: BudgetIncomeRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -700,7 +898,7 @@ export default function PN01Form() {
   };
 
   const deleteBudgetExpenseRow = (id: number) => {
-    setBudgetExpenseRows((prevRows) => {
+    setBudgetExpenseRows((prevRows: BudgetExpenseRow[]) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -738,7 +936,7 @@ export default function PN01Form() {
     field: string,
     value: string,
   ) => {
-    setResponsibleRows((prevRows) =>
+    setResponsibleRows((prevRows: ResponsibleRow[]) =>
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
 
@@ -752,7 +950,7 @@ export default function PN01Form() {
   };
 
   const handleOIVTChange = (id: number, field: string, value: string) => {
-    setOIVTRows((prevRows) =>
+    setOIVTRows((prevRows: OIVTRow[]) =>
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
 
@@ -766,7 +964,7 @@ export default function PN01Form() {
   };
 
   const handleExpectedResultChange = (id: number, value: string) => {
-    setExpectedResultRows((prevRows) =>
+    setExpectedResultRows((prevRows: ExpectedResultRow[]) =>
       prevRows.map((row) =>
         row.id === id ? { ...row, expected_result: value } : row,
       ),
@@ -782,7 +980,7 @@ export default function PN01Form() {
   };
 
   const handleOperationDurationChange = (id: number, value: string) => {
-    setOperationDurationRows((prevRows) =>
+    setOperationDurationRows((prevRows: OperationDurationRow[]) =>
       prevRows.map((row) =>
         row.id === id ? { ...row, operation_duration: value } : row,
       ),
@@ -800,7 +998,7 @@ export default function PN01Form() {
   const handleProjectScheduleChange = (id: number, event: any) => {
     const { name, value } = event.target;
 
-    setProjectScheduleRows((prevRows) =>
+    setProjectScheduleRows((prevRows: ProjectScheduleRow[]) =>
       prevRows.map((row) =>
         row.id === id
           ? {
@@ -821,7 +1019,7 @@ export default function PN01Form() {
   };
 
   const handleTargetChange = (id: number, field: string, value: string) => {
-    setTargetRows((prevRows) =>
+    setTargetRows((prevRows: TargetRow[]) =>
       prevRows.map((row) =>
         row.id === id
           ? { ...row, [field]: field == 'detail' ? value : Number(value) }
@@ -843,7 +1041,7 @@ export default function PN01Form() {
     field: string,
     value: string,
   ) => {
-    setBudgetIncomeRows((prevRows) =>
+    setBudgetIncomeRows((prevRows: BudgetIncomeRow[]) =>
       prevRows.map((row) =>
         row.id === id
           ? {
@@ -868,7 +1066,7 @@ export default function PN01Form() {
     field: string,
     value: string,
   ) => {
-    setBudgetExpenseRows((prevRows) =>
+    setBudgetExpenseRows((prevRows: BudgetExpenseRow[]) =>
       prevRows.map((row) =>
         row.id === id
           ? {
@@ -889,13 +1087,16 @@ export default function PN01Form() {
   };
 
   const calculateTargetTotal = () => {
-    const total = targetRows.reduce((acc, row) => acc + Number(row.count), 0);
+    const total = targetRows.reduce(
+      (acc: number, row: { count: any }) => acc + Number(row.count),
+      0,
+    );
     setTargetTotal(total.toLocaleString());
   };
 
   const calculateBudgetIncomeTotal = () => {
     const total = budgetIncomeRows.reduce(
-      (acc, row) => acc + Number(row.amount),
+      (acc: number, row: { amount: any }) => acc + Number(row.amount),
       0,
     );
     setBudgetIncomeTotal(total.toLocaleString());
@@ -903,7 +1104,7 @@ export default function PN01Form() {
 
   const calculateBudgetExpenseTotal = () => {
     const total = budgetExpenseRows.reduce(
-      (acc, row) => acc + Number(row.amount),
+      (acc: number, row: { amount: any }) => acc + Number(row.amount),
       0,
     );
     setBudgetExpenseTotal(total.toLocaleString());
@@ -1125,36 +1326,58 @@ export default function PN01Form() {
     console.log('formData: ', formData);
   };
 
+  const handleSubmissionError = () => {
+    setLoading(false);
+    setModalError(true);
+    setTitleModal(isEditing ? 'แก้ไขข้อมูลผิดพลาด' : 'ผิดพลาด');
+    setDetailModal('โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
+    setOpenResponseModal(true);
+  };
+
   const handleSubmit = async () => {
+    setLoading(true);
+    resetResponseModal();
+
     console.log('handleSubmit');
 
     const formData = setFinalFormData(false);
     console.log('formData: ', formData);
 
-    // try {
-    //   const response = await fetch(
-    //     `${process.env.API_URL}/api/project-proposal`,
-    //     {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify(formData),
-    //     },
-    //   );
+    try {
+      let response: any;
 
-    //   if (!response.ok) {
-    //     console.error(
-    //       'Failed to send data. Server responded with:',
-    //       response.status,
-    //       response.statusText,
-    //     );
-    //   } else {
-    //     console.log('Create project proposal success ', response);
-    //   }
-    // } catch (error) {
-    //   console.error('Error while sending data:', error);
-    // }
+      if (isEditing) {
+        response = await updateData(
+          'project-proposal',
+          formData,
+          editData.id
+        );
+      } else {
+        response = await createData('project-proposal', formData);
+      }
+
+      if (response && (response.status === 201 || response.status === 200)) {
+        setLoading(false);
+        setModalSuccess(true);
+        setTitleModal(isEditing ? 'แก้ไขข้อมูลสำเร็จ' : 'สำเร็จ');
+        setDetailModal(
+          isEditing
+            ? 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา'
+            : 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา',
+        );
+        setButtonLink(
+          isEditing
+            ? `/dashboard/project-proposal/document/${editData.id}`
+            : `/dashboard/project-proposal/document/${response.data.id}`,
+        );
+        setButtonText('ไปยังเอกสารเอกสาร พน.01');
+        setOpenResponseModal(true);
+      } else {
+        handleSubmissionError();
+      }
+    } catch (error) {
+      handleSubmissionError();
+    }
   };
 
   const setFinalFormData = (isDraft: boolean) => {
@@ -1165,6 +1388,7 @@ export default function PN01Form() {
       isDraft: isDraft,
       faculty: formInput.faculty,
       projectName: formInput.projectName,
+      projectYear: formInput.projectYear,
       projectHead: formInput.projectHead,
       projectHeadPhone: formInput.projectHeadPhone,
       principleReason: formInput.principleReason,
@@ -1201,7 +1425,7 @@ export default function PN01Form() {
     <>
       <form className="py-2">
         <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
-          <div className={`mb-0 grid gap-6 md:grid-cols-2`}>
+          <div className={`mb-6 grid gap-6 md:grid-cols-3`}>
             <div>
               <label
                 htmlFor="faculty"
@@ -1242,6 +1466,28 @@ export default function PN01Form() {
                 helperText={validationError.projectName}
               />
             </div>
+            <div>
+              <label
+                htmlFor="projectName"
+                className={`mb-2 block text-base font-medium ${
+                  validationError.projectName ? 'text-red-600' : 'text-gray-900'
+                }`}
+              >
+                ปีการศึกษา (พ.ศ.) *
+              </label>
+              <TextField
+                type="number"
+                name="projectYear"
+                className="flex w-full"
+                value={formInput.projectYear}
+                onChange={handleInputChange}
+                placeholder="ปีพุทธศักราช (พ.ศ)"
+                error={Boolean(validationError.projectYear)}
+                helperText={validationError.projectYear}
+              />
+            </div>
+          </div>
+          <div className={`grid gap-6 md:grid-cols-2`}>
             <div>
               <label
                 htmlFor="projectHead"
@@ -1309,7 +1555,7 @@ export default function PN01Form() {
                   </tr>
                 </thead>
                 <tbody>
-                  {responsibleRows.map((row) => (
+                  {responsibleRows.map((row: ResponsibleRow) => (
                     <tr className="border-b bg-white" key={row.id}>
                       <th
                         scope="row"
@@ -1711,14 +1957,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="academicService"
+                  name="academic_service"
                   type="checkbox"
-                  checked={projectTypes.academicService}
+                  checked={projectTypes.academic_service}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="academicService"
+                  htmlFor="academic_service"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนบริการวิชาการ
@@ -1732,14 +1978,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="knowledgeManagement"
+                  name="knowledge_management"
                   type="checkbox"
-                  checked={projectTypes.knowledgeManagement}
+                  checked={projectTypes.knowledge_management}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="knowledgeManagement"
+                  htmlFor="knowledge_management"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนการจัดการความรู้
@@ -1753,14 +1999,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="researchPromotion"
+                  name="research_promotion"
                   type="checkbox"
-                  checked={projectTypes.researchPromotion}
+                  checked={projectTypes.research_promotion}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="researchPromotion"
+                  htmlFor="research_promotion"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนการส่งเสริมงานวิจัย
@@ -1774,14 +2020,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="educationQualityAssurance"
+                  name="education_quality_assurance"
                   type="checkbox"
-                  checked={projectTypes.educationQualityAssurance}
+                  checked={projectTypes.education_quality_assurance}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="educationQualityAssurance"
+                  htmlFor="education_quality_assurance"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนการประกันคุณภาพการศึกษา
@@ -1795,14 +2041,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="personnelDevelopment"
+                  name="personnel_development"
                   type="checkbox"
-                  checked={projectTypes.personnelDevelopment}
+                  checked={projectTypes.personnel_development}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="personnelDevelopment"
+                  htmlFor="personnel_development"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนพัฒนาบุคลากร
@@ -1816,14 +2062,14 @@ export default function PN01Form() {
                 } ps-4`}
               >
                 <input
-                  name="riskManagement"
+                  name="risk_management"
                   type="checkbox"
-                  checked={projectTypes.riskManagement}
+                  checked={projectTypes.risk_management}
                   onChange={handleProjectTypeChange}
                   className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                 />
                 <label
-                  htmlFor="riskManagement"
+                  htmlFor="risk_management"
                   className="ms-2 w-full py-4 text-sm font-medium"
                 >
                   แผนบริหารความเสี่ยง
@@ -1840,14 +2086,14 @@ export default function PN01Form() {
               <div className="grid gap-x-6 gap-y-3 md:grid-cols-1">
                 <div className="flex items-center ps-4">
                   <input
-                    name="studentDevelopment"
+                    name="student_development"
                     type="checkbox"
-                    checked={projectTypes.studentDevelopment}
+                    checked={projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="studentDevelopment"
+                    htmlFor="student_development"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     แผนพัฒนานักศึกษาตามกรอบมาตรฐานคุณวุฒิ
@@ -1857,25 +2103,25 @@ export default function PN01Form() {
               </div>
               <div
                 className={`${
-                  !projectTypes.studentDevelopment
+                  !projectTypes.student_development
                     ? 'bg-gray-100 text-gray-400'
                     : 'text-gray-900'
                 } grid gap-x-6 gap-y-0 px-2 pb-2 pt-0 md:grid-cols-2`}
               >
                 <div className="flex items-center ps-4">
                   <input
-                    name="moralEthical"
+                    name="moral_ethical"
                     type="checkbox"
                     checked={
-                      projectTypes.moralEthical &&
-                      projectTypes.studentDevelopment
+                      projectTypes.moral_ethical &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="moralEthical"
+                    htmlFor="moral_ethical"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     ด้านคุณธรรม จริยธรรม
@@ -1883,18 +2129,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="academicPromotion"
+                    name="academic_promotion"
                     type="checkbox"
                     checked={
-                      projectTypes.academicPromotion &&
-                      projectTypes.studentDevelopment
+                      projectTypes.academic_promotion &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="academicPromotion"
+                    htmlFor="academic_promotion"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     กิจกรรมด้านวิชาการที่ส่งเสริมคุณลักษณะที่พึงประสงค์
@@ -1905,9 +2151,9 @@ export default function PN01Form() {
                     name="knowledge"
                     type="checkbox"
                     checked={
-                      projectTypes.knowledge && projectTypes.studentDevelopment
+                      projectTypes.knowledge && projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
@@ -1924,9 +2170,9 @@ export default function PN01Form() {
                     type="checkbox"
                     checked={
                       projectTypes.environment &&
-                      projectTypes.studentDevelopment
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
@@ -1939,18 +2185,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="intellectualSkill"
+                    name="intellectual_skill"
                     type="checkbox"
                     checked={
-                      projectTypes.intellectualSkill &&
-                      projectTypes.studentDevelopment
+                      projectTypes.intellectual_skill &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="intellectualSkill"
+                    htmlFor="intellectual_skill"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     ด้านทักษะทางปัญญา
@@ -1961,9 +2207,9 @@ export default function PN01Form() {
                     name="sport"
                     type="checkbox"
                     checked={
-                      projectTypes.sport && projectTypes.studentDevelopment
+                      projectTypes.sport && projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
@@ -1976,18 +2222,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="knowledgeAnalysisCommunicationTechnology"
+                    name="knowledge_analysis_communication_technology"
                     type="checkbox"
                     checked={
-                      projectTypes.knowledgeAnalysisCommunicationTechnology &&
-                      projectTypes.studentDevelopment
+                      projectTypes.knowledge_analysis_communication_technology &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="knowledgeAnalysisCommunicationTechnology"
+                    htmlFor="knowledge_analysis_communication_technology"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     ด้านทักษะด้านความสัมพันธ์ระหว่างบุคคลและความรับผิดชอบ
@@ -1995,18 +2241,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="artCultureDevelopment"
+                    name="art_culture_development"
                     type="checkbox"
                     checked={
-                      projectTypes.artCultureDevelopment &&
-                      projectTypes.studentDevelopment
+                      projectTypes.art_culture_development &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="artCultureDevelopment"
+                    htmlFor="art_culture_development"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     กิจกรรมส่งเสริมศิลปะและวัฒนธรรม
@@ -2014,18 +2260,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="numericalAnalysisCommunicationTechnology"
+                    name="numerical_analysis_communication_technology"
                     type="checkbox"
                     checked={
-                      projectTypes.numericalAnalysisCommunicationTechnology &&
-                      projectTypes.studentDevelopment
+                      projectTypes.numerical_analysis_communication_technology &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="numericalAnalysisCommunicationTechnology"
+                    htmlFor="numerical_analysis_communication_technology"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     ด้านทักษะการวิเคราะห์เชิงตัวเลข การสื่อสาร
@@ -2034,18 +2280,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="moralEthicalDevelopment"
+                    name="moral_ethical_development"
                     type="checkbox"
                     checked={
-                      projectTypes.moralEthicalDevelopment &&
-                      projectTypes.studentDevelopment
+                      projectTypes.moral_ethical_development &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="moralEthicalDevelopment"
+                    htmlFor="moral_ethical_development"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     กิจกรรมเสริมสร้างคุณธรรม จริยธรรม
@@ -2053,18 +2299,18 @@ export default function PN01Form() {
                 </div>
                 <div className="flex items-center ps-4">
                   <input
-                    name="leadershipDevelopment"
+                    name="leadership_development"
                     type="checkbox"
                     checked={
-                      projectTypes.leadershipDevelopment &&
-                      projectTypes.studentDevelopment
+                      projectTypes.leadership_development &&
+                      projectTypes.student_development
                     }
-                    disabled={!projectTypes.studentDevelopment}
+                    disabled={!projectTypes.student_development}
                     onChange={handleProjectTypeChange}
                     className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
                   <label
-                    htmlFor="leadershipDevelopment"
+                    htmlFor="leadership_development"
                     className="ms-2 w-full py-4 text-sm font-medium"
                   >
                     กิจกรรมส่งเสริมพัฒนาทักษะชีวิตความเป็นผู้นำ
@@ -2073,30 +2319,31 @@ export default function PN01Form() {
                 <div className="ps-4">
                   <div className="flex items-center">
                     <input
-                      name="subOther"
+                      name="sub_other"
                       type="checkbox"
                       checked={
-                        projectTypes.subOther && projectTypes.studentDevelopment
+                        projectTypes.sub_other &&
+                        projectTypes.student_development
                       }
-                      disabled={!projectTypes.studentDevelopment}
+                      disabled={!projectTypes.student_development}
                       onChange={handleProjectTypeChange}
                       className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
                     />
                     <label
-                      htmlFor="subOther"
+                      htmlFor="sub_other"
                       className="ms-2 py-4 text-sm font-medium"
                     >
                       อื่นๆ
                     </label>
-                    {projectTypes.subOther &&
-                      projectTypes.studentDevelopment && (
+                    {projectTypes.sub_other &&
+                      projectTypes.student_development && (
                         <div className="w-full border-b border-gray-300 px-2">
                           <input
                             type="text"
-                            name="subOtherDetail"
+                            name="sub_other_detail"
                             className="flex w-full border-none "
                             placeholder="โปรดระบุ"
-                            value={projectTypes.subOtherDetail || ''}
+                            value={projectTypes.sub_other_detail || ''}
                             onChange={handleProjectTypeChange}
                             disabled={isSubOtherDisabled}
                             required={!isSubOtherDisabled}
@@ -2133,10 +2380,10 @@ export default function PN01Form() {
                     <div className="w-full border-b border-gray-300 pl-2 pr-4">
                       <input
                         type="text"
-                        name="otherDetail"
+                        name="other_detail"
                         className="flex w-full border-none"
                         placeholder="โปรดระบุ"
-                        value={projectTypes.otherDetail || ''}
+                        value={projectTypes.other_detail || ''}
                         onChange={handleProjectTypeChange}
                         disabled={isOtherDisabled}
                         required={!isOtherDisabled}
@@ -2319,7 +2566,7 @@ export default function PN01Form() {
                     </tr>
                   </thead>
                   <tbody>
-                    {OIVTRows.map((row) => (
+                    {OIVTRows.map((row: OIVTRow) => (
                       <tr className="border-b bg-white" key={row.id}>
                         <td className="bg-gray-50 px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
@@ -2466,7 +2713,7 @@ export default function PN01Form() {
             <div className="grid gap-6 md:grid-cols-1">
               <table className="w-full rounded border text-left text-sm text-gray-500">
                 <tbody>
-                  {expectedResultRows.map((row) => (
+                  {expectedResultRows.map((row: ExpectedResultRow) => (
                     <tr className="border-b bg-white" key={row.id}>
                       <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                         {row.id}
@@ -2533,7 +2780,7 @@ export default function PN01Form() {
             <div className="grid gap-6 md:grid-cols-1">
               <table className="w-full rounded border text-left text-sm text-gray-500">
                 <tbody>
-                  {operationDurationRows.map((row) => (
+                  {operationDurationRows.map((row: OperationDurationRow) => (
                     <tr className="border-b bg-white" key={row.id}>
                       <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                         {row.id}
@@ -2689,90 +2936,101 @@ export default function PN01Form() {
                           </tr>
                         </thead>
                         <tbody>
-                          {projectScheduleRows.map((row) => (
-                            <tr className="border-b bg-white" key={row.id}>
-                              <td className="px-6 py-4">
-                                <div className={`grid grid-cols-1 gap-6`}>
-                                  <TextField
-                                    type="text"
-                                    name="date"
-                                    className="flex w-full"
-                                    variant="outlined"
-                                    placeholder="วัน/เดือน/ปี"
-                                    value={row.date}
-                                    onChange={(value) =>
-                                      handleProjectScheduleChange(row.id, value)
-                                    }
-                                  />
-                                </div>
-                              </td>
-                              <td className="bg-gray-50 px-6 py-4">
-                                <div className={`grid grid-cols-1 gap-6`}>
-                                  <TextField
-                                    type="text"
-                                    name="time"
-                                    className="flex w-full"
-                                    variant="outlined"
-                                    placeholder="รูปแบบ 24 ชั่วโมง"
-                                    value={row.time}
-                                    onChange={(value) =>
-                                      handleProjectScheduleChange(row.id, value)
-                                    }
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-6 py-4">
-                                <div className={`grid grid-cols-1 gap-6`}>
-                                  <TextField
-                                    type="text"
-                                    name="detail"
-                                    className="flex w-full"
-                                    variant="outlined"
-                                    placeholder=""
-                                    value={row.detail}
-                                    onChange={(value) =>
-                                      handleProjectScheduleChange(row.id, value)
-                                    }
-                                    error={Boolean(
-                                      validationArrayError[
-                                        'projectSchedule_detail'
-                                      ]?.some((item) => item.id === row.id),
-                                    )}
-                                    helperText={
-                                      validationArrayError[
-                                        'projectSchedule_detail'
-                                      ]?.find((item) => item.id === row.id)
-                                        ?.error || ''
-                                    }
-                                  />
-                                </div>
-                              </td>
-                              <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                                <Tooltip title="เพิ่มแถว">
-                                  <IconButton
-                                    aria-label="add_row"
-                                    size="small"
-                                    onClick={addProjectScheduleRow}
-                                  >
-                                    <PlusCircleIcon className="h-9 w-9" />
-                                  </IconButton>
-                                </Tooltip>
-                                {projectScheduleRows.length > 1 && (
-                                  <Tooltip title="ลบแถว">
-                                    <IconButton
-                                      aria-label="delete_row"
-                                      size="small"
-                                      onClick={() =>
-                                        deleteProjectScheduleRow(row.id)
+                          {projectScheduleRows.map(
+                            (row: ProjectScheduleRow) => (
+                              <tr className="border-b bg-white" key={row.id}>
+                                <td className="px-6 py-4">
+                                  <div className={`grid grid-cols-1 gap-6`}>
+                                    <TextField
+                                      type="text"
+                                      name="date"
+                                      className="flex w-full"
+                                      variant="outlined"
+                                      placeholder="วัน/เดือน/ปี"
+                                      value={row.date}
+                                      onChange={(value) =>
+                                        handleProjectScheduleChange(
+                                          row.id,
+                                          value,
+                                        )
                                       }
+                                    />
+                                  </div>
+                                </td>
+                                <td className="bg-gray-50 px-6 py-4">
+                                  <div className={`grid grid-cols-1 gap-6`}>
+                                    <TextField
+                                      type="text"
+                                      name="time"
+                                      className="flex w-full"
+                                      variant="outlined"
+                                      placeholder="รูปแบบ 24 ชั่วโมง"
+                                      value={row.time}
+                                      onChange={(value) =>
+                                        handleProjectScheduleChange(
+                                          row.id,
+                                          value,
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className={`grid grid-cols-1 gap-6`}>
+                                    <TextField
+                                      type="text"
+                                      name="detail"
+                                      className="flex w-full"
+                                      variant="outlined"
+                                      placeholder=""
+                                      value={row.detail}
+                                      onChange={(value) =>
+                                        handleProjectScheduleChange(
+                                          row.id,
+                                          value,
+                                        )
+                                      }
+                                      error={Boolean(
+                                        validationArrayError[
+                                          'projectSchedule_detail'
+                                        ]?.some((item) => item.id === row.id),
+                                      )}
+                                      helperText={
+                                        validationArrayError[
+                                          'projectSchedule_detail'
+                                        ]?.find((item) => item.id === row.id)
+                                          ?.error || ''
+                                      }
+                                    />
+                                  </div>
+                                </td>
+                                <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                                  <Tooltip title="เพิ่มแถว">
+                                    <IconButton
+                                      aria-label="add_row"
+                                      size="small"
+                                      onClick={addProjectScheduleRow}
                                     >
-                                      <XCircleIcon className="h-9 w-9" />
+                                      <PlusCircleIcon className="h-9 w-9" />
                                     </IconButton>
                                   </Tooltip>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
+                                  {projectScheduleRows.length > 1 && (
+                                    <Tooltip title="ลบแถว">
+                                      <IconButton
+                                        aria-label="delete_row"
+                                        size="small"
+                                        onClick={() =>
+                                          deleteProjectScheduleRow(row.id)
+                                        }
+                                      >
+                                        <XCircleIcon className="h-9 w-9" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </td>
+                              </tr>
+                            ),
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -2819,7 +3077,7 @@ export default function PN01Form() {
                   </tr>
                 </thead>
                 <tbody>
-                  {targetRows.map((row) => (
+                  {targetRows.map((row: TargetRow) => (
                     <tr className="border-b bg-white" key={row.id}>
                       <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                         <div className={`grid grid-cols-1 gap-6`}>
@@ -2980,7 +3238,7 @@ export default function PN01Form() {
                     </tr>
                   </thead>
                   <tbody>
-                    {budgetIncomeRows.map((row) => (
+                    {budgetIncomeRows.map((row: BudgetIncomeRow) => (
                       <tr className="border-b bg-white" key={row.id}>
                         <th
                           scope="row"
@@ -3151,7 +3409,7 @@ export default function PN01Form() {
                     </tr>
                   </thead>
                   <tbody>
-                    {budgetExpenseRows.map((row) => (
+                    {budgetExpenseRows.map((row: BudgetExpenseRow) => (
                       <tr className="border-b bg-white" key={row.id}>
                         <th
                           scope="row"
@@ -3317,10 +3575,12 @@ export default function PN01Form() {
         >
           แบบร่าง
         </button>
-        <Button onClick={() => handleOpenModal(false, false, true)}>ตกลง</Button>
+        <Button onClick={() => handleOpenModal(false, false, true)}>
+          ตกลง
+        </Button>
 
         <ModalQuestion
-          openModal={openModal}
+          openModal={openQuestionModal}
           onCloseModal={handleCloseModal}
           title={titleModal}
           detail={detailModal}
@@ -3331,10 +3591,23 @@ export default function PN01Form() {
             } else if (action === 'submit') {
               handleSubmit();
             } else if (action === 'cancel') {
-              router.push('/dashboard/project-proposal', { scroll: false })
+              router.push('/dashboard/project-proposal', { scroll: false });
             }
           }}
         />
+
+        <ModalResponse
+          openModal={openResponseModal}
+          onCloseModal={handleCloseModal}
+          title={titleModal}
+          detail={detailModal}
+          isSuccess={modalSuccess}
+          isError={modalError}
+          buttonLink={buttonLink}
+          buttonText={buttonText}
+        />
+
+        <OverlayLoading showLoading={loading} />
       </div>
     </>
   );

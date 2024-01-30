@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import React, { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,6 +6,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import { Box, IconButton, Modal } from '@mui/material';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -85,14 +86,24 @@ export function ModalResponse({
   isError,
   title,
   detail,
+  buttonLink,
+  buttonText,
 }: {
   openModal: boolean;
-  onCloseModal: () => void;
+  onCloseModal?: () => void;
   isSuccess?: boolean;
   isError?: boolean;
   title: string;
   detail: string;
+  buttonLink: string;
+  buttonText?: string;
 }) {
+  const router = useRouter();
+
+  const handleNextPage = () => {
+    router.replace(buttonLink)
+  }
+
   return (
     <Modal
       open={openModal}
@@ -120,19 +131,25 @@ export function ModalResponse({
         </div>
 
         <div className="flex items-center justify-start p-5">
-          {/* <button
-            type="button"
-            className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm"
-            onClick={onCloseModal}
-          >
-            ยกเลิก
-          </button> */}
-          <Link
-            href=""
-            className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
-          >
-            กลับไปหน้าแรก
-          </Link>
+          {isError && (
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-md border border-red-500 px-4 py-2 text-base font-medium text-red-500 shadow-sm hover:bg-red-50"
+              onClick={onCloseModal}
+            >
+              ปิด
+            </button>
+          )}
+
+          {isSuccess && (
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+              onClick={handleNextPage}
+            >
+              {buttonText}
+            </button>
+          )}
         </div>
       </Box>
     </Modal>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 
 export async function getStrategicIssue() {
   const res = await fetch(
@@ -105,13 +106,69 @@ export async function getAllData(apiPath: string) {
 }
 
 export async function getDataById(apiPath: string, id: string) {
+  noStore();
+
   const res = await fetch(`${process.env.API_URL}/api/${apiPath}/${id}`);
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
+  // if (!res.ok) {
+  //   throw new Error('Failed to fetch data');
+  // }
 
   return res.json();
+}
+
+export async function fetchPages(apiPath: string, search: string) {
+  noStore();
+
+  const url = new URL(`${process.env.API_URL}/api/${apiPath}`);
+
+  if (search) {
+    url.searchParams.append('query', search);
+  }
+
+  try {
+    const res = await fetch(url.toString());
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    return res.json();
+  } catch (error: any) {
+    console.error('Error during fetch:', error.message);
+    throw error;
+  }
+}
+
+export async function fetchFilter(
+  apiPath: string,
+  search: string | undefined,
+  currentPage: number | undefined,
+) {
+  noStore();
+
+  const url = new URL(`${process.env.API_URL}/api/${apiPath}`);
+
+  if (search) {
+    url.searchParams.append('search', search);
+  }
+
+  if (currentPage) {
+    url.searchParams.append('page', currentPage.toString());
+  }
+
+  try {
+    const res = await fetch(url.toString());
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Error during fetch:', error);
+    throw error;
+  }
 }
 
 export async function createData(apiPath: string, formData: any) {
@@ -128,15 +185,42 @@ export async function createData(apiPath: string, formData: any) {
 
     console.log('Create project proposal success', response);
 
-    // If the response data contains an 'id' field, use it
     if (response.data.id) {
       const insertedId = response.data.id;
       console.log('Inserted ID:', insertedId);
-      return response; // Return the response object
+      return response;
     } else {
       console.warn('No ID found in the response data:', response.data);
-      return response; // Return the response object even if no ID is found
+      return response;
     }
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
+export async function updateData(apiPath: string, formData: any, id: string | number) {
+  try {
+    const response = await axios.put(
+      `${process.env.API_URL}/api/${apiPath}/${id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    console.log('Update project proposal success', response);
+
+    // if (response.data.id) {
+    //   const insertedId = response.data.id;
+    //   console.log('Inserted ID:', insertedId);
+    //   return response;
+    // } else {
+    //   console.warn('No ID found in the response data:', response.data);
+    //   return response;
+    // }
+    return response;
   } catch (error) {
     console.error('Error while sending data:', error);
   }

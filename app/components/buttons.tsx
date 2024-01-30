@@ -1,4 +1,9 @@
-import { PencilIcon, PlusIcon, TrashIcon ,EyeIcon  } from '@heroicons/react/24/outline';
+import {
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+  EyeIcon,
+} from '@heroicons/react/24/outline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import Link from 'next/link';
 import { deleteInvoice } from '@/app/lib/actions';
@@ -44,7 +49,7 @@ export function MoreDetialInvoice() {
     <form action="">
       <button className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">MoreDetial</span>
-        <EyeIcon  className="w-5" />
+        <EyeIcon className="w-5" />
       </button>
     </form>
   );
@@ -74,19 +79,62 @@ export function DeleteInvoice({ id }: { id: string }) {
   );
 }
 
-export function EditButton() {
+export function DetailButton({
+  id,
+  path,
+}: {
+  id?: string;
+  path?: string;
+}) {
   return (
     <Link
-      href={``}
+      href={`/dashboard/${path}/${id}`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
-      <PencilIcon className="w-5" />
+      <EyeIcon className="w-5" />
     </Link>
   );
 }
 
-export function DeleteButton() {
+export function EditButton({
+  id,
+  path,
+  disabled,
+}: {
+  id?: string;
+  path?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-md border p-2 ${
+        disabled
+          ? 'cursor-not-allowed bg-gray-100 text-gray-500'
+          : 'hover:bg-gray-100'
+      }`}
+    >
+      {disabled ? (
+        <span className="w-5">
+          <PencilIcon className="w-5" />
+        </span>
+      ) : (
+        <Link href={id ? `/dashboard/${path}/${id}/edit` : '#'}>
+          <PencilIcon className="w-5" />
+        </Link>
+      )}
+    </div>
+  );
+}
 
+export function DeleteButton({
+  id,
+  path,
+}: {
+  id?: string;
+  path?: string;
+}) {
+
+  
   return (
     <form>
       <button className="rounded-md border p-2 hover:bg-gray-100">

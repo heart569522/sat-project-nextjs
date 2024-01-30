@@ -1,8 +1,10 @@
 export interface PN01 {
+  id?: string;
   userId?: string;
   isDraft? : boolean;
   faculty?: string;
   projectName?: string;
+  projectYear?: string;
   projectHead?: string;
   projectHeadPhone?: string;
   principleReason?: string;
@@ -32,7 +34,7 @@ export interface PN01 {
   universityIndentity?: UniversityIdentity;
 }
 
-interface ResponsibleRow {
+export interface ResponsibleRow {
   id: number;
   firstname: string;
   lastname: string;
@@ -40,7 +42,7 @@ interface ResponsibleRow {
   work: string;
 }
 
-interface OIVTRow {
+export interface OIVTRow {
   id: number;
   objective: string;
   indicator: string;
@@ -48,70 +50,70 @@ interface OIVTRow {
   tool: string;
 }
 
-interface ExpectedResultRow {
+export interface ExpectedResultRow {
   id: number;
   expected_result: string;
 }
 
-interface OperationDurationRow {
+export interface OperationDurationRow {
   id: number;
   operation_duration: string;
 }
 
-interface ProjectScheduleRow {
+export interface ProjectScheduleRow {
   id: number;
   date: string | null;
   time: string | null;
   detail: string;
 }
 
-interface TargetRow {
+export interface TargetRow {
   id: number;
   detail: string;
   count: string;
 }
 
-interface BudgetIncomeRow {
+export interface BudgetIncomeRow {
   id: number;
   detail: string;
   amount: string;
   source: string;
 }
 
-interface BudgetExpenseRow {
+export interface BudgetExpenseRow {
   id: number;
   detail: string;
   amount: string;
   note: string;
 }
 
-interface ProjectTypes {
+export interface ProjectTypes {
   maintenance: boolean;
-  academicService: boolean;
-  knowledgeManagement: boolean;
-  researchPromotion: boolean;
-  educationQualityAssurance: boolean;
-  personnelDevelopment: boolean;
-  riskManagement: boolean;
-  studentDevelopment: boolean;
-  moralEthical: boolean;
-  academicPromotion: boolean;
+  academic_service: boolean;
+  knowledge_management: boolean;
+  research_promotion: boolean;
+  education_quality_assurance: boolean;
+  personnel_development: boolean;
+  risk_management: boolean;
+  student_development: boolean;
+  moral_ethical: boolean;
+  academic_promotion: boolean;
   knowledge: boolean;
   environment: boolean;
-  intellectualSkill: boolean;
+  intellectual_skill: boolean;
   sport: boolean;
-  knowledgeAnalysisCommunicationTechnology: boolean;
-  artCultureDevelopment: boolean;
-  numericalAnalysisCommunicationTechnology: boolean;
-  moralEthicalDevelopment: boolean;
-  leadershipDevelopment: boolean;
-  subOther: boolean;
-  subOtherDetail: string;
+  knowledge_analysis_communication_technology: boolean;
+  art_culture_development: boolean;
+  numerical_analysis_communication_technology: boolean;
+  moral_ethical_development: boolean;
+  leadership_development: boolean;
+  sub_other: boolean;
+  sub_other_detail: string;
   other: boolean;
-  otherDetail: string;
+  other_detail: string;
 }
 
-interface UniversityIdentity {
+export interface UniversityIdentity {
   moral: boolean;
   serve: boolean;
   academic: boolean;
