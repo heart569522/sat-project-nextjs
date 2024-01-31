@@ -71,7 +71,7 @@ export default async function InvoicesTable({
                   <div className="flex justify-center gap-2">
                   <MoreDetialInvoice />
                     <EditButton />
-                    <DeleteButton />
+                    <DeleteButton id={1} apiPath=''/>
                   </div>
                 </td>
               </tr>
@@ -96,7 +96,7 @@ export default async function InvoicesTable({
                   <div className="flex justify-center gap-2">
                   <MoreDetialInvoice />
                     <EditButton />
-                    <DeleteButton />
+                    <DeleteButton id={1} apiPath=''/>
                   </div>
                 </td>
               </tr>
@@ -119,7 +119,7 @@ export default async function InvoicesTable({
                   <div className="flex justify-center gap-2">
                   <MoreDetialInvoice />
                     <EditButton />
-                    <DeleteButton />
+                    <DeleteButton id={1} apiPath=''/>
                   </div>
                 </td>
               </tr>
@@ -142,7 +142,7 @@ export default async function InvoicesTable({
                   <div className="flex justify-center gap-2">
                   <MoreDetialInvoice />
                     <EditButton />
-                    <DeleteButton />
+                    <DeleteButton id={1} apiPath=''/>
                   </div>
                 </td>
               </tr>
