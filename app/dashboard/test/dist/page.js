@@ -15,6 +15,6 @@ function BasicDatePicker() {
         React.createElement("div", null,
             React.createElement("p", null,
                 " ",
-                pn01_status_1.PN01Status.เสนอเซ็นแล้ว))));
+                pn01_status_1.PN01Status['กรุณานำส่งเอกสาร พน.01']))));
 }
 exports["default"] = BasicDatePicker;

@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       </div>
       {/* <Form invoice={invoice} customers={customers} /> */}
       <div className="mt-4 w-full">
-        <PN01Form editData={data[0]} isEditing={true}/>
+        <PN01Form editData={data} isEditing={true}/>
       </div>
     </main>
   );

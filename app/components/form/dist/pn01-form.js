@@ -58,7 +58,7 @@ exports.__esModule = true;
 var outline_1 = require("@heroicons/react/24/outline");
 var material_1 = require("@mui/material");
 var react_1 = require("react");
-var button_1 = require("../button");
+var button_1 = require("../button/button");
 var link_1 = require("next/link");
 var api_service_1 = require("@/app/lib/api-service");
 var modal_1 = require("../modal");
@@ -67,8 +67,9 @@ var loading_screen_1 = require("../loading-screen");
 function PN01Form(_a) {
     var _this = this;
     var editData = _a.editData, isEditing = _a.isEditing;
+    // console.log("🚀 ~ editData:", editData)
     var router = navigation_1.useRouter();
-    if (!editData.is_edit) {
+    if (isEditing && !editData.is_edit) {
         router.replace('/dashboard/project-proposal');
     }
     var _b = react_1.useState(false), loading = _b[0], setLoading = _b[1];
@@ -1684,7 +1685,7 @@ function PN01Form(_a) {
         React.createElement("div", { className: "mt-6 flex justify-end gap-4" },
             React.createElement(link_1["default"], { href: "/dashboard/project-proposal/document/", className: "flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200" }, "Test Document"),
             React.createElement("button", { onClick: function () { return handleOpenModal(true, false, false); }, className: "flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200" }, "\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01"),
-            React.createElement("button", { onClick: function () { return handleOpenModal(false, true, false); }, className: "flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100" }, "\u0E41\u0E1A\u0E1A\u0E23\u0E48\u0E32\u0E07"),
+            !isEditing && (React.createElement("button", { onClick: function () { return handleOpenModal(false, true, false); }, className: "flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100" }, "\u0E41\u0E1A\u0E1A\u0E23\u0E48\u0E32\u0E07")),
             React.createElement(button_1.Button, { onClick: function () { return handleOpenModal(false, false, true); } }, "\u0E15\u0E01\u0E25\u0E07"),
             React.createElement(modal_1.ModalQuestion, { openModal: openQuestionModal, onCloseModal: handleCloseModal, title: titleModal, detail: detailModal, okAction: handleAction, onOk: function (action) {
                     if (action === 'draft') {

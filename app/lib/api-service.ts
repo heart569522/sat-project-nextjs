@@ -198,7 +198,11 @@ export async function createData(apiPath: string, formData: any) {
   }
 }
 
-export async function updateData(apiPath: string, formData: any, id: string | number) {
+export async function updateData(
+  apiPath: string,
+  formData: any,
+  id: string | number,
+) {
   try {
     const response = await axios.put(
       `${process.env.API_URL}/api/${apiPath}/${id}`,
@@ -211,15 +215,18 @@ export async function updateData(apiPath: string, formData: any, id: string | nu
     );
 
     console.log('Update project proposal success', response);
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
 
-    // if (response.data.id) {
-    //   const insertedId = response.data.id;
-    //   console.log('Inserted ID:', insertedId);
-    //   return response;
-    // } else {
-    //   console.warn('No ID found in the response data:', response.data);
-    //   return response;
-    // }
+export async function deleteData(apiPath: string, id: string | number) {
+  try {
+    const response = await axios.patch(
+      `${process.env.API_URL}/api/${apiPath}/${id}`
+    );
+
     return response;
   } catch (error) {
     console.error('Error while sending data:', error);

@@ -4,31 +4,36 @@ import { getCurrentDateAndTime } from '@/app/lib/services';
 import { PN01Status } from '@/app/model/pn01-status';
 
 async function generateProjectCode(projectYear: string) {
-  const yearDigits = projectYear.slice(-2); // Last two digits of the project year
+  try {
+    const yearDigits = projectYear.slice(-2); // Last two digits of the project year
 
-  // Find the maximum project code within the range of current and next year
-  const latestProject = await pool.query(`
-    SELECT MAX(CAST(project_code AS INTEGER)) AS max_project_code
-    FROM project_proposal_pn01
-    WHERE project_code LIKE '${yearDigits}%'
-  `);
+    // Find the maximum project code within the range of current and next year
+    const latestProject = await pool.query(
+      `SELECT MAX(CAST(project_code AS INTEGER)) AS max_project_code
+       FROM project_proposal_pn01
+       WHERE project_code LIKE '${yearDigits}%';`,
+    );
 
-  // Determine the runningNumber
-  let runningNumber = 1;
-  if (
-    latestProject.rows.length > 0 &&
-    latestProject.rows[0].max_project_code !== null
-  ) {
-    runningNumber = latestProject.rows[0].max_project_code + 1;
+    // Determine the runningNumber
+    let runningNumber = 1;
+    if (
+      latestProject.rows.length > 0 &&
+      latestProject.rows[0].max_project_code !== null
+    ) {
+      runningNumber = latestProject.rows[0].max_project_code + 1;
+    }
+
+    // Ensure the runningNumber does not exceed 999
+    runningNumber = runningNumber % 1000;
+
+    // Format the runningNumber to be three digits (padded with leading zeros)
+    const formattedRunningNumber = runningNumber.toString().padStart(3, '0');
+
+    return `${yearDigits}${formattedRunningNumber}`;
+  } catch (error) {
+    console.error('Error generating project code:', error);
+    throw error; // Rethrow the error to propagate it up the call stack
   }
-
-  // Ensure the runningNumber does not exceed 999
-  runningNumber = runningNumber % 1000;
-
-  // Format the runningNumber to be three digits (padded with leading zeros)
-  const formattedRunningNumber = runningNumber.toString().padStart(3, '0');
-
-  return `${yearDigits}${formattedRunningNumber}`;
 }
 
 export async function GET() {
@@ -96,26 +101,92 @@ export async function POST(req: NextRequest) {
 
     const response = await pool.query(`
         INSERT INTO project_proposal_pn01 (
-            project_code, date, time, faculty, project_name, project_year, project_head, project_head_phone,
-            project_responsible, strategic_issue_id, objective_id, university_strategic_id,
-            strategic_plan_kpi_id, operational_plan_kpi_id, project_kpi_id, project_status_id,
-            project_type, university_identity, principle_reason, objective_indicator_value_tool,
-            expected_result, operation_duration, project_location, project_datetime,
-            project_schedule, lecturer, target_total, target, improvement, budget_income_total, budget_income, budget_expense_total, budget_expense,
-            status, created_by
+            project_code, 
+            date, 
+            time, 
+            faculty, 
+            project_name, 
+            project_year, 
+            project_head, 
+            project_head_phone,
+            project_responsible, 
+            strategic_issue_id, 
+            strategic_issue, 
+            objective_id, 
+            objective, 
+            university_strategic_id, 
+            university_strategic, 
+            strategic_plan_kpi_id, 
+            strategic_plan_kpi, 
+            operational_plan_kpi_id, 
+            operational_plan_kpi, 
+            project_kpi_id, 
+            project_kpi, 
+            project_status_id, 
+            project_status,
+            project_type, 
+            university_identity, 
+            principle_reason, 
+            objective_indicator_value_tool,
+            expected_result, 
+            operation_duration, 
+            project_location, 
+            project_datetime,
+            project_schedule, 
+            lecturer, 
+            target_total, 
+            target, 
+            improvement, 
+            budget_income_total, 
+            budget_income, 
+            budget_expense_total, 
+            budget_expense,
+            status_id,
+            created_by
         )
         VALUES (
-            '${projectCode}', '${date}', '${time}', '${faculty}',
-            '${project_name}', '${project_year}', '${project_head}', '${project_head_phone}',
-            '${responsible_rows}', '${strategic_issue}', '${objective}',
-            '${university_strategic}', '${strategic_plan_kpi}', '${operational_plan_kpi}',
-            '${project_kpi}', '${project_status}', '${project_types}',
-            '${university_identity}', '${principle_reason}',
-            '${OIVT_rows}', '${expected_result_rows}',
-            '${operation_duration_rows}', '${project_location}', '${project_datetime}',
-            '${project_schedule_rows}', '${lecturer}', '${target_total}', '${target_rows}',
-            '${improvement}', '${budget_income_total}', '${budget_income_rows}', '${budget_expense_total}', '${budget_expense_rows}',
-            '${PN01Status['กรุณานำส่งเอกสาร พน.01']}', (SELECT id FROM users WHERE id = '${userId}')
+            '${projectCode}', 
+            '${date}', 
+            '${time}', 
+            '${faculty}',
+            '${project_name}', 
+            '${project_year}', 
+            '${project_head}', 
+            '${project_head_phone}',
+            '${responsible_rows}', 
+            '${strategic_issue}', 
+            (SELECT name FROM strategic_issue_list WHERE id = '${strategic_issue}'), 
+            '${objective}', 
+            (SELECT name FROM objective_list WHERE id = '${objective}'),
+            '${university_strategic}',
+            (SELECT name FROM university_strategic_list WHERE id = '${university_strategic}'),
+            '${strategic_plan_kpi}', 
+            (SELECT name FROM strategic_plan_kpi_list WHERE id = '${strategic_plan_kpi}'),
+            '${operational_plan_kpi}',
+            (SELECT name FROM operational_plan_kpi_list WHERE id = '${operational_plan_kpi}'),
+            '${project_kpi}', 
+            (SELECT name FROM project_kpi_list WHERE id = '${project_kpi}'),
+            '${project_status}', 
+            (SELECT name FROM project_status_list WHERE id = '${project_status}'),
+            '${project_types}',
+            '${university_identity}', 
+            '${principle_reason}',
+            '${OIVT_rows}', 
+            '${expected_result_rows}',
+            '${operation_duration_rows}', 
+            '${project_location}', 
+            '${project_datetime}',
+            '${project_schedule_rows}', 
+            '${lecturer}', 
+            '${target_total}', 
+            '${target_rows}',
+            '${improvement}', 
+            '${budget_income_total}', 
+            '${budget_income_rows}', 
+            '${budget_expense_total}', 
+            '${budget_expense_rows}',
+            (SELECT id FROM pn01_status WHERE name = '${PN01Status[1]}'),
+            (SELECT id FROM users WHERE id = '${userId}')
         )
         RETURNING id;
     `);

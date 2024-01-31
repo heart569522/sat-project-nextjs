@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Button } from '../button';
+import { Button } from '../button/button';
 import { PN11 } from '@/app/model/pn11';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import { createData, getAllData } from '@/app/lib/api-service';

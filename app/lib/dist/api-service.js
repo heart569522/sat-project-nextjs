@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.updateData = exports.createData = exports.fetchFilter = exports.fetchPages = exports.getDataById = exports.getAllData = exports.getProjectProposals = exports.getProjectStatus = exports.getProjectKPI = exports.getOperationPlanKPI = exports.getStrategicPlanKPI = exports.getUniversityStrategic = exports.getObjective = exports.getStrategicIssue = void 0;
+exports.deleteData = exports.updateData = exports.createData = exports.fetchFilter = exports.fetchPages = exports.getDataById = exports.getAllData = exports.getProjectProposals = exports.getProjectStatus = exports.getProjectKPI = exports.getOperationPlanKPI = exports.getStrategicPlanKPI = exports.getUniversityStrategic = exports.getObjective = exports.getStrategicIssue = void 0;
 var axios_1 = require("axios");
 var cache_1 = require("next/cache");
 function getStrategicIssue() {
@@ -326,14 +326,6 @@ function updateData(apiPath, formData, id) {
                 case 1:
                     response = _a.sent();
                     console.log('Update project proposal success', response);
-                    // if (response.data.id) {
-                    //   const insertedId = response.data.id;
-                    //   console.log('Inserted ID:', insertedId);
-                    //   return response;
-                    // } else {
-                    //   console.warn('No ID found in the response data:', response.data);
-                    //   return response;
-                    // }
                     return [2 /*return*/, response];
                 case 2:
                     error_4 = _a.sent();
@@ -345,3 +337,24 @@ function updateData(apiPath, formData, id) {
     });
 }
 exports.updateData = updateData;
+function deleteData(apiPath, id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, error_5;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, axios_1["default"].patch(process.env.API_URL + "/api/" + apiPath + "/" + id)];
+                case 1:
+                    response = _a.sent();
+                    return [2 /*return*/, response];
+                case 2:
+                    error_5 = _a.sent();
+                    console.error('Error while sending data:', error_5);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.deleteData = deleteData;

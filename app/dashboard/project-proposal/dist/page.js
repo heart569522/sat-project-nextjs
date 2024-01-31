@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.metadata = void 0;
-var buttons_1 = require("@/app/components/buttons");
+var buttons_1 = require("@/app/components/button/buttons");
 var pagination_1 = require("@/app/components/pagination");
 var table_1 = require("@/app/components/project-proposal/table");
 var search_auto_1 = require("@/app/components/search-box/search-auto");

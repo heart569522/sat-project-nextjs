@@ -18,7 +18,7 @@ export default function BasicDatePicker() {
       </LocalizationProvider>
 
       <div>
-        <p> {PN01Status.เสนอเซ็นแล้ว}</p>
+        <p> {PN01Status['กรุณานำส่งเอกสาร พน.01']}</p>
       </div>
     </div>
   );

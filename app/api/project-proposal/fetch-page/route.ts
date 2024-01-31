@@ -26,7 +26,7 @@ const searchColumns = [
   'improvement',
   'budget_income',
   'budget_expense',
-  'status',
+  'status_id',
   'target_total',
   'budget_expense_total',
   'budget_income_total',
@@ -44,6 +44,7 @@ export async function GET(query: NextRequest) {
     const count = await pool.query(
       `SELECT COUNT(*) FROM project_proposal_pn01 ${searchConditions} AND is_delete = false`,
     );
+    console.log("🚀 ~ GET ~ count:", count)
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
 

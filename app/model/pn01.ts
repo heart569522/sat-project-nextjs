@@ -1,7 +1,7 @@
 export interface PN01 {
   id?: string;
   userId?: string;
-  isDraft? : boolean;
+  isDraft?: boolean;
   faculty?: string;
   projectName?: string;
   projectYear?: string;
@@ -32,6 +32,58 @@ export interface PN01 {
   budgetExpenseRows?: BudgetExpenseRow[];
   projectTypes?: ProjectTypes;
   universityIndentity?: UniversityIdentity;
+}
+
+export interface PaperPN01 {
+  id?: string;
+  project_code?: string;
+  date?: string;
+  time?: string;
+  faculty?: string;
+  project_name?: string;
+  project_head?: string;
+  project_head_phone?: string;
+  project_responsible?: ResponsibleRow[];
+  strategic_issue_id?: number;
+  objective_id?: number;
+  university_strategic_id?: number;
+  strategic_plan_kpi_id?: number;
+  operational_plan_kpi_id?: number;
+  project_kpi_id?: number;
+  project_status_id?: number;
+  project_type?: ProjectTypes;
+  university_identity?: UniversityIdentity;
+  principle_reason?: string;
+  objective_indicator_value_tool?: OIVTRow[];
+  expected_result?: ExpectedResultRow[];
+  operation_duration?: OperationDurationRow[];
+  project_location?: string;
+  project_datetime?: string;
+  project_schedule?: ProjectScheduleRow[];
+  lecturer?: string;
+  target?: TargetRow[];
+  improvement?: string;
+  budget_income?: BudgetIncomeRow[];
+  budget_expense?: BudgetExpenseRow[];
+  is_delete?: boolean;
+  target_total?: string;
+  budget_expense_total?: string;
+  budget_income_total?: string;
+  created_at?: string;
+  updated_at?: string | null;
+  created_by?: string;
+  is_draft?: boolean;
+  is_edit?: boolean;
+  project_year?: string;
+  status_remark?: string | null;
+  strategic_issue?: string;
+  objective?: string;
+  university_strategic?: string;
+  strategic_plan_kpi?: string;
+  operational_plan_kpi?: string;
+  project_kpi?: string;
+  project_status?: string;
+  status_id?: number;
 }
 
 export interface ResponsibleRow {

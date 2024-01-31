@@ -46,7 +46,7 @@ var searchColumns = [
     'date',
     'project_name',
     'project_head',
-    'status',
+    'status_id',
 ];
 function GET(req) {
     return __awaiter(this, void 0, void 0, function () {

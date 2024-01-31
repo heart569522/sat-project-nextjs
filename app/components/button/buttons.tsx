@@ -7,6 +7,7 @@ import {
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import Link from 'next/link';
 import { deleteInvoice } from '@/app/lib/actions';
+import { deleteData } from '@/app/lib/api-service';
 
 export function CreateRequestProjectProposal() {
   return (
@@ -79,13 +80,7 @@ export function DeleteInvoice({ id }: { id: string }) {
   );
 }
 
-export function DetailButton({
-  id,
-  path,
-}: {
-  id?: string;
-  path?: string;
-}) {
+export function DetailButton({ id, path }: { id?: string; path?: string }) {
   return (
     <Link
       href={`/dashboard/${path}/${id}`}
@@ -128,19 +123,19 @@ export function EditButton({
 
 export function DeleteButton({
   id,
-  path,
+  apiPath,
 }: {
-  id?: string;
-  path?: string;
+  id: string | number;
+  apiPath: string;
 }) {
+  const handleDelete = async () => {
+    await deleteData(apiPath, id);
+  };
 
-  
   return (
-    <form>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </form>
+    <button onClick={handleDelete} className="rounded-md border p-2 hover:bg-gray-100">
+      <span className="sr-only">Delete</span>
+      <TrashIcon className="w-5" />
+    </button>
   );
 }

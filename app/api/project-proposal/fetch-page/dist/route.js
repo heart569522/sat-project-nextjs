@@ -64,7 +64,7 @@ var searchColumns = [
     'improvement',
     'budget_income',
     'budget_expense',
-    'status',
+    'status_id',
     'target_total',
     'budget_expense_total',
     'budget_income_total',
@@ -87,6 +87,7 @@ function GET(query) {
                     return [4 /*yield*/, db_1.pool.query("SELECT COUNT(*) FROM project_proposal_pn01 " + searchConditions + " AND is_delete = false")];
                 case 2:
                     count = _a.sent();
+                    console.log("🚀 ~ GET ~ count:", count);
                     totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
                     return [2 /*return*/, server_1.NextResponse.json(totalPages, { status: 200 })];
                 case 3:

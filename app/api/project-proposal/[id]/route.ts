@@ -14,7 +14,7 @@ export async function GET(
       [id],
     );
 
-    return NextResponse.json(res.rows, { status: 200 });
+    return NextResponse.json(res.rows[0], { status: 200 });
   } catch (error) {
     return NextResponse.json(
       {
@@ -71,73 +71,46 @@ export async function PUT(
       `
       UPDATE project_proposal_pn01
       SET
-        faculty = $1,
-        project_name = $2,
-        project_year = $3,
-        project_head = $4,
-        project_head_phone = $5,
-        project_responsible = $6,
-        strategic_issue_id = $7,
-        objective_id = $8,
-        university_strategic_id = $9,
-        strategic_plan_kpi_id = $10,
-        operational_plan_kpi_id = $11,
-        project_kpi_id = $12,
-        project_status_id = $13,
-        project_type = $14,
-        university_identity = $15,
-        principle_reason = $16,
-        objective_indicator_value_tool = $17,
-        expected_result = $18,
-        operation_duration = $19,
-        project_location = $20,
-        project_datetime = $21,
-        project_schedule = $22,
-        lecturer = $23,
-        target_total = $24,
-        target = $25,
-        improvement = $26,
-        budget_income_total = $27,
-        budget_income = $28,
-        budget_expense_total = $29,
-        budget_expense = $30,
-        is_edit = $31
-      WHERE id = $32
+        faculty = '${faculty}',
+        project_name = '${project_name}',
+        project_year = '${project_year}',
+        project_head = '${project_head}',
+        project_head_phone = '${project_head_phone}',
+        project_responsible = '${responsible_rows}',
+        strategic_issue_id = '${strategic_issue}', 
+        strategic_issue = (SELECT name FROM strategic_issue_list WHERE id = '${strategic_issue}'), 
+        objective_id = '${objective}', 
+        objective = (SELECT name FROM objective_list WHERE id = '${objective}'),
+        university_strategic_id = '${university_strategic}', 
+        university_strategic = (SELECT name FROM university_strategic_list WHERE id = '${university_strategic}'),
+        strategic_plan_kpi_id = '${strategic_plan_kpi}',  
+        strategic_plan_kpi = (SELECT name FROM strategic_plan_kpi_list WHERE id = '${strategic_plan_kpi}'),
+        operational_plan_kpi_id = '${operational_plan_kpi}',   
+        operational_plan_kpi = (SELECT name FROM operational_plan_kpi_list WHERE id = '${operational_plan_kpi}'),
+        project_kpi_id = '${project_kpi}',   
+        project_kpi = (SELECT name FROM project_kpi_list WHERE id = '${project_kpi}'),
+        project_status_id = '${project_status}', 
+        project_status = (SELECT name FROM project_status_list WHERE id = '${project_status}'),
+        project_type = '${project_types}',
+        university_identity = '${university_identity}',
+        principle_reason = '${principle_reason}',
+        objective_indicator_value_tool = '${OIVT_rows}',
+        expected_result = '${expected_result_rows}',
+        operation_duration = '${operation_duration_rows}',
+        project_location = '${project_location}',
+        project_datetime = '${project_datetime}',
+        project_schedule = '${project_schedule_rows}',
+        lecturer = '${lecturer}',
+        target_total = '${target_total}',
+        target = '${target_rows}',
+        improvement = '${improvement}',
+        budget_income_total = '${budget_income_total}',
+        budget_income = '${budget_income_rows}',
+        budget_expense_total = '${budget_expense_total}',
+        budget_expense = '${budget_expense_rows}',
+        is_edit = false
+      WHERE id = '${id}'
     `,
-      [
-        faculty,
-        project_name,
-        project_year,
-        project_head,
-        project_head_phone,
-        responsible_rows,
-        strategic_issue,
-        objective,
-        university_strategic,
-        strategic_plan_kpi,
-        operational_plan_kpi,
-        project_kpi,
-        project_status,
-        project_types,
-        university_identity,
-        principle_reason,
-        OIVT_rows,
-        expected_result_rows,
-        operation_duration_rows,
-        project_location,
-        project_datetime,
-        project_schedule_rows,
-        lecturer,
-        target_total,
-        target_rows,
-        improvement,
-        budget_income_total,
-        budget_income_rows,
-        budget_expense_total,
-        budget_expense_rows,
-        false,
-        id,
-      ],
     );
 
     return NextResponse.json(
@@ -155,5 +128,33 @@ export async function PUT(
       { status: 500 },
     );
   }
-    
+}
+
+export async function PATCH(
+  req: NextRequest,
+  context: { params: { id: string } },
+) {
+  const { id } = context.params;
+
+  try {
+    const res = await pool.query(
+      `
+      UPDATE project_proposal_pn01
+      SET is_delete = true
+      WHERE id = $1
+      RETURNING *;
+      `,
+      [id],
+    );
+
+    return NextResponse.json(res.rows[0], { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: 'Can not update data!!',
+        error,
+      },
+      { status: 500 },
+    );
+  }
 }

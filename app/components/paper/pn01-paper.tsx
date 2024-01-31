@@ -2,19 +2,16 @@
 import Image from 'next/image';
 import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
-import { PN01 } from '@/app/model/pn01';
+import { PaperPN01 } from '@/app/model/pn01';
 import {
-  convertISOStringToDateText,
-  convertISOStringToDateTimeText,
-  convertISOStringToTimeText,
   convertStringToThaiBathText,
   convertToLocaleString,
 } from '@/app/lib/services';
 import { useEffect, useRef } from 'react';
 
-export default function PN01Paper({ data }: { data: PN01 }) {
+export default function PN01Paper({ data }: { data: PaperPN01 }) {
   console.log(data);
-  
+
   const paperRef = useRef<HTMLDivElement>(null);
 
   const createNewPage = (container: HTMLDivElement): HTMLDivElement => {
@@ -108,7 +105,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </td>
                     <td className="w-[20%]">
                       <div className={`border border-black p-3 text-xs`}>
-                        <p>รหัสโครงการ..........................</p>
+                        <p>รหัสโครงการ.......{data.project_code}........</p>
                         <br />
                         <div className="flex justify-start">
                           <p>วันที่..................</p>
@@ -138,7 +135,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 <label className={`font-semibold`}>
                   2.&nbsp;&nbsp;&nbsp;ชื่อโครงการ:
                 </label>
-                <p>{data.projectName}</p>
+                <p>{data.project_name}</p>
               </div>
             </article>
             <article id="part" className="part">
@@ -146,11 +143,11 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 <label className={`font-semibold`}>
                   3.&nbsp;&nbsp;&nbsp;ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ:
                 </label>
-                <p>{data.projectHead}</p>
+                <p>{data.project_head}</p>
               </div>
               <div className="flex gap-x-3 py-2 pl-28 text-sm">
                 <label className="font-semibold">หมายเลขโทรศัพท์:</label>
-                <p>{data.projectHeadPhone}</p>
+                <p>{data.project_head_phone}</p>
               </div>
               <div className="flex justify-center py-1">
                 <table className="w-[95%]">
@@ -171,7 +168,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.responsibleRows?.map((row) => (
+                    {data.project_responsible?.map((row) => (
                       <tr className="text-sm" key={row.id}>
                         <td className="table-p border border-black text-center">
                           {row.id}
@@ -202,67 +199,47 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                   <label className="whitespace-nowrap">
                     4.1&nbsp;&nbsp;ประเด็นยุทธศาสตร์ที่
                   </label>
-                  <p className="whitespace-normal">
-                    1 สร้างบัณฑิตที่มีคุณภาพตามปรัชญาการศึกษา
-                    และมีความเป็นเลิศทางวิชาการ วิชาชีพ และวิชาชีวิต
-                  </p>
+                  <p className="whitespace-normal">{data.strategic_issue}</p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.2&nbsp;&nbsp;เป้าประสงค์ที่
                   </label>
-                  <p className="whitespace-normal">
-                    1.1
-                    พัฒนาการเรียนการสอนและพัฒนานักศึกษาโดยจัดการศึกษาที่ยึดมั่นใน
-                    “สัจจะ-บริการ” เพื่อสร้างสรรค์คนดี คนเก่ง และมีคุณธรรม
-                    นำไปพัฒนารับใช้สังคม นำไปสู่ความเป็นเลิศทางวิชาการ
-                    ความเป็นเลิศทางวิชาชีพ และ ความเป็นเลิศทางวิชาชีวิต
-                  </p>
+                  <p className="whitespace-normal">{data.objective}</p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.3&nbsp;&nbsp;กลยุทธ์ระดับมหาวิทยาลัยที่
                   </label>
                   <p className="whitespace-normal">
-                    3.1.1 ส่งเสริมการผลิตผลงานวิชาการ วิจัย นวัตกรรม
-                    งานสร้างสรรค์ และแนวปฏิบัติที่ดี
-                    ที่สอดคล้องกับความต้องการของชุมชน สังคม
-                    และก่อให้เกิดการเปลี่ยนแปลงในการพัฒนาชุมชนและสังคมตามเป้าหมายการพัฒนาที่ยั่งยืน
+                    {data.university_strategic}
                   </p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.4&nbsp;&nbsp;ตัวชี้วัดแผนกลยุทธ์ที่
                   </label>
-                  <p className="whitespace-normal">
-                    7 จำนวนเงินทุน/มูลค่าการบูรณาการงานวิจัย การบริการวิชาการ
-                    การทำนุบำรุงศิลปะและ/หรือวัฒนธรรมเพื่อเพิ่มมูลค่าเชิงพาณิชย์
-                    = 10 ล้าน
-                  </p>
+                  <p className="whitespace-normal">{data.strategic_plan_kpi}</p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.5&nbsp;&nbsp;ตัวชี้วัดแผนปฏิบัติการที่
                   </label>
                   <p className="whitespace-normal">
-                    (32)
-                    ร้อยละความสำเร็จของกิจกรรมหรือโครงการที่ส่งเสริมการเรียนรู้ตลอดชีวิต
-                    ความเป็นนานาชาติ การเรียนรู้ข้ามวัฒนธรรม และพหุวัฒนธรรม = 80
+                    {data.operational_plan_kpi}
                   </p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.6&nbsp;&nbsp;ตัวชี้วัดโครงการ
                   </label>
-                  <p className="whitespace-normal">ไม่รุ้</p>
+                  <p className="whitespace-normal">{data.project_kpi}</p>
                 </div>
                 <div className="flex gap-x-1 py-2 text-sm">
                   <label className="whitespace-nowrap">
                     4.7&nbsp;&nbsp;สถานะโครงการ
                   </label>
-                  <p className="whitespace-normal">
-                    โครงการที่ดำเนินการเองในแผนปฏิบัติการของหน่วยงาน/คณะวิชา
-                  </p>
+                  <p className="whitespace-normal">{data.project_status}</p>
                 </div>
               </div>
             </article>
@@ -275,7 +252,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
               <div className="pl-6">
                 <div className="grid grid-cols-2">
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.maintenance ? (
+                    {data.project_type?.maintenance ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -285,7 +262,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.academicService ? (
+                    {data.project_type?.academic_service ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -295,7 +272,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.knowledgeManagement ? (
+                    {data.project_type?.knowledge_management ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -305,7 +282,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.researchPromotion ? (
+                    {data.project_type?.research_promotion ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -315,7 +292,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.educationQualityAssurance ? (
+                    {data.project_type?.education_quality_assurance ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -325,7 +302,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.personnelDevelopment ? (
+                    {data.project_type?.personnel_development ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -335,7 +312,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.riskManagement ? (
+                    {data.project_type?.risk_management ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -347,7 +324,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 </div>
 
                 <div className="flex gap-x-1 py-1 text-sm">
-                  {data.projectTypes?.studentDevelopment ? (
+                  {data.project_type?.student_development ? (
                     <CheckBoxSharpIcon />
                   ) : (
                     <CheckBoxOutlineBlankSharpIcon />
@@ -362,7 +339,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 </div>
                 <div className="grid grid-cols-2 pl-9">
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.moralEthical ? (
+                    {data.project_type?.moral_ethical ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -372,7 +349,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.academicPromotion ? (
+                    {data.project_type?.academic_promotion ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -382,7 +359,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.knowledge ? (
+                    {data.project_type?.knowledge ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -392,7 +369,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.environment ? (
+                    {data.project_type?.environment ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -402,7 +379,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.intellectualSkill ? (
+                    {data.project_type?.intellectual_skill ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -412,7 +389,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.sport ? (
+                    {data.project_type?.sport ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -422,8 +399,8 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes
-                      ?.knowledgeAnalysisCommunicationTechnology ? (
+                    {data.project_type
+                      ?.knowledge_analysis_communication_technology ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -433,7 +410,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.artCultureDevelopment ? (
+                    {data.project_type?.art_culture_development ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -443,8 +420,8 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes
-                      ?.numericalAnalysisCommunicationTechnology ? (
+                    {data.project_type
+                      ?.numerical_analysis_communication_technology ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -455,7 +432,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.moralEthicalDevelopment ? (
+                    {data.project_type?.moral_ethical_development ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -465,7 +442,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.subOther ? (
+                    {data.project_type?.sub_other ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -474,11 +451,11 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                       อื่นๆ (โปรดระบุ)
                     </label>
                     <p className="whitespace-normal">
-                      {data.projectTypes?.subOtherDetail}
+                      {data.project_type?.sub_other_detail}
                     </p>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.projectTypes?.leadershipDevelopment ? (
+                    {data.project_type?.leadership_development ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -489,7 +466,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                   </div>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
-                  {data.projectTypes?.other ? (
+                  {data.project_type?.other ? (
                     <CheckBoxSharpIcon />
                   ) : (
                     <CheckBoxOutlineBlankSharpIcon />
@@ -498,7 +475,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     อื่นๆ (โปรดระบุ)
                   </label>
                   <p className="whitespace-normal">
-                    {data.projectTypes?.otherDetail}
+                    {data.project_type?.other_detail}
                   </p>
                 </div>
               </div>
@@ -512,7 +489,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
               <div className="px-10">
                 <div className="grid grid-cols-4">
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.universityIndentity?.moral ? (
+                    {data.university_identity?.moral ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -522,7 +499,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.universityIndentity?.serve ? (
+                    {data.university_identity?.serve ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -532,7 +509,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.universityIndentity?.academic ? (
+                    {data.university_identity?.academic ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -542,7 +519,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </label>
                   </div>
                   <div className="flex gap-x-1 py-1 text-sm">
-                    {data.universityIndentity?.develop ? (
+                    {data.university_identity?.develop ? (
                       <CheckBoxSharpIcon />
                     ) : (
                       <CheckBoxOutlineBlankSharpIcon />
@@ -562,7 +539,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
               </div>
               <div className="pl-6">
                 <div className="flex gap-x-3 py-1 text-sm">
-                  <p className="whitespace-normal">{data.principleReason}</p>
+                  <p className="whitespace-normal">{data.principle_reason}</p>
                 </div>
               </div>
             </article>
@@ -593,7 +570,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.OIVTRows?.map((row) => (
+                    {data.objective_indicator_value_tool?.map((row) => (
                       <tr className="text-sm" key={row.id}>
                         <td className="table-p border border-black">
                           {row.objective}
@@ -620,7 +597,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 </label>
               </div>
               <div className="pl-6">
-                {data.expectedResultRows?.map((row) => (
+                {data.expected_result?.map((row) => (
                   <div className="flex gap-x-1 py-1 text-sm" key={row.id}>
                     <label className="whitespace-nowrap">
                       9.{row.id}&nbsp;&nbsp;
@@ -637,7 +614,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                 </label>
               </div>
               <div className="pl-6">
-                {data.operationDurationRows?.map((row) => (
+                {data.operation_duration?.map((row) => (
                   <div className="flex gap-x-1 py-1 text-sm" key={row.id}>
                     <label className="whitespace-nowrap">
                       10.{row.id}&nbsp;&nbsp;
@@ -660,15 +637,13 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                   <label className="whitespace-nowrap">
                     11.1&nbsp;&nbsp;สถานที่จัดโครงการ
                   </label>
-                  <p className="whitespace-normal">{data.projectLocation}</p>
+                  <p className="whitespace-normal">{data.project_location}</p>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   <label className="whitespace-nowrap">
                     11.2&nbsp;&nbsp;วัน/เวลา ที่จัดโครงการ
                   </label>
-                  <p className="whitespace-normal">
-                    {convertISOStringToDateTimeText(data.projectDatetime)}
-                  </p>
+                  <p className="whitespace-normal">{data.project_datetime}</p>
                 </div>
                 <div className="flex gap-x-1 py-1 text-sm">
                   <label className="whitespace-nowrap">
@@ -691,13 +666,13 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.projectScheduleRows?.map((row) => (
+                      {data.project_schedule?.map((row) => (
                         <tr className="text-sm" key={row.id}>
                           <td className="table-p border border-black text-center">
-                            {convertISOStringToDateText(row.date)}
+                            {row.date}
                           </td>
                           <td className="table-p border border-black text-center">
-                            {convertISOStringToTimeText(row.time)}
+                            {row.time}
                           </td>
                           <td className="table-p border border-black">
                             {row.detail}
@@ -723,13 +698,13 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                   13.&nbsp;&nbsp;&nbsp;ผู้เข้าร่วมโครงการ/กลุ่มเป้าหมาย
                 </label>
                 <p className="whitespace-normal">
-                  (รวมจำนวน {convertToLocaleString(data.targetTotal)} คน)
+                  (รวมจำนวน {convertToLocaleString(data.target_total)} คน)
                 </p>
               </div>
               <div className="flex justify-center py-1">
                 <table className="w-[95%]">
                   <tbody>
-                    {data.targetRows?.map((row) => (
+                    {data.target?.map((row) => (
                       <tr className="text-sm" key={row.id}>
                         <td className="w-[8%] px-2 py-1">13.{row.id}</td>
                         <td className="w-[62%] px-2 py-1">{row.detail}</td>
@@ -787,7 +762,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.budgetIncomeRows?.map((row) => (
+                      {data.budget_income?.map((row) => (
                         <tr className="text-sm" key={row.id}>
                           <td className="table-p border border-black text-center">
                             {row.id}
@@ -808,7 +783,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                           รวมงบประมาณรายรับ
                         </td>
                         <td className="table-p border border-black text-center">
-                          {data.budgetIncomeTotal}
+                          {data.budget_income_total}
                         </td>
                         <td className="table-p text-left">บาท</td>
                       </tr>
@@ -839,7 +814,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.budgetExpenseRows?.map((row) => (
+                      {data.budget_expense?.map((row) => (
                         <tr className="text-sm" key={row.id}>
                           <td className="table-p border border-black text-center">
                             {row.id}
@@ -860,7 +835,7 @@ export default function PN01Paper({ data }: { data: PN01 }) {
                           รวมงบประมาณรายจ่าย
                         </td>
                         <td className="table-p border border-black text-center">
-                          {data.budgetExpenseTotal}
+                          {data.budget_expense_total}
                         </td>
                         <td className="table-p text-left">บาท</td>
                       </tr>
@@ -872,10 +847,10 @@ export default function PN01Paper({ data }: { data: PN01 }) {
             <article id="part" className="part">
               <div className="flex gap-x-3 py-1 text-sm">
                 <p className="pl-10 pt-4">
-                  ในการนี้จึงเรียนมาเพื่อขออนุมัติจัดโครงการ{data.projectName}
+                  ในการนี้จึงเรียนมาเพื่อขออนุมัติจัดโครงการ{data.project_name}
                   &nbsp; และขออนุมัติงบประมาณเพื่อดำเนินโครงการจำนวน{' '}
-                  {data.budgetExpenseTotal} บาท (
-                  {convertStringToThaiBathText(data.budgetExpenseTotal)})
+                  {data.budget_expense_total} บาท (
+                  {convertStringToThaiBathText(data.budget_expense_total)})
                 </p>
               </div>
               <div className="mt-10 pl-6 text-center text-sm">

@@ -14,7 +14,7 @@ export async function GET(
       [id],
     );
 
-    return NextResponse.json(res.rows, { status: 200 });
+    return NextResponse.json(res.rows[0], { status: 200 });
   } catch (error) {
     return NextResponse.json(
       {

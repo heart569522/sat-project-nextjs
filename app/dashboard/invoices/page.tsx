@@ -1,7 +1,7 @@
 import Pagination from '@/app/components/pagination';
 import SearchAuto from '@/app/components/search-box/search-auto';
 import Table from '@/app/components/invoices/table';
-import { CreateInvoice } from '@/app/components/buttons';
+import { CreateInvoice } from '@/app/components/button/buttons';
 import { InvoicesTableSkeleton } from '@/app/components/skeletons';
 import { Suspense } from 'react';
 import { fetchInvoicesPages } from '@/app/lib/data';

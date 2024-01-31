@@ -40,16 +40,18 @@ exports.__esModule = true;
 var react_1 = require("react");
 var api_service_1 = require("@/app/lib/api-service");
 var services_1 = require("@/app/lib/services");
-var buttons_1 = require("../buttons");
+var buttons_1 = require("@/app/components/button/buttons");
 var react_2 = require("react");
 var FeedbackOutlined_1 = require("@mui/icons-material/FeedbackOutlined");
 var material_1 = require("@mui/material");
+var skeletons_1 = require("@/app/components/skeletons");
+var status_1 = require("@/app/components/status-badge/status");
 function ProjectProposalTable(_a) {
     var _this = this;
     var query = _a.query, currentPage = _a.currentPage;
     var _b = react_2.useState([]), data = _b[0], setData = _b[1];
-    console.log('🚀 ~ data:', data);
-    var _c = react_2.useState(null), showRemark = _c[0], setShowRemark = _c[1];
+    var _c = react_2.useState(true), loading = _c[0], setLoading = _c[1];
+    var _d = react_2.useState(null), showRemark = _d[0], setShowRemark = _d[1];
     var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
         var res;
         return __generator(this, function (_a) {
@@ -57,13 +59,21 @@ function ProjectProposalTable(_a) {
                 case 0: return [4 /*yield*/, api_service_1.fetchFilter('project-proposal/fetch-filter', query, currentPage)];
                 case 1:
                     res = _a.sent();
-                    setData(res);
+                    if (res) {
+                        setData(res);
+                        setLoading(false);
+                    }
                     return [2 /*return*/];
             }
         });
     }); };
     react_2.useEffect(function () {
-        fetchData();
+        var fetchDataWithTimeout = function () {
+            // setTimeout(() => {
+            fetchData();
+            // }, 100);
+        };
+        fetchDataWithTimeout();
     }, [query]);
     var handleOpenRemark = function (rowId) {
         setShowRemark(function (prevShowRemark) {
@@ -75,35 +85,36 @@ function ProjectProposalTable(_a) {
             react_1["default"].createElement("div", { className: "overflow-x-auto" },
                 react_1["default"].createElement("div", { className: "inline-block min-w-full align-middle" },
                     react_1["default"].createElement("div", { className: "overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0" },
-                        react_1["default"].createElement("div", { className: "md:hidden" }, data === null || data === void 0 ? void 0 : data.map(function (row, i) { return (react_1["default"].createElement("div", { key: row.id, className: "mb-2 w-full rounded-md bg-white p-4" },
+                        react_1["default"].createElement("div", { className: "md:hidden" }, loading ? (react_1["default"].createElement(react_1["default"].Fragment, null,
+                            react_1["default"].createElement(skeletons_1.TableRowMobileSkeleton, { countColumn: 3 }))) : (data === null || data === void 0 ? void 0 : data.map(function (row, i) { return (react_1["default"].createElement("div", { key: row.id, className: "mb-2 w-full rounded-md bg-white p-4" },
                             react_1["default"].createElement("div", { className: "flex items-center justify-between gap-2 border-b pb-4" },
                                 react_1["default"].createElement("div", { className: "flex items-center justify-start gap-3" },
                                     react_1["default"].createElement("div", { className: "text-center text-gray-900" },
                                         react_1["default"].createElement("p", { className: "font-semibold" }, i + 1)),
-                                    react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center" },
+                                    react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center gap-y-1" },
                                         react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E42\u0E04\u0E23\u0E07\u0E01\u0E32\u0E23/\u0E01\u0E34\u0E08\u0E01\u0E23\u0E23\u0E21"),
                                         react_1["default"].createElement("p", { className: "text-lg font-semibold" }, row.project_name))),
-                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center" },
+                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center gap-y-1" },
                                     react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E23\u0E2B\u0E31\u0E2A\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23"),
                                     react_1["default"].createElement("p", { className: "text-lg font-semibold" }, row.project_code))),
                             react_1["default"].createElement("div", { className: "flex w-full items-center justify-between border-b py-5" },
-                                react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center" },
+                                react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center gap-y-1" },
                                     react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E1C\u0E39\u0E49\u0E23\u0E31\u0E1A\u0E1C\u0E34\u0E14\u0E0A\u0E2D\u0E1A\u0E42\u0E04\u0E23\u0E07\u0E01\u0E32\u0E23"),
                                     react_1["default"].createElement("p", { className: "text-base font-semibold" }, row.project_head)),
-                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center" },
+                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center gap-y-1" },
                                     react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E40\u0E1A\u0E2D\u0E23\u0E4C\u0E42\u0E17\u0E23\u0E28\u0E31\u0E1E\u0E17\u0E4C\u0E1C\u0E39\u0E49\u0E23\u0E31\u0E1A\u0E1C\u0E34\u0E14\u0E0A\u0E2D\u0E1A"),
                                     react_1["default"].createElement("p", { className: "text-base font-semibold" }, row.project_head_phone))),
                             react_1["default"].createElement("div", { className: "flex w-full items-center justify-between border-b py-5" },
-                                react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center" },
+                                react_1["default"].createElement("div", { className: "flex flex-col items-start justify-center gap-y-2" },
                                     react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E27\u0E31\u0E19\u0E17\u0E35\u0E48"),
                                     react_1["default"].createElement("p", { className: "text-base font-semibold" }, services_1.convertISOStringToDateText(row.created_at))),
-                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center" },
+                                react_1["default"].createElement("div", { className: "flex flex-col items-end justify-center gap-y-2" },
                                     react_1["default"].createElement("p", { className: "text-sm font-medium" }, "\u0E2A\u0E16\u0E32\u0E19\u0E30"),
-                                    react_1["default"].createElement("p", { className: "text-base font-semibold" }, row.status))),
+                                    react_1["default"].createElement(status_1["default"], { docType: 'pn01', statusId: row.status_id }))),
                             react_1["default"].createElement("div", { className: "flex items-center justify-center gap-2 pt-4" },
                                 react_1["default"].createElement(buttons_1.DetailButton, { id: row.id, path: "project-proposal/document" }),
                                 react_1["default"].createElement(buttons_1.EditButton, { id: row.id, path: "project-proposal", disabled: !row.is_edit }),
-                                react_1["default"].createElement(buttons_1.DeleteButton, { id: row.id, path: "project-proposal" })))); })),
+                                react_1["default"].createElement(buttons_1.DeleteButton, { id: row.id, apiPath: "project-proposal" })))); }))),
                         react_1["default"].createElement("table", { className: "hidden min-w-full rounded-md text-gray-900 md:table" },
                             react_1["default"].createElement("thead", { className: "rounded-md bg-gray-50 text-center text-sm font-semibold" },
                                 react_1["default"].createElement("tr", null,
@@ -116,7 +127,8 @@ function ProjectProposalTable(_a) {
                                     react_1["default"].createElement("th", { scope: "col", className: "w-[10%] px-3 py-5" }, "\u0E2A\u0E16\u0E32\u0E19\u0E30"),
                                     react_1["default"].createElement("th", { scope: "col", className: "w-[5%] px-3 py-5" }, "\u0E2B\u0E21\u0E32\u0E22\u0E40\u0E2B\u0E15\u0E38"),
                                     react_1["default"].createElement("th", { scope: "col", className: "w-[15%] px-3 py-5" }, "\u0E08\u0E31\u0E14\u0E01\u0E32\u0E23"))),
-                            react_1["default"].createElement("tbody", { className: "divide-y divide-gray-200 text-gray-900" }, data === null || data === void 0 ? void 0 : data.map(function (row, i) { return (react_1["default"].createElement(react_1["default"].Fragment, { key: row.id },
+                            react_1["default"].createElement("tbody", { className: "divide-y divide-gray-200 text-gray-900" }, loading ? (react_1["default"].createElement(react_1["default"].Fragment, null,
+                                react_1["default"].createElement(skeletons_1.TableRowFullSkeleton, { countColumn: 9 }))) : (data === null || data === void 0 ? void 0 : data.map(function (row, i) { return (react_1["default"].createElement(react_1["default"].Fragment, { key: row.id },
                                 react_1["default"].createElement("tr", { className: "group text-center" },
                                     react_1["default"].createElement("td", { rowSpan: showRemark === row.id ? 2 : 1, className: "whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6" }, i + 1),
                                     react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" }, row.project_code),
@@ -124,7 +136,8 @@ function ProjectProposalTable(_a) {
                                     react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" }, row.project_head),
                                     react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" }, row.project_head_phone),
                                     react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" }, services_1.convertISOStringToDateText(row.created_at)),
-                                    react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" }, row.status),
+                                    react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" },
+                                        react_1["default"].createElement(status_1["default"], { docType: 'pn01', statusId: row.status_id })),
                                     react_1["default"].createElement("td", { className: "whitespace-nowrap bg-white px-4 py-5 text-sm" },
                                         react_1["default"].createElement(material_1.IconButton, { onClick: function () { return handleOpenRemark(row.id); }, disabled: Boolean(!row.status_remark) },
                                             react_1["default"].createElement(FeedbackOutlined_1["default"], { className: "w-8" }))),
@@ -132,11 +145,11 @@ function ProjectProposalTable(_a) {
                                         react_1["default"].createElement("div", { className: "flex justify-center gap-2" },
                                             react_1["default"].createElement(buttons_1.DetailButton, { id: row.id, path: "project-proposal/document" }),
                                             react_1["default"].createElement(buttons_1.EditButton, { id: row.id, path: "project-proposal", disabled: !row.is_edit }),
-                                            react_1["default"].createElement(buttons_1.DeleteButton, { id: row.id, path: "project-proposal" })))),
+                                            react_1["default"].createElement(buttons_1.DeleteButton, { id: row.id, apiPath: "project-proposal" })))),
                                 showRemark === row.id && (react_1["default"].createElement("tr", { className: "group" },
                                     react_1["default"].createElement("td", { colSpan: 9, className: "whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm" },
                                         react_1["default"].createElement("div", { className: "flex flex-col items-start" },
                                             react_1["default"].createElement("p", { className: "text-sm font-medium underline" }, "\u0E2B\u0E21\u0E32\u0E22\u0E40\u0E2B\u0E15\u0E38"),
-                                            react_1["default"].createElement("p", { className: "text-base" }, row.status_remark || '-'))))))); })))))))));
+                                            react_1["default"].createElement("p", { className: "text-base" }, row.status_remark || '-'))))))); }))))))))));
 }
 exports["default"] = ProjectProposalTable;

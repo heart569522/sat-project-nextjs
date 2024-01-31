@@ -26,7 +26,7 @@ import {
   ResponsibleRow,
   TargetRow,
 } from '@/app/model/pn01';
-import { Button } from '../button';
+import { Button } from '../button/button';
 import Link from 'next/link';
 import {
   getStrategicIssue,
@@ -69,9 +69,10 @@ export default function PN01Form({
   editData?: any;
   isEditing?: boolean;
 }) {
+  // console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 
-  if (!editData.is_edit) {
+  if (isEditing && !editData.is_edit) {
     router.replace('/dashboard/project-proposal');
   }
 
@@ -1347,11 +1348,7 @@ export default function PN01Form({
       let response: any;
 
       if (isEditing) {
-        response = await updateData(
-          'project-proposal',
-          formData,
-          editData.id
-        );
+        response = await updateData('project-proposal', formData, editData.id);
       } else {
         response = await createData('project-proposal', formData);
       }
@@ -3569,12 +3566,14 @@ export default function PN01Form({
         >
           ยกเลิก
         </button>
-        <button
-          onClick={() => handleOpenModal(false, true, false)}
-          className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
-        >
-          แบบร่าง
-        </button>
+        {!isEditing && (
+          <button
+            onClick={() => handleOpenModal(false, true, false)}
+            className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+          >
+            แบบร่าง
+          </button>
+        )}
         <Button onClick={() => handleOpenModal(false, false, true)}>
           ตกลง
         </Button>

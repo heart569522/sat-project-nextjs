@@ -3,8 +3,8 @@ import Image from 'next/image';
 import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBlankSharp';
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
 
-export default async function PN11Paper({ docData }: { docData: PN11 }) {
-  const data = Array.isArray(docData) ? docData[0] : docData;
+export default async function PN11Paper({ data }: { data: any }) {
+  console.log("🚀 ~ PN11Paper ~ data:", data)
   
   const DotsPlaceholder = ({
     numOfDots,

@@ -1,5 +1,5 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
-import { CreateRequestProjectProposal } from '@/app/components/buttons';
+import { CreateRequestProjectProposal } from '@/app/components/button/buttons';
 import PN01Form from '@/app/components/form/pn01-form';
 import Pagination from '@/app/components/pagination';
 import ProjectProposalTable from '@/app/components/project-proposal/table';

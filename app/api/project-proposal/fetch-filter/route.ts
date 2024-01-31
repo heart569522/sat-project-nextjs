@@ -8,7 +8,7 @@ const searchColumns = [
   'date',
   'project_name',
   'project_head',
-  'status',
+  'status_id',
 ];
 
 export async function GET(req: NextRequest) {

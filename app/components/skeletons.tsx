@@ -1,3 +1,6 @@
+import { Skeleton } from '@mui/material';
+import React from 'react';
+
 // Loading animation
 const shimmer =
   'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
@@ -97,6 +100,49 @@ export default function DashboardSkeleton() {
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
         <RevenueChartSkeleton />
         <LatestInvoicesSkeleton />
+      </div>
+    </>
+  );
+}
+
+export function TableRowFullSkeleton({ countColumn }: { countColumn: number }) {
+  const skeletonColumns = Array.from({ length: countColumn }, (_, index) => (
+    <td key={index} scope="col" className="px-4 py-5">
+      <Skeleton animation="wave" sx={{ width: '100%', height: '30px' }} />
+    </td>
+  ));
+
+  return <tr className="w-full animate-pulse bg-white">{skeletonColumns}</tr>;
+}
+
+export function TableRowMobileSkeleton({
+  countColumn,
+}: {
+  countColumn: number;
+}) {
+  const skeletonColumns = Array.from({ length: countColumn }, (_, index) => (
+    <div
+      key={index}
+      className="flex w-full items-center justify-between gap-2 border-b pb-4 pt-2"
+    >
+      <div className="flex w-full flex-col items-start justify-center">
+        <Skeleton animation="wave" sx={{ width: '100%', height: '15px' }} />
+        <Skeleton animation="wave" sx={{ width: '100%', height: '30px' }} />
+      </div>
+      <div className="flex w-full flex-col items-end justify-center">
+        <Skeleton animation="wave" sx={{ width: '100%', height: '15px' }} />
+        <Skeleton animation="wave" sx={{ width: '100%', height: '30px' }} />
+      </div>
+    </div>
+  ));
+
+  return (
+    <>
+      <div className="mb-2 w-full rounded-md bg-white p-4">
+        {skeletonColumns}
+        <div className="flex w-full items-center justify-center gap-2 pt-4">
+          <Skeleton animation="wave" sx={{ width: '100%', height: '30px' }} />
+        </div>
       </div>
     </>
   );

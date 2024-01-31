@@ -44,7 +44,7 @@ export default async function Page(context: { params: { id: string } }) {
       <div className="flex justify-center">
         <div id="pdf-content" className={`${sarabun.className}`}>
           <Suspense fallback={<DocumentLoading />}>
-            <PN11Paper docData={pn11Data} />
+            <PN11Paper data={pn11Data} />
           </Suspense>
         </div>
         <ToolBox

@@ -12,7 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { FormHelperText, MenuItem, Select } from '@mui/material';
 import Link from 'next/link';
-import { Button } from '../button';
+import { Button } from '../button/button';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import { getAllData } from '@/app/lib/api-service';
 interface TabPanelProps {
