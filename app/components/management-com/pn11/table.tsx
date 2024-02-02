@@ -4,7 +4,7 @@ import {
   DeleteInvoice,
   EditButton,
   DeleteButton,
-} from '@/app/components/button/buttons';
+} from '@/app/components/buttons/buttons';
 import InvoiceStatus from '@/app/components/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredInvoices } from '@/app/lib/data';

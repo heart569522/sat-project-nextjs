@@ -198,10 +198,30 @@ export async function createData(apiPath: string, formData: any) {
   }
 }
 
+export async function createDraft(apiPath: string, formData: any) {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/api/${apiPath}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    console.log('Create draft project proposal success', response);
+
+    return response
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
 export async function updateData(
   apiPath: string,
   formData: any,
-  id: string | number,
+  id: string,
 ) {
   try {
     const response = await axios.put(
@@ -221,7 +241,7 @@ export async function updateData(
   }
 }
 
-export async function deleteData(apiPath: string, id: string | number) {
+export async function deleteData(apiPath: string, id: string) {
   try {
     const response = await axios.patch(
       `${process.env.API_URL}/api/${apiPath}/${id}`

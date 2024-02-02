@@ -2,12 +2,24 @@
 import React from 'react';
 import { fetchFilter } from '@/app/lib/api-service';
 import { convertISOStringToDateText } from '@/app/lib/services';
-import { DeleteButton, DetailButton, EditButton } from '@/app/components/button/buttons';
+import {
+  DeleteButton,
+  DetailButton,
+  EditButton,
+} from '@/app/components/buttons/buttons';
 import { useEffect, useState } from 'react';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import { IconButton } from '@mui/material';
-import { TableRowFullSkeleton, TableRowMobileSkeleton } from '@/app/components/skeletons';
+import {
+  TableRowFullSkeleton,
+  TableRowMobileSkeleton,
+} from '@/app/components/skeletons';
 import StatusBadge from '@/app/components/status-badge/status';
+import {
+  TableRowFullNotFound,
+  TableRowMobileNotFound,
+} from '@/app/components/not-found';
+import { ButtonDialog } from '@/app/components/buttons/button-dialog';
 
 export default function ProjectProposalTable({
   query,
@@ -21,6 +33,8 @@ export default function ProjectProposalTable({
   const [showRemark, setShowRemark] = useState<string | null>(null);
 
   const fetchData = async () => {
+    setLoading(true);
+
     const res = await fetchFilter(
       'project-proposal/fetch-filter',
       query,
@@ -37,11 +51,11 @@ export default function ProjectProposalTable({
     const fetchDataWithTimeout = () => {
       // setTimeout(() => {
       fetchData();
-      // }, 100);
+      // }, 2000);
     };
 
     fetchDataWithTimeout();
-  }, [query]);
+  }, [query, currentPage]);
 
   const handleOpenRemark = (rowId: string) => {
     setShowRemark((prevShowRemark) =>
@@ -60,6 +74,8 @@ export default function ProjectProposalTable({
                   <>
                     <TableRowMobileSkeleton countColumn={3} />
                   </>
+                ) : data.length === 0 ? (
+                  <TableRowMobileNotFound />
                 ) : (
                   data?.map((row: any, i: number) => (
                     <div
@@ -114,7 +130,10 @@ export default function ProjectProposalTable({
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
                           <p className="text-sm font-medium">สถานะ</p>
-                          <StatusBadge docType={'pn01'} statusId={row.status_id} /> 
+                          <StatusBadge
+                            docType={'pn01'}
+                            statusId={row.status_id}
+                          />
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
@@ -127,14 +146,25 @@ export default function ProjectProposalTable({
                           path="project-proposal"
                           disabled={!row.is_edit}
                         />
-                        <DeleteButton id={row.id} apiPath="project-proposal" />
+                        <ButtonDialog
+                          id={row.id}
+                          apiPath="project-proposal"
+                          action="delete"
+                          title="ลบโครงการ/กิจกรรม"
+                          detail={`${
+                            row.is_draft
+                              ? 'คุณยืนยันที่จะลบรายการแบบร่างนี้ ?'
+                              : `คุณยืนยันที่จะลบรายการโครงการ/กิจกรรม "${row.project_name}" ?`
+                          }`}
+                          onSuccess={fetchData}
+                        />
                       </div>
                     </div>
                   ))
                 )}
               </div>
               <table className="hidden min-w-full rounded-md text-gray-900 md:table">
-                <thead className="rounded-md bg-gray-50 text-center text-sm font-semibold">
+                <thead className="rounded-md bg-gray-50 text-center text-base font-semibold">
                   <tr>
                     <th scope="col" className="w-[5%] px-4 py-5 sm:pl-6">
                       ลำดับ
@@ -170,10 +200,10 @@ export default function ProjectProposalTable({
                   {loading ? (
                     <>
                       <TableRowFullSkeleton countColumn={9} />
-                      {/* <TableRowFullSkeleton countColumn={9} />
-                      <TableRowFullSkeleton countColumn={9} />
-                      <TableRowFullSkeleton countColumn={9} />
-                      <TableRowFullSkeleton countColumn={9} /> */}
+                    </>
+                  ) : data.length === 0 ? (
+                    <>
+                      <TableRowFullNotFound countColumn={9} />
                     </>
                   ) : (
                     data?.map((row: any, i: number) => (
@@ -181,34 +211,43 @@ export default function ProjectProposalTable({
                         <tr className="group text-center">
                           <td
                             rowSpan={showRemark === row.id ? 2 : 1}
-                            className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6"
+                            className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-base text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6"
                           >
                             {i + 1}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_code}
+                            {row.project_code || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_name}
+                            {row.project_name || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_head}
+                            {row.project_head || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_head_phone}
+                            {row.project_head_phone || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {convertISOStringToDateText(row.created_at)}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <StatusBadge docType={'pn01'} statusId={row.status_id} /> 
+                            <StatusBadge
+                              docType={'pn01'}
+                              statusId={row.status_id}
+                            />
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <IconButton
                               onClick={() => handleOpenRemark(row.id)}
                               disabled={Boolean(!row.status_remark)}
                             >
-                              <FeedbackOutlinedIcon className="w-8" />
+                              <FeedbackOutlinedIcon
+                                className={`${
+                                  Boolean(row.status_remark)
+                                    ? 'text-red-700'
+                                    : 'text-gray-400'
+                                } h-6 w-6 `}
+                              />
                             </IconButton>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
@@ -220,11 +259,19 @@ export default function ProjectProposalTable({
                               <EditButton
                                 id={row.id}
                                 path="project-proposal"
-                                disabled={!row.is_edit}
+                                disabled={!row.is_edit && !row.is_draft}
                               />
-                              <DeleteButton
+                              <ButtonDialog
                                 id={row.id}
                                 apiPath="project-proposal"
+                                action="delete"
+                                title="ลบโครงการ/กิจกรรม"
+                                detail={`${
+                                  row.is_draft
+                                    ? 'คุณยืนยันที่จะลบรายการแบบร่างนี้ ?'
+                                    : `คุณยืนยันที่จะลบรายการโครงการ/กิจกรรม "${row.project_name}" ?`
+                                }`}
+                                onSuccess={fetchData}
                               />
                             </div>
                           </td>

@@ -6,8 +6,29 @@ const ITEMS_PER_PAGE = 10;
 const searchColumns = [
   'project_code',
   'date',
+  'time',
+  'faculty',
   'project_name',
   'project_head',
+  'project_head_phone',
+  'project_responsible',
+  'project_type',
+  'university_identity',
+  'principle_reason',
+  'objective_indicator_value_tool',
+  'expected_result',
+  'operation_duration',
+  'project_location',
+  'project_datetime',
+  'project_schedule',
+  'lecturer',
+  'target',
+  'improvement',
+  'budget_income',
+  'budget_expense',
+  'target_total',
+  'budget_expense_total',
+  'budget_income_total',
   'status_id',
 ];
 
@@ -19,17 +40,27 @@ export async function GET(req: NextRequest) {
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
-    const searchConditions = search
-      ? `WHERE ${searchColumns
-          .map((column) => `CAST(${column} AS TEXT) ILIKE '%${search}%'`)
-          .join(' OR ')} AND is_delete = false`
-      : 'WHERE is_delete = false';
+    let searchConditions = '';
+    if (search) {
+      searchConditions = `WHERE ${searchColumns
+        .map((column) => {
+          if (column === 'status_id') {
+            return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%')`;
+          } else {
+            return `CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%'`;
+          }
+        })
+        .join(' OR ')} AND project_proposal_pn01.is_delete = false`;
+    } else {
+      searchConditions = 'WHERE project_proposal_pn01.is_delete = false';
+    }
 
     const projects = await pool.query(
-      `SELECT *
+      `SELECT project_proposal_pn01.*, pn01_status.name AS status_name
            FROM project_proposal_pn01
+           LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
            ${searchConditions}
-           ORDER BY created_at DESC
+           ORDER BY project_proposal_pn01.created_at DESC
            LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`,
     );
 

@@ -88,6 +88,7 @@ export function ModalResponse({
   detail,
   buttonLink,
   buttonText,
+  isCloseButton
 }: {
   openModal: boolean;
   onCloseModal?: () => void;
@@ -95,13 +96,14 @@ export function ModalResponse({
   isError?: boolean;
   title: string;
   detail: string;
-  buttonLink: string;
+  buttonLink?: string;
   buttonText?: string;
+  isCloseButton?: boolean;
 }) {
   const router = useRouter();
 
   const handleNextPage = () => {
-    router.replace(buttonLink)
+    router.replace(buttonLink as string)
   }
 
   return (
@@ -127,7 +129,7 @@ export function ModalResponse({
         </div>
 
         <div className="mb-4 px-6 text-center">
-          <p id="modal-modal-description">{detail}</p>
+          <p id="modal-modal-description">{`${detail}`}</p>
         </div>
 
         <div className="flex items-center justify-start p-5">
@@ -135,6 +137,16 @@ export function ModalResponse({
             <button
               type="button"
               className="inline-flex w-full justify-center rounded-md border border-red-500 px-4 py-2 text-base font-medium text-red-500 shadow-sm hover:bg-red-50"
+              onClick={onCloseModal}
+            >
+              ปิด
+            </button>
+          )}
+
+          {isCloseButton && (
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-md border border-blue-500 px-4 py-2 text-base font-medium text-blue-500 shadow-sm hover:bg-blue-50"
               onClick={onCloseModal}
             >
               ปิด

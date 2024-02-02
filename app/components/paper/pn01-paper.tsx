@@ -52,10 +52,10 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
 
         articles.forEach((article, index) => {
           const articleHeight = article.getBoundingClientRect().height;
-          console.log(`Article ${index + 1} height: ${articleHeight}`);
+          // console.log(`Article ${index + 1} height: ${articleHeight}`);
 
           if (currentPageHeight + articleHeight > pageHeight) {
-            console.log(`Creating new page. Total pages: ${currentPageNumber}`);
+            // console.log(`Creating new page. Total pages: ${currentPageNumber}`);
 
             currentPage = createNewPage(paperRef.current!);
             currentPageHeight = 0;

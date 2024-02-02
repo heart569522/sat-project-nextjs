@@ -26,31 +26,45 @@ const searchColumns = [
   'improvement',
   'budget_income',
   'budget_expense',
-  'status_id',
   'target_total',
   'budget_expense_total',
   'budget_income_total',
+  'status_id',
 ];
 
-export async function GET(query: NextRequest) {
+export async function GET(req: NextRequest) {
   noStore();
+
+  const search = req.nextUrl.searchParams.get('query');
+
   try {
-    const searchConditions = query
-      ? `WHERE ${searchColumns
-          .map((column) => `CAST(${column} AS TEXT) ILIKE '%${query}%'`)
-          .join(' OR ')}`
-      : '';
+    let searchConditions = '';
+
+    if (search) {
+      searchConditions = `WHERE ${searchColumns
+        .map((column) => {
+          if (column === 'status_id') {
+            return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(${column} AS TEXT) ILIKE '%${search}%')`;
+          } else {
+            return `CAST(${column} AS TEXT) ILIKE '%${search}%'`;
+          }
+        })
+        .join(' OR ')} AND project_proposal_pn01.is_delete = false`;
+    } else {
+      searchConditions = 'WHERE project_proposal_pn01.is_delete = false';
+    }
 
     const count = await pool.query(
-      `SELECT COUNT(*) FROM project_proposal_pn01 ${searchConditions} AND is_delete = false`,
+      `SELECT COUNT(*) FROM project_proposal_pn01 
+      LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
+      ${searchConditions}`,
     );
-    console.log("🚀 ~ GET ~ count:", count)
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
 
     return NextResponse.json(totalPages, { status: 200 });
   } catch (error) {
-    // console.error('Server error:', error);
+    console.error('Server error:', error);
     return NextResponse.json(
       { message: `Server error, please try again later` },
       {

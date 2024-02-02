@@ -125,7 +125,7 @@ export function DeleteButton({
   id,
   apiPath,
 }: {
-  id: string | number;
+  id: string;
   apiPath: string;
 }) {
   const handleDelete = async () => {

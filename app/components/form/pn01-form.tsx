@@ -26,7 +26,7 @@ import {
   ResponsibleRow,
   TargetRow,
 } from '@/app/model/pn01';
-import { Button } from '../button/button';
+import { Button } from '../buttons/button';
 import Link from 'next/link';
 import {
   getStrategicIssue,
@@ -38,6 +38,7 @@ import {
   getStrategicPlanKPI,
   createData,
   updateData,
+  createDraft,
 } from '@/app/lib/api-service';
 import {
   objective_list,
@@ -51,7 +52,6 @@ import {
 import { ModalQuestion, ModalResponse } from '../modal';
 import { usePathname, useRouter } from 'next/navigation';
 import { OverlayLoading } from '../loading-screen';
-import { revalidatePath } from 'next/cache';
 
 interface ValidationError {
   id: number;
@@ -1320,19 +1320,50 @@ export default function PN01Form({
     return isValid;
   };
 
-  const handleDraft = async () => {
-    console.log('handleDraft');
-
-    const formData = setFinalFormData(true);
-    console.log('formData: ', formData);
-  };
-
   const handleSubmissionError = () => {
     setLoading(false);
     setModalError(true);
     setTitleModal(isEditing ? 'แก้ไขข้อมูลผิดพลาด' : 'ผิดพลาด');
     setDetailModal('โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
     setOpenResponseModal(true);
+  };
+
+  const handleDraft = async () => {
+    setLoading(true);
+    resetResponseModal();
+
+    console.log('handleDraft');
+
+    const formData = setFinalFormData(true);
+    console.log('formData: ', formData);
+
+    try {
+      let response: any;
+
+      response = await createDraft('project-proposal/draft', formData);
+
+      if (response && (response.status === 201 || response.status === 200)) {
+        setLoading(false);
+        setModalSuccess(true);
+        setTitleModal(isEditing ? 'แก้ไขแบบร่างสำเร็จ' : 'สำเร็จ');
+        setDetailModal(
+          isEditing
+            ? 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา'
+            : 'สร้างคำร้องการเสนอโครงการ/กิจกรรม (ฉบับร่าง) สำเร็จ',
+        );
+        setButtonLink(
+          isEditing
+            ? `/dashboard/project-proposal/document/${editData.id}`
+            : `/dashboard/project-proposal`,
+        );
+        setButtonText('กลับไปหน้าแรก');
+        setOpenResponseModal(true);
+      } else {
+        handleSubmissionError();
+      }
+    } catch (error) {
+      handleSubmissionError();
+    }
   };
 
   const handleSubmit = async () => {
@@ -3554,12 +3585,6 @@ export default function PN01Form({
         </div>
       </form>
       <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/dashboard/project-proposal/document/"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Test Document
-        </Link>
         <button
           onClick={() => handleOpenModal(true, false, false)}
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"

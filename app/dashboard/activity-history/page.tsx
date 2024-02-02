@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import SearchHistory from '@/app/components/search-box/search-history';
-import { CreateRequestTranscript } from '@/app/components/button/buttons';
+import { CreateRequestTranscript } from '@/app/components/buttons/buttons';
 import Pagination from '@/app/components/pagination';
 import Table from '@/app/components/history-activity/table';
 import Breadcrumbs from '@/app/components/breadcrumbs';
