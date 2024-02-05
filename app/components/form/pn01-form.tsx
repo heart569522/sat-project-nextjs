@@ -65,14 +65,16 @@ interface ValidationErrors {
 export default function PN01Form({
   editData,
   isEditing,
+  isDrafting,
 }: {
   editData?: any;
   isEditing?: boolean;
+  isDrafting?: boolean;
 }) {
   // console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 
-  if (isEditing && !editData.is_edit) {
+  if ((isEditing && !editData.is_edit) || (isDrafting && !editData.is_draft)) {
     router.replace('/dashboard/project-proposal');
   }
 
@@ -85,6 +87,7 @@ export default function PN01Form({
   const [handleAction, setHandleAction] = useState('');
   const [modalSuccess, setModalSuccess] = useState(false);
   const [modalError, setModalError] = useState(false);
+  const [modalNextPage, setModalNextPage] = useState(true);
   const [buttonLink, setButtonLink] = useState('');
   const [buttonText, setButtonText] = useState('');
 
@@ -163,16 +166,20 @@ export default function PN01Form({
   }>({});
 
   const [formInput, setFormInput] = useState({
-    faculty: isEditing ? editData?.faculty || '' : '',
-    projectName: isEditing ? editData?.project_name || '' : '',
-    projectYear: isEditing ? editData?.project_year || '' : '',
-    projectHead: isEditing ? editData?.project_head || '' : '',
-    projectHeadPhone: isEditing ? editData?.project_head_phone || '' : '',
-    principleReason: isEditing ? editData?.principle_reason || '' : '',
-    projectLocation: isEditing ? editData?.project_location || '' : '',
-    projectDatetime: isEditing ? editData?.project_datetime || '' : '',
-    lecturer: isEditing ? editData?.lecturer || '' : '',
-    improvement: isEditing ? editData?.improvement || '' : '',
+    faculty: isEditing || isDrafting ? editData?.faculty || '' : '',
+    projectName: isEditing || isDrafting ? editData?.project_name || '' : '',
+    projectYear: isEditing || isDrafting ? editData?.project_year || '' : '',
+    projectHead: isEditing || isDrafting ? editData?.project_head || '' : '',
+    projectHeadPhone:
+      isEditing || isDrafting ? editData?.project_head_phone || '' : '',
+    principleReason:
+      isEditing || isDrafting ? editData?.principle_reason || '' : '',
+    projectLocation:
+      isEditing || isDrafting ? editData?.project_location || '' : '',
+    projectDatetime:
+      isEditing || isDrafting ? editData?.project_datetime || '' : '',
+    lecturer: isEditing || isDrafting ? editData?.lecturer || '' : '',
+    improvement: isEditing || isDrafting ? editData?.improvement || '' : '',
   });
 
   const [strategicIssueList, setStrategicIssueList] = useState<
@@ -194,7 +201,7 @@ export default function PN01Form({
   );
 
   const getStrategicIssueList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -207,7 +214,7 @@ export default function PN01Form({
   };
 
   const getObjectiveList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -220,7 +227,7 @@ export default function PN01Form({
   };
 
   const getUniversityStrategicList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -233,7 +240,7 @@ export default function PN01Form({
   };
 
   const getStrategicPlanKPIList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -246,7 +253,7 @@ export default function PN01Form({
   };
 
   const getOperationPlanKPIList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -259,7 +266,7 @@ export default function PN01Form({
   };
 
   const getProjectKPIList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -272,7 +279,7 @@ export default function PN01Form({
   };
 
   const getProjectStatusList = async () => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       setLoading(true);
     }
     try {
@@ -302,19 +309,22 @@ export default function PN01Form({
   }, []);
 
   const [selectedValues, setSelectedValues] = useState({
-    strategicIssue: isEditing ? editData?.strategic_issue_id || '' : '',
-    objective: isEditing ? editData?.objective_id || '' : '',
-    universityStrategic: isEditing
-      ? editData?.university_strategic_id || ''
-      : '',
-    strategicPlanKPI: isEditing ? editData?.strategic_plan_kpi_id || '' : '',
-    operationPlanKPI: isEditing ? editData?.operational_plan_kpi_id || '' : '',
-    projectKPI: isEditing ? editData?.project_kpi_id || '' : '',
-    projectStatus: isEditing ? editData?.project_status_id || '' : '',
+    strategicIssue:
+      isEditing || isDrafting ? editData?.strategic_issue_id || '' : '',
+    objective: isEditing || isDrafting ? editData?.objective_id || '' : '',
+    universityStrategic:
+      isEditing || isDrafting ? editData?.university_strategic_id || '' : '',
+    strategicPlanKPI:
+      isEditing || isDrafting ? editData?.strategic_plan_kpi_id || '' : '',
+    operationPlanKPI:
+      isEditing || isDrafting ? editData?.operational_plan_kpi_id || '' : '',
+    projectKPI: isEditing || isDrafting ? editData?.project_kpi_id || '' : '',
+    projectStatus:
+      isEditing || isDrafting ? editData?.project_status_id || '' : '',
   });
 
   const [responsibleRows, setResponsibleRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.project_responsible || [
           { id: 1, firstname: '', lastname: '', position: '', work: '' },
         ]
@@ -322,7 +332,7 @@ export default function PN01Form({
   );
 
   const [OIVTRows, setOIVTRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.objective_indicator_value_tool || [
           { id: 1, objective: '', indicator: '', value: '', tool: '' },
         ]
@@ -330,19 +340,19 @@ export default function PN01Form({
   );
 
   const [expectedResultRows, setExpectedResultRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.expected_result || [{ id: 1, expected_result: '' }]
       : [{ id: 1, expected_result: '' }],
   );
 
   const [operationDurationRows, setOperationDurationRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.operation_duration || [{ id: 1, operation_duration: '' }]
       : [{ id: 1, operation_duration: '' }],
   );
 
   const [projectScheduleRows, setProjectScheduleRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.project_schedule || [
           { id: 1, date: '', time: '', detail: '' },
         ]
@@ -350,21 +360,21 @@ export default function PN01Form({
   );
 
   const [targetTotal, setTargetTotal] = useState(
-    isEditing ? editData?.target_total || '' : '',
+    isEditing || isDrafting ? editData?.target_total || '' : '',
   );
 
   const [targetRows, setTargetRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.target || [{ id: 1, detail: '', count: '' }]
       : [{ id: 1, detail: '', count: '' }],
   );
 
   const [budgetIncomeTotal, setBudgetIncomeTotal] = useState(
-    isEditing ? editData?.budget_income_total || '' : '',
+    isEditing || isDrafting ? editData?.budget_income_total || '' : '',
   );
 
   const [budgetIncomeRows, setBudgetIncomeRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.budget_income || [
           { id: 1, detail: '', amount: '', source: '' },
         ]
@@ -372,11 +382,11 @@ export default function PN01Form({
   );
 
   const [budgetExpenseTotal, setBudgetExpenseTotal] = useState(
-    isEditing ? editData?.budget_expense_total || '' : '',
+    isEditing || isDrafting ? editData?.budget_expense_total || '' : '',
   );
 
   const [budgetExpenseRows, setBudgetExpenseRows] = useState(
-    isEditing
+    isEditing || isDrafting
       ? editData?.budget_expense || [
           { id: 1, detail: '', amount: '', note: '' },
         ]
@@ -384,7 +394,7 @@ export default function PN01Form({
   );
 
   const [projectTypes, setProjectTypes] = useState(() => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       const {
         maintenance,
         academic_service,
@@ -468,7 +478,7 @@ export default function PN01Form({
   });
 
   const [universityIndentity, setUniversityIndentity] = useState(() => {
-    if (isEditing) {
+    if (isEditing || isDrafting) {
       const { moral, serve, academic, develop } =
         editData?.university_identity || {};
 
@@ -1323,7 +1333,7 @@ export default function PN01Form({
   const handleSubmissionError = () => {
     setLoading(false);
     setModalError(true);
-    setTitleModal(isEditing ? 'แก้ไขข้อมูลผิดพลาด' : 'ผิดพลาด');
+    setTitleModal(isEditing || isDrafting ? 'แก้ไขข้อมูลผิดพลาด' : 'ผิดพลาด');
     setDetailModal('โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
     setOpenResponseModal(true);
   };
@@ -1340,23 +1350,29 @@ export default function PN01Form({
     try {
       let response: any;
 
-      response = await createDraft('project-proposal/draft', formData);
+      if (isDrafting) {
+        response = await updateData(
+          'project-proposal/draft',
+          formData,
+          editData.id,
+          isDrafting
+        );
+      } else {
+        response = await createDraft('project-proposal/draft', formData);
+      }
 
       if (response && (response.status === 201 || response.status === 200)) {
         setLoading(false);
         setModalSuccess(true);
-        setTitleModal(isEditing ? 'แก้ไขแบบร่างสำเร็จ' : 'สำเร็จ');
+        setTitleModal(isDrafting ? 'แก้ไขแบบร่างสำเร็จ' : 'สำเร็จ');
         setDetailModal(
-          isEditing
-            ? 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา'
+          isDrafting
+            ? 'บันทึกข้อมูลคำร้องการเสนอโครงการ/กิจกรรม (ฉบับร่าง) สำเร็จ'
             : 'สร้างคำร้องการเสนอโครงการ/กิจกรรม (ฉบับร่าง) สำเร็จ',
         );
-        setButtonLink(
-          isEditing
-            ? `/dashboard/project-proposal/document/${editData.id}`
-            : `/dashboard/project-proposal`,
-        );
+        setButtonLink(`/dashboard/project-proposal`);
         setButtonText('กลับไปหน้าแรก');
+        setModalNextPage(false)
         setOpenResponseModal(true);
       } else {
         handleSubmissionError();
@@ -1380,6 +1396,8 @@ export default function PN01Form({
 
       if (isEditing) {
         response = await updateData('project-proposal', formData, editData.id);
+      } else if (isDrafting) {
+        response = await updateData('project-proposal/draft', formData, editData.id);
       } else {
         response = await createData('project-proposal', formData);
       }
@@ -1394,7 +1412,7 @@ export default function PN01Form({
             : 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา',
         );
         setButtonLink(
-          isEditing
+          isEditing || isDrafting
             ? `/dashboard/project-proposal/document/${editData.id}`
             : `/dashboard/project-proposal/document/${response.data.id}`,
         );
@@ -3596,11 +3614,11 @@ export default function PN01Form({
             onClick={() => handleOpenModal(false, true, false)}
             className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
           >
-            แบบร่าง
+            {isDrafting ? 'บันทึกแบบร่าง' : 'แบบร่าง'}
           </button>
         )}
         <Button onClick={() => handleOpenModal(false, false, true)}>
-          ตกลง
+          {isDrafting ? 'เสนอคำร้อง' : 'ตกลง'}
         </Button>
 
         <ModalQuestion
@@ -3629,6 +3647,7 @@ export default function PN01Form({
           isError={modalError}
           buttonLink={buttonLink}
           buttonText={buttonText}
+          haveNextPage={modalNextPage}
         />
 
         <OverlayLoading showLoading={loading} />

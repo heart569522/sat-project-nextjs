@@ -88,7 +88,8 @@ export function ModalResponse({
   detail,
   buttonLink,
   buttonText,
-  isCloseButton
+  isCloseButton,
+  haveNextPage,
 }: {
   openModal: boolean;
   onCloseModal?: () => void;
@@ -99,12 +100,17 @@ export function ModalResponse({
   buttonLink?: string;
   buttonText?: string;
   isCloseButton?: boolean;
+  haveNextPage?: boolean;
 }) {
   const router = useRouter();
 
-  const handleNextPage = () => {
-    router.replace(buttonLink as string)
-  }
+  const handleSubitButton = () => {
+    if (haveNextPage) {
+      router.replace(buttonLink as string);
+    } else {
+      router.push(buttonLink as string);
+    }
+  };
 
   return (
     <Modal
@@ -157,7 +163,7 @@ export function ModalResponse({
             <button
               type="button"
               className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
-              onClick={handleNextPage}
+              onClick={handleSubitButton}
             >
               {buttonText}
             </button>

@@ -212,7 +212,7 @@ export async function createDraft(apiPath: string, formData: any) {
 
     console.log('Create draft project proposal success', response);
 
-    return response
+    return response;
   } catch (error) {
     console.error('Error while sending data:', error);
   }
@@ -222,9 +222,12 @@ export async function updateData(
   apiPath: string,
   formData: any,
   id: string,
+  isPN01Draft?: boolean,
 ) {
   try {
-    const response = await axios.put(
+    const method = isPN01Draft ? 'patch' : 'put';
+
+    const response = await axios[method](
       `${process.env.API_URL}/api/${apiPath}/${id}`,
       formData,
       {
@@ -244,7 +247,7 @@ export async function updateData(
 export async function deleteData(apiPath: string, id: string) {
   try {
     const response = await axios.patch(
-      `${process.env.API_URL}/api/${apiPath}/${id}`
+      `${process.env.API_URL}/api/${apiPath}/${id}`,
     );
 
     return response;
