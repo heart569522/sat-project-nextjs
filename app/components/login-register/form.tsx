@@ -99,11 +99,6 @@ export default function Form() {
     fetchData();
   }, []);
 
-  const [formRadio, setFormRadio] = useState({
-    formRole: '',
-  });
-  const isStudent = formRadio.formRole == 'student';
-
   const [validationError, setValidationError] = useState<{
     [key: string]: string;
   }>({});
@@ -125,17 +120,19 @@ export default function Form() {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+    <div className='bg-gray-50' style={{ width: '100%' }}>
+      <div style={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
           onChange={handleChange}
           aria-label="login-registerSelectedTab"
+          variant="fullWidth"
+          centered
         >
-          <Tab label="เข้าสู่ระบบ" {...a11yProps(0)} />
+          <Tab className='p-4 bg-orange-500' label="เข้าสู่ระบบ" {...a11yProps(0)} />
           <Tab label="สมัครสมาชิก" {...a11yProps(1)} />
         </Tabs>
-      </Box>
+      </div>
       <CustomTabPanel value={value} index={0}>
         <div className="w-full max-w-xs">
           <form className="mb-4 rounded bg-white px-8 pb-8 pt-6 shadow-md">
@@ -340,6 +337,6 @@ export default function Form() {
           </div>
         </form>
       </CustomTabPanel>
-    </Box>
+    </div>
   );
 }

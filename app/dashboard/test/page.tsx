@@ -6,20 +6,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import { PN01Status } from '@/app/model/pn01-status';
+import Form from '@/app/components/login-register/form';
 
 export default function BasicDatePicker() {
   return (
     <div>
-      {/* <OverlayLoading /> */}
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
-          <DatePicker label="Basic date picker" views={['year']} />
-        </DemoContainer>
-      </LocalizationProvider>
-
-      <div>
-        <p> {PN01Status[0]}</p>
-      </div>
+      <Form />
     </div>
   );
 }

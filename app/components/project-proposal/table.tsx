@@ -92,14 +92,14 @@ export default function ProjectProposalTable({
                               โครงการ/กิจกรรม
                             </p>
                             <p className="text-lg font-semibold">
-                              {row.project_name}
+                              {row.project_name || '-'}
                             </p>
                           </div>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
                           <p className="text-sm font-medium">รหัสเอกสาร</p>
                           <p className="text-lg font-semibold">
-                            {row.project_code}
+                            {row.project_code || '-'}
                           </p>
                         </div>
                       </div>
@@ -109,7 +109,7 @@ export default function ProjectProposalTable({
                             ผู้รับผิดชอบโครงการ
                           </p>
                           <p className="text-base font-semibold">
-                            {row.project_head}
+                            {row.project_head || '-'}
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
@@ -117,7 +117,7 @@ export default function ProjectProposalTable({
                             เบอร์โทรศัพท์ผู้รับผิดชอบ
                           </p>
                           <p className="text-base font-semibold">
-                            {row.project_head_phone}
+                            {row.project_head_phone || '-'}
                           </p>
                         </div>
                       </div>
@@ -144,7 +144,7 @@ export default function ProjectProposalTable({
                         <EditButton
                           id={row.id}
                           path="project-proposal"
-                          disabled={!row.is_edit}
+                          disabled={!row.is_edit && !row.is_draft}
                         />
                         <ButtonDialog
                           id={row.id}
