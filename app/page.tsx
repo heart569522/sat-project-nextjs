@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Form from '@/app/components/login-register/form';
 import TabLoginRegister from '@/app/components/login-register/tab';
 
 export const metadata: Metadata = {
@@ -14,7 +13,6 @@ export default async function Page({}: {}) {
           เข้าสู่ระบบ / สมัครสมาชิก
         </div>
         <div className="mt-8">
-          {/* <Form /> */}
           <TabLoginRegister />
         </div>
       </div>

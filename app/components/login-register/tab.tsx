@@ -7,8 +7,8 @@ import RegisterForm from './register-form';
 export default function TabLoginRegister() {
   const [activeTab, setActiveTab] = useState('login');
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
+  const handleTabChange = (tabName: string) => {
+    setActiveTab(tabName);
   };
 
   return (
@@ -44,11 +44,7 @@ export default function TabLoginRegister() {
               </div>
             </div>
           )}
-          {activeTab === 'register' && (
-            // <div className="flex justify-center">
-              <RegisterForm />
-            // </div>
-          )}
+          {activeTab === 'register' && <RegisterForm />}
         </div>
       </div>
     </React.Fragment>
