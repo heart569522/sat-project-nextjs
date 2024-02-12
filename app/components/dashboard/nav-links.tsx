@@ -60,7 +60,7 @@ const links = [
   },
   {
     name: 'เข้าสู่ระบบ/สมัครสมาชิก',
-    href: '/dashboard/login-register',
+    href: '/',
     icon: LoginOutlinedIcon,
   },
   { name: 'test', href: '/dashboard/test', icon: DocumentDuplicateIcon },
