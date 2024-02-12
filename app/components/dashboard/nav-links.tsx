@@ -19,43 +19,43 @@ const links = [
   // { name: 'Home', href: '/dashboard', icon: HomeIcon },
   // {
   //   name: 'Invoices',
-  //   href: '/dashboard/invoices',
+  //   href: '/invoices',
   //   icon: DocumentDuplicateIcon,
   // },
-  // { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  // { name: 'Customers', href: '/customers', icon: UserGroupIcon },
   {
     name: 'โครงการ/กิจกรรม',
-    href: '/dashboard/project-proposal',
+    href: '/project-proposal',
     icon: DocumentDuplicateIcon,
   },
   {
     name: 'บันทึกการเข้าร่วมโครการ/กิจกรรม',
-    href: '/dashboard/activity-record',
+    href: '/activity-record',
     icon: ContactPageOutlinedIcon,
   },
   {
     name: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
-    href: '/dashboard/activity-history',
+    href: '/activity-history',
     icon: FindInPageOutlinedIcon,
   },
   {
     name: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม (พน.01)',
-    href: '/dashboard/management/pn01',
+    href: '/management/pn01',
     icon: FindInPageOutlinedIcon,
   },
   {
     name: 'จัดการข้อมูลบันทึกการเข้าร่วมโครงการกิจกรรม (พน.10)',
-    href: '/dashboard/management/pn10',
+    href: '/management/pn10',
     icon: FindInPageOutlinedIcon,
   },
   {
     name: 'จัดการคำร้องขอระเบียนกิจกรรม (พน.11)',
-    href: '/dashboard/management/pn11',
+    href: '/management/pn11',
     icon: FindInPageOutlinedIcon,
   },
   {
     name: 'จัดการข้อมูลผู้ใช้งานระบบ',
-    href: '/dashboard/management/user-management',
+    href: '/management/user-management',
     icon: FindInPageOutlinedIcon,
   },
   {
@@ -63,7 +63,7 @@ const links = [
     href: '/',
     icon: LoginOutlinedIcon,
   },
-  { name: 'test', href: '/dashboard/test', icon: DocumentDuplicateIcon },
+  { name: 'test', href: '/test', icon: DocumentDuplicateIcon },
 ];
 
 export default function NavLinks() {
@@ -75,7 +75,7 @@ export default function NavLinks() {
         const LinkIcon = link.icon;
         const isActive =
           pathname.startsWith(link.href) &&
-          (link.href === '/dashboard' ? pathname === '/dashboard' : true);
+          (link.href === '/' ? pathname === '/' : true);
 
         return (
           <Link
