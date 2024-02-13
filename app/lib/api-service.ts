@@ -95,6 +95,36 @@ export async function getProjectProposals() {
   return res.json();
 }
 
+export async function register(formData: any) {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/api/auth/register`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    console.log('Register success', response);
+
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
+export async function checkExist(type: string, data: string) {
+  const res = await axios.get(
+    `${process.env.API_URL}/api/auth/check-exist/${type}/${encodeURIComponent(
+      data,
+    )}`,
+  );
+
+  return res.data.exists;
+}
+
 export async function getAllData(apiPath: string) {
   const res = await fetch(`${process.env.API_URL}/api/${apiPath}`);
 

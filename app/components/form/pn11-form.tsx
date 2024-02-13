@@ -235,7 +235,7 @@ export default function PN11Form() {
         console.log('Create success!');
         console.log('id: ', res.data.id);
         
-        router.push(`/dashboard/activity-history/transcript/document/${res.data.id}`);
+        router.push(`/activity-history/transcript/document/${res.data.id}`);
 
       } else {
         console.error('Create failed, please try again later');
@@ -362,6 +362,7 @@ export default function PN11Form() {
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationError.faculty)}
+                size='small'
               >
                 <Select
                   name="faculty"
@@ -390,7 +391,7 @@ export default function PN11Form() {
               >
                 สาขาวิชา
               </label>
-              <FormControl className="flex w-full">
+              <FormControl className="flex w-full" size='small'>
                 <Select
                   name="major"
                   value={formInput.major}
@@ -580,7 +581,7 @@ export default function PN11Form() {
       </form>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/activity-history/transcript/document/"
+          href="/activity-history/transcript/document/"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Test Document
@@ -605,7 +606,7 @@ export default function PN11Form() {
           if (action === 'submit') {
             handleSubmit();
           } else if (action === 'cancel') {
-            router.push('/dashboard/activity-history/', { scroll: false });
+            router.push('/activity-history/', { scroll: false });
           }
         }}
       />

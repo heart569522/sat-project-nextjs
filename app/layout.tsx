@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${notoThai.className} antialiased`}>
         <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-          <div className="w-full flex-none print:hidden md:w-80">
+          <div className="w-full border-r-2 shadow-xl flex-none print:hidden md:w-80">
             <SideNav />
           </div>
           <div className="grow p-6 print:pt-0 md:overflow-y-auto md:px-12">

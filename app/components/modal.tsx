@@ -90,6 +90,7 @@ export function ModalResponse({
   buttonText,
   isCloseButton,
   haveNextPage,
+  isNextTab
 }: {
   openModal: boolean;
   onCloseModal?: () => void;
@@ -101,12 +102,15 @@ export function ModalResponse({
   buttonText?: string;
   isCloseButton?: boolean;
   haveNextPage?: boolean;
+  isNextTab?: boolean;
 }) {
   const router = useRouter();
 
   const handleSubitButton = () => {
     if (haveNextPage) {
       router.replace(buttonLink as string);
+    } else if (isNextTab) {
+      window.location.href = (buttonLink as string)
     } else {
       router.push(buttonLink as string);
     }

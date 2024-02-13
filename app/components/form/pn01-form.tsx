@@ -1762,6 +1762,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.strategicIssue)}
+                size='small'
               >
                 <Select
                   name="strategicIssue"
@@ -1792,6 +1793,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.objective)}
+                size='small'
               >
                 <Select
                   name="objective"
@@ -1822,6 +1824,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.universityStrategic)}
+                size='small'
               >
                 <Select
                   name="universityStrategic"
@@ -1852,6 +1855,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.strategicPlanKPI)}
+                size='small'
               >
                 <Select
                   name="strategicPlanKPI"
@@ -1882,6 +1886,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.operationPlanKPI)}
+                size='small'
               >
                 <Select
                   name="operationPlanKPI"
@@ -1912,6 +1917,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.projectKPI)}
+                size='small'
               >
                 <Select
                   name="projectKPI"
@@ -1942,6 +1948,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.projectStatus)}
+                size='small'
               >
                 <Select
                   name="projectStatus"

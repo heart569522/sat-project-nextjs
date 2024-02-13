@@ -80,7 +80,7 @@ export default async function InvoicesTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
                       <EditButton />
-                      <DeleteButton id={1} apiPath=''/>
+                      <DeleteButton id='1' apiPath=''/>
                     </div>
                   </td>
                 </tr>
@@ -115,7 +115,7 @@ export default async function InvoicesTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
                       <EditButton />
-                      <DeleteButton id={1} apiPath=''/>
+                      <DeleteButton id='1' apiPath=''/>
                     </div>
                   </td>
                 </tr>
@@ -150,7 +150,7 @@ export default async function InvoicesTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
                       <EditButton />
-                      <DeleteButton id={1} apiPath=''/>
+                      <DeleteButton id='1' apiPath=''/>
                     </div>
                   </td>
                 </tr>
@@ -185,7 +185,7 @@ export default async function InvoicesTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex gap-2 justify-center">
                       <EditButton />
-                      <DeleteButton id={1} apiPath=''/>
+                      <DeleteButton id='1' apiPath=''/>
                     </div>
                   </td>
                 </tr>
