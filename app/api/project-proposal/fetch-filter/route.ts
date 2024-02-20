@@ -37,12 +37,14 @@ export async function GET(req: NextRequest) {
   try {
     const page = req.nextUrl.searchParams.get('page');
     const search = req.nextUrl.searchParams.get('search');
+    const userId = req.nextUrl.searchParams.get('userId');
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
     let searchConditions = '';
     if (search) {
-      searchConditions = `WHERE ${searchColumns
+      console.log('search');
+      searchConditions = `(${searchColumns
         .map((column) => {
           if (column === 'status_id') {
             return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%')`;
@@ -50,19 +52,33 @@ export async function GET(req: NextRequest) {
             return `CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%'`;
           }
         })
-        .join(' OR ')} AND project_proposal_pn01.is_delete = false`;
+        .join(' OR ')})`;
+
+      if (userId) {
+        console.log('user id');
+        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
+      } else {
+        console.log('not user id');
+        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+      }
     } else {
-      searchConditions = 'WHERE project_proposal_pn01.is_delete = false';
+      console.log('not search');
+      if (userId) {
+        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
+      } else {
+        searchConditions = 'project_proposal_pn01.is_delete = false';
+      }
     }
 
-    const projects = await pool.query(
-      `SELECT project_proposal_pn01.*, pn01_status.name AS status_name
-           FROM project_proposal_pn01
-           LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
-           ${searchConditions}
-           ORDER BY project_proposal_pn01.created_at DESC
-           LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`,
-    );
+    const sqlQuery = `
+      SELECT project_proposal_pn01.*, pn01_status.name AS status_name
+      FROM project_proposal_pn01
+      LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
+      WHERE ${searchConditions}
+      ORDER BY project_proposal_pn01.created_at DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
+
+    const projects = await pool.query(sqlQuery);
 
     return NextResponse.json(projects.rows, { status: 200 });
   } catch (error) {

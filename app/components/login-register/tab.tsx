@@ -62,7 +62,7 @@ export default function TabLoginRegister() {
         </div>
         <div className="rounded-md border border-gray-200 p-4">
           {activeTab === 'login' && (
-            <div id="login" className="flex justify-center">
+            <div className="flex justify-center">
               <div className="w-2/4 max-lg:w-full">
                 <LoginForm />
               </div>
@@ -70,7 +70,7 @@ export default function TabLoginRegister() {
           )}
 
           {activeTab === 'register' && (
-            <div id="register">
+            <div>
               <RegisterForm />
             </div>
           )}

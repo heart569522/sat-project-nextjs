@@ -125,6 +125,18 @@ export async function checkExist(type: string, data: string) {
   return res.data.exists;
 }
 
+export async function checkRole(data: string) {
+  const res = await fetch(`${process.env.API_URL}/api/auth/check-role/${data}`);
+
+  return res.text();
+}
+
+export async function getUserLoginData(data: string) {
+  const res = await fetch(`${process.env.API_URL}/api/users/get-login-data/${data}`);
+
+  return res.json();
+}
+
 export async function getAllData(apiPath: string) {
   const res = await fetch(`${process.env.API_URL}/api/${apiPath}`);
 
@@ -147,13 +159,17 @@ export async function getDataById(apiPath: string, id: string) {
   return res.json();
 }
 
-export async function fetchPages(apiPath: string, search: string) {
+export async function fetchPages(apiPath: string, search: string, userId: string | undefined) {
   noStore();
 
   const url = new URL(`${process.env.API_URL}/api/${apiPath}`);
 
   if (search) {
     url.searchParams.append('query', search);
+  }
+
+  if (userId) {
+    url.searchParams.append('userId', userId);
   }
 
   try {
@@ -174,6 +190,7 @@ export async function fetchFilter(
   apiPath: string,
   search: string | undefined,
   currentPage: number | undefined,
+  userId: string | undefined,
 ) {
   noStore();
 
@@ -185,6 +202,10 @@ export async function fetchFilter(
 
   if (currentPage) {
     url.searchParams.append('page', currentPage.toString());
+  }
+
+  if (userId) {
+    url.searchParams.append('userId', userId);
   }
 
   try {

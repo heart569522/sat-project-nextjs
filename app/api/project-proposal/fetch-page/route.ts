@@ -36,29 +36,42 @@ export async function GET(req: NextRequest) {
   noStore();
 
   const search = req.nextUrl.searchParams.get('query');
+  const userId = req.nextUrl.searchParams.get('userId');
 
   try {
     let searchConditions = '';
 
     if (search) {
-      searchConditions = `WHERE ${searchColumns
+      searchConditions = `${searchColumns
         .map((column) => {
           if (column === 'status_id') {
-            return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(${column} AS TEXT) ILIKE '%${search}%')`;
+            return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%')`;
           } else {
-            return `CAST(${column} AS TEXT) ILIKE '%${search}%'`;
+            return `CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%'`;
           }
         })
-        .join(' OR ')} AND project_proposal_pn01.is_delete = false`;
+        .join(' OR ')}`;
+    
+      if (userId) {
+        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
+      } else {
+        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+      }
     } else {
-      searchConditions = 'WHERE project_proposal_pn01.is_delete = false';
+      if (userId) {
+        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
+      } else {
+        searchConditions = 'project_proposal_pn01.is_delete = false';
+      }
     }
-
-    const count = await pool.query(
-      `SELECT COUNT(*) FROM project_proposal_pn01 
+    
+    const sqlQuery = `
+      SELECT COUNT(*) 
+      FROM project_proposal_pn01
       LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
-      ${searchConditions}`,
-    );
+      WHERE ${searchConditions}`;
+    
+    const count = await pool.query(sqlQuery);
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
 

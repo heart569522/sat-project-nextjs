@@ -22,9 +22,11 @@ import {
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
 
 export default function ProjectProposalTable({
+  userId,
   query,
   currentPage,
 }: {
+  userId?: string;
   query?: string;
   currentPage?: number;
 }) {
@@ -39,6 +41,7 @@ export default function ProjectProposalTable({
       'project-proposal/fetch-filter',
       query,
       currentPage,
+      userId
     );
 
     if (res) {

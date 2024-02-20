@@ -52,6 +52,7 @@ import {
 import { ModalQuestion, ModalResponse } from '../modal';
 import { usePathname, useRouter } from 'next/navigation';
 import { OverlayLoading } from '../loading-screen';
+import { useSession } from 'next-auth/react';
 
 interface ValidationError {
   id: number;
@@ -63,10 +64,12 @@ interface ValidationErrors {
 }
 
 export default function PN01Form({
+  userId,
   editData,
   isEditing,
   isDrafting,
 }: {
+  userId?: string;
   editData?: any;
   isEditing?: boolean;
   isDrafting?: boolean;
@@ -75,7 +78,7 @@ export default function PN01Form({
   const router = useRouter();
 
   if ((isEditing && !editData.is_edit) || (isDrafting && !editData.is_draft)) {
-    router.replace('/dashboard/project-proposal');
+    router.replace('/project-proposal');
   }
 
   const [loading, setLoading] = useState(false);
@@ -151,8 +154,6 @@ export default function PN01Form({
     setOpenQuestionModal(false);
     setOpenResponseModal(false);
   };
-
-  let userId = '8d2de365-1dea-4b3e-97ec-9f46b5b68ff1'; // test id super admin
 
   const [validationError, setValidationError] = useState<{
     [key: string]: string;
@@ -296,13 +297,15 @@ export default function PN01Form({
     console.log('🚀 ~ editData:', editData);
 
     const fetchListData = async () => {
-      await getStrategicIssueList();
-      await getObjectiveList();
-      await getUniversityStrategicList();
-      await getStrategicPlanKPIList();
-      await getOperationPlanKPIList();
-      await getProjectKPIList();
-      await getProjectStatusList();
+      await Promise.all([
+        getStrategicIssueList(),
+        getObjectiveList(),
+        getUniversityStrategicList(),
+        getStrategicPlanKPIList(),
+        getOperationPlanKPIList(),
+        getProjectKPIList(),
+        getProjectStatusList(),
+      ]);
     };
 
     fetchListData();
@@ -1355,7 +1358,7 @@ export default function PN01Form({
           'project-proposal/draft',
           formData,
           editData.id,
-          isDrafting
+          isDrafting,
         );
       } else {
         response = await createDraft('project-proposal/draft', formData);
@@ -1370,9 +1373,9 @@ export default function PN01Form({
             ? 'บันทึกข้อมูลคำร้องการเสนอโครงการ/กิจกรรม (ฉบับร่าง) สำเร็จ'
             : 'สร้างคำร้องการเสนอโครงการ/กิจกรรม (ฉบับร่าง) สำเร็จ',
         );
-        setButtonLink(`/dashboard/project-proposal`);
+        setButtonLink(`/project-proposal`);
         setButtonText('กลับไปหน้าแรก');
-        setModalNextPage(false)
+        setModalNextPage(false);
         setOpenResponseModal(true);
       } else {
         handleSubmissionError();
@@ -1397,7 +1400,11 @@ export default function PN01Form({
       if (isEditing) {
         response = await updateData('project-proposal', formData, editData.id);
       } else if (isDrafting) {
-        response = await updateData('project-proposal/draft', formData, editData.id);
+        response = await updateData(
+          'project-proposal/draft',
+          formData,
+          editData.id,
+        );
       } else {
         response = await createData('project-proposal', formData);
       }
@@ -1413,8 +1420,8 @@ export default function PN01Form({
         );
         setButtonLink(
           isEditing || isDrafting
-            ? `/dashboard/project-proposal/document/${editData.id}`
-            : `/dashboard/project-proposal/document/${response.data.id}`,
+            ? `/project-proposal/document/${editData.id}`
+            : `/project-proposal/document/${response.data.id}`,
         );
         setButtonText('ไปยังเอกสารเอกสาร พน.01');
         setOpenResponseModal(true);
@@ -1762,7 +1769,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.strategicIssue)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="strategicIssue"
@@ -1793,7 +1800,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.objective)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="objective"
@@ -1824,7 +1831,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.universityStrategic)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="universityStrategic"
@@ -1855,7 +1862,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.strategicPlanKPI)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="strategicPlanKPI"
@@ -1886,7 +1893,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.operationPlanKPI)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="operationPlanKPI"
@@ -1917,7 +1924,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.projectKPI)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="projectKPI"
@@ -1948,7 +1955,7 @@ export default function PN01Form({
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationSelectError.projectStatus)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="projectStatus"
@@ -3640,7 +3647,7 @@ export default function PN01Form({
             } else if (action === 'submit') {
               handleSubmit();
             } else if (action === 'cancel') {
-              router.push('/dashboard/project-proposal', { scroll: false });
+              router.push('/project-proposal', { scroll: false });
             }
           }}
         />

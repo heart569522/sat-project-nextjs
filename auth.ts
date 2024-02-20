@@ -1,14 +1,17 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
-import { sql } from '@vercel/postgres';
+import { pool } from '@/app/lib/db';
 import { z } from 'zod';
-import type { User } from '@/app/lib/definitions';
-import { authConfig } from './auth.config';
+import { authConfig } from '@/auth.config';
+import { Session } from 'next-auth/types';
 
-async function getUser(email: string): Promise<User | undefined> {
+async function login(username: string) {
   try {
-    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
+    const user = await pool.query(
+      'SELECT * FROM users WHERE is_delete = false AND username = $1',
+      [username],
+    );
     return user.rows[0];
   } catch (error) {
     console.error('Failed to fetch user:', error);
@@ -16,28 +19,39 @@ async function getUser(email: string): Promise<User | undefined> {
   }
 }
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
-    // Credentials({
-    //   async authorize(credentials) {
-    //     const parsedCredentials = z
-    //       .object({ email: z.string().email(), password: z.string().min(6) })
-    //       .safeParse(credentials);
+    Credentials({
+      async authorize(credentials) {
+        const parsedCredentials = z
+          .object({ username: z.string(), password: z.string().min(6) })
+          .safeParse(credentials);
 
-    //     if (parsedCredentials.success) {
-    //       const { email, password } = parsedCredentials.data;
+        if (parsedCredentials.success) {
+          const { username, password } = parsedCredentials.data;
 
-    //       const user = await getUser(email);
-    //       if (!user) return null;
+          const user = await login(username);
+          console.log('🚀 ~ authorize ~ user:', user);
+          if (!user) return null;
 
-    //       const passwordsMatch = await bcrypt.compare(password, user.password);
-    //       if (passwordsMatch) return user;
-    //     }
+          const passwordsMatch = await bcrypt.compare(password, user.password);
+          if (passwordsMatch) return user;
+        }
 
-    //     console.log('Invalid credentials');
-    //     return null;
-    //   },
-    // }),
+        console.log('Invalid credentials');
+        return null;
+      },
+    }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.role = user.role;
+      return token;
+    },
+    async session({ session, token }: { session: Session; token: any }) {
+      if (session?.user) session.user.role = token.role;
+      return session;
+    },
+  },
 });

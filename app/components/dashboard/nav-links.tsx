@@ -4,6 +4,7 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
@@ -66,12 +67,41 @@ const links = [
   { name: 'test', href: '/test', icon: DocumentDuplicateIcon },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({ userData }: { userData: any }) {
   const pathname = usePathname();
+
+  const allowedPaths = {
+    teacher: [
+      '/project-proposal',
+      '/activity-record',
+      '/activity-history',
+      '/test',
+    ],
+    admin: [
+      '/project-proposal',
+      '/activity-record',
+      '/activity-history',
+      '/test',
+      '/management',
+      '/dashboard',
+    ],
+  };
+
+  // Get the allowed paths based on the user's role or use default for other roles
+  const allowedPathsForRole = allowedPaths[
+    userData?.role as keyof typeof allowedPaths
+  ] || ['/', '/activity-history', '/test'];
+
+  // Filter links based on allowed paths
+  const filteredLinks = links.filter((link) =>
+    allowedPathsForRole.some((allowedPath) =>
+      allowedPath === '/' ? link.href === '/' : link.href.startsWith(allowedPath)
+    )
+  );
 
   return (
     <>
-      {links.map((link) => {
+      {filteredLinks.map((link) => {
         const LinkIcon = link.icon;
         const isActive =
           pathname.startsWith(link.href) &&
@@ -96,3 +126,23 @@ export default function NavLinks() {
     </>
   );
 }
+
+export const ProfileButton = () => {
+  const pathname = usePathname();
+  const isActive = pathname === '/profile';
+
+  return (
+    <Link
+      href="/profile"
+      className={clsx(
+        'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
+        {
+          'bg-sky-100 text-blue-600': isActive,
+        },
+      )}
+    >
+      <UserIcon className="w-6" />
+      <p className="hidden md:block">โปรไฟล์</p>
+    </Link>
+  );
+};

@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           breadcrumbs={[
             {
               label: 'โครงการ/กิจกรรม',
-              href: '/dashboard/project-proposal',
+              href: '/project-proposal',
               active: false,
             },
             {

@@ -4,7 +4,8 @@ import PN01Form from '@/app/components/form/pn01-form';
 import Pagination from '@/app/components/pagination';
 import ProjectProposalTable from '@/app/components/project-proposal/table';
 import SearchAuto from '@/app/components/search-box/search-auto';
-import { fetchPages } from '@/app/lib/api-service';
+import { fetchPages, getUserLoginData } from '@/app/lib/api-service';
+import { auth } from '@/auth';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -19,22 +20,26 @@ export default async function Page({
     page?: string;
   };
 }) {
+  const authResult = (await auth()) as any;
+  const { email } = authResult?.user || null;
+  const userData = await getUserLoginData(email)
+
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
   console.log("🚀 ~ currentPage:", currentPage)
 
-  const totalPages = await fetchPages('project-proposal/fetch-page', query);
+  const totalPages = await fetchPages('project-proposal/fetch-page', query, userData.id);
   console.log('🚀 ~ totalPages:', totalPages);
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-2">
       <div className="flex text-xl md:text-2xl">โครงการ/กิจกรรม</div>
       <div className="mt-4">
         <div className="flex items-center justify-between gap-2 md:mt-8">
           <CreateRequestProjectProposal />
           <SearchAuto placeholder="ค้นหาโครงการ/กิจกรรม" />
         </div>
-        <ProjectProposalTable query={query} currentPage={currentPage} />
+        <ProjectProposalTable userId={userData.id} query={query} currentPage={currentPage} />
 
         <div className="mt-5 flex w-full justify-center">
           <Pagination totalPages={totalPages} />

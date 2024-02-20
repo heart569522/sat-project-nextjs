@@ -1,12 +1,19 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import PN01Form from '@/app/components/form/pn01-form';
+import { getUserLoginData } from '@/app/lib/api-service';
+import { auth } from '@/auth';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'แบบฟอร์มเสนอโครงการ/กิจกรรม (พน.01)',
 };
 
-export default async function Page({}: {}) {
+export default async function Page() {
+  const authResult = (await auth()) as any;
+  const { email } = authResult?.user || null;
+
+  const userData = await getUserLoginData(email)
+  
   return (
     <>
       <div>
@@ -14,12 +21,12 @@ export default async function Page({}: {}) {
           breadcrumbs={[
             {
               label: 'โครงการ/กิจกรรม',
-              href: '/dashboard/project-proposal',
+              href: '/project-proposal',
               active: false,
             },
             {
               label: 'เสนอโครงการ/กิจกรรม (พน.01)',
-              href: '/dashboard/project-proposal/request',
+              href: '/project-proposal/request',
               active: true,
             },
           ]}
@@ -29,7 +36,7 @@ export default async function Page({}: {}) {
         </div>
       </div>
       <div className="mt-4 w-full">
-        <PN01Form />
+        <PN01Form userId={userData.id}/>
       </div>
     </>
   );

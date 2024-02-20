@@ -22,7 +22,7 @@ export default async function Page(context: { params: { id: string } }) {
           breadcrumbs={[
             {
               label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
-              href: '/dashboard/activity-history',
+              href: '/activity-history',
               active: false,
             },
             {

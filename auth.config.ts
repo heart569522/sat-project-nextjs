@@ -9,16 +9,30 @@ export const authConfig = {
     // while this file is also used in non-Node.js environments
   ],
   callbacks: {
-    // authorized({ auth, request: { nextUrl } }) {
-    //   const isLoggedIn = !!auth?.user;
-    //   const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-    //   if (isOnDashboard) {
-    //     if (isLoggedIn) return true;
-    //     return false; // Redirect unauthenticated users to login page
-    //   } else if (isLoggedIn) {
-    //     return Response.redirect(new URL('/dashboard', nextUrl));
-    //   }
-    //   return true;
-    // },
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnProtectedPage = [
+        '/project-proposal',
+        '/activity-record',
+        '/management',
+        '/dashboard',
+        '/profile',
+      ].some((path) => nextUrl.pathname.startsWith(path));
+
+      if (
+        nextUrl.pathname.startsWith('/activity-history') ||
+        nextUrl.pathname === '/test'
+      ) {
+        return true;
+      }
+
+      if (isOnProtectedPage) {
+        if (isLoggedIn) return true;
+        return false; // Redirect unauthenticated users to login page
+      } else if (isLoggedIn) {
+        return Response.redirect(new URL('/project-proposal', nextUrl));
+      }
+      return true;
+    },
   },
 } satisfies NextAuthConfig;

@@ -14,12 +14,12 @@ export default async function Page({}: {}) {
           breadcrumbs={[
             {
               label: 'ประวัติการเข้าร่วมโครงการ/กิจกรรม',
-              href: '/dashboard/activity-history',
+              href: '/activity-history',
               active: false,
             },
             {
               label: 'ร้องขอเอกสารระเบียนกิจกรรม',
-              href: '/dashboard/activity-history/transcript',
+              href: '/activity-history/transcript',
               active: true,
             },
           ]}

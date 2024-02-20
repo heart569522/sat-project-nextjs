@@ -17,7 +17,7 @@ export default async function Page() {
           breadcrumbs={[
             {
               label: 'บันทึกการเข้าร่วมโครงการ/กิจกรรม',
-              href: '/dashboard/activity-record',
+              href: '/activity-record',
               active: false,
             },
             {
