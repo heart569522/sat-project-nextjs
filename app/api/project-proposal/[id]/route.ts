@@ -158,3 +158,31 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } },
+) {
+  const { id } = context.params;
+
+  try {
+    const res = await pool.query(
+      `
+      DELETE FROM project_proposal_pn01
+      WHERE id = $1
+      RETURNING *;
+      `,
+      [id],
+    );
+
+    return NextResponse.json(res.rows[0], { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: 'Can not delete data!!',
+        error,
+      },
+      { status: 500 },
+    );
+  }
+}

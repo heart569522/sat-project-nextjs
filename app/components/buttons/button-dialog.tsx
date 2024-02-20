@@ -20,14 +20,16 @@ export function ButtonDialog({
   action,
   title,
   detail,
-  onSuccess
+  onSuccess,
+  isPN01Draft
 }: {
   id: string;
   apiPath: string;
   action: string;
   title: string;
   detail: string;
-  onSuccess: any
+  onSuccess: any;
+  isPN01Draft?: boolean;
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ export function ButtonDialog({
 
     switch (action) {
       case 'delete':
-        response = await deleteData(apiPath, id);
+        response = await deleteData(apiPath, id, isPN01Draft);
         break;
 
       default:
@@ -100,9 +102,9 @@ export function ButtonDialog({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          <h3 className={`${notoThai.className} text-xl font-semibold`}>
+          <p className={`${notoThai.className} text-xl font-semibold`}>
             {title}
-          </h3>
+          </p>
         </DialogTitle>
 
         <DialogContent>

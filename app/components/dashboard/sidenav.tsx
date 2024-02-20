@@ -4,10 +4,14 @@ import BannerLogo from '@/app/components/banner-logo';
 import { PowerIcon, UserIcon } from '@heroicons/react/24/outline';
 import { signOut } from '@/auth';
 import { auth } from '@/auth';
+import { getUserLoginData } from '@/app/lib/api-service';
 
 export default async function SideNav() {
   const authResult = (await auth()) as any;
   const user = authResult?.user || null;
+
+  const email = authResult?.user?.email ?? null;
+  const userData = email ? await getUserLoginData(email) : null;
 
   return (
     <div className="flex md:h-screen md:fixed md:w-80 flex-col px-3 py-4 md:px-2">
@@ -24,7 +28,7 @@ export default async function SideNav() {
         <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
         {user && (
           <>
-            <ProfileButton />
+            <ProfileButton name={userData?.firstname}/>
             <form
               action={async () => {
                 'use server';

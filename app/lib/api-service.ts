@@ -132,7 +132,9 @@ export async function checkRole(data: string) {
 }
 
 export async function getUserLoginData(data: string) {
-  const res = await fetch(`${process.env.API_URL}/api/users/get-login-data/${data}`);
+  const res = await fetch(
+    `${process.env.API_URL}/api/users/get-login-data/${data}`,
+  );
 
   return res.json();
 }
@@ -159,7 +161,11 @@ export async function getDataById(apiPath: string, id: string) {
   return res.json();
 }
 
-export async function fetchPages(apiPath: string, search: string, userId: string | undefined) {
+export async function fetchPages(
+  apiPath: string,
+  search: string,
+  userId: string | undefined,
+) {
   noStore();
 
   const url = new URL(`${process.env.API_URL}/api/${apiPath}`);
@@ -295,9 +301,15 @@ export async function updateData(
   }
 }
 
-export async function deleteData(apiPath: string, id: string) {
+export async function deleteData(
+  apiPath: string,
+  id: string,
+  isPN01Draft?: boolean,
+) {
   try {
-    const response = await axios.patch(
+    const method = isPN01Draft ? 'delete' : 'patch';
+
+    const response = await axios[method](
       `${process.env.API_URL}/api/${apiPath}/${id}`,
     );
 

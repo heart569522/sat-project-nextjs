@@ -275,6 +275,7 @@ export default function ProjectProposalTable({
                                     : `คุณยืนยันที่จะลบรายการโครงการ/กิจกรรม "${row.project_name}" ?`
                                 }`}
                                 onSuccess={fetchData}
+                                isPN01Draft={row.status_id === 0 ? true : false}
                               />
                             </div>
                           </td>

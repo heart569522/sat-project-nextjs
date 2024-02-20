@@ -95,8 +95,10 @@ export default function NavLinks({ userData }: { userData: any }) {
   // Filter links based on allowed paths
   const filteredLinks = links.filter((link) =>
     allowedPathsForRole.some((allowedPath) =>
-      allowedPath === '/' ? link.href === '/' : link.href.startsWith(allowedPath)
-    )
+      allowedPath === '/'
+        ? link.href === '/'
+        : link.href.startsWith(allowedPath),
+    ),
   );
 
   return (
@@ -127,7 +129,7 @@ export default function NavLinks({ userData }: { userData: any }) {
   );
 }
 
-export const ProfileButton = () => {
+export function ProfileButton({ name }: { name: string }) {
   const pathname = usePathname();
   const isActive = pathname === '/profile';
 
@@ -142,7 +144,7 @@ export const ProfileButton = () => {
       )}
     >
       <UserIcon className="w-6" />
-      <p className="hidden md:block">โปรไฟล์</p>
+      <p className="hidden md:block">คุณ&nbsp;{name || 'โปรไฟล์'}</p>
     </Link>
   );
-};
+}
