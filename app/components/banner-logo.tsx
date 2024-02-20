@@ -13,8 +13,10 @@ export default function BannerLogo() {
           priority
         />
       </div>
-      <div className={`flex flex-row items-center justify-center leading-none`}>
-        <p className="pb-2 text-2xl md:pb-0 md:text-xl">
+      <div
+        className={`flex flex-row items-center leading-none md:justify-center`}
+      >
+        <p className="pb-1 text-lg max-md:font-semibold md:pb-0 md:text-xl">
           ระบบระเบียนกิจกรรมนักศึกษา
         </p>
       </div>
