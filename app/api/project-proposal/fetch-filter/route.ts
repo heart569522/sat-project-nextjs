@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     const page = req.nextUrl.searchParams.get('page');
     const search = req.nextUrl.searchParams.get('search');
     const userId = req.nextUrl.searchParams.get('userId');
+    const isWithoutDraft = req.nextUrl.searchParams.get('isWithoutDraft');
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
@@ -55,16 +56,25 @@ export async function GET(req: NextRequest) {
         .join(' OR ')})`;
 
       if (userId) {
-        console.log('user id');
         searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
       } else {
-        console.log('not user id');
+        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+      }
+
+      if (isWithoutDraft) {
+        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
+      } else {
         searchConditions += ` AND project_proposal_pn01.is_delete = false`;
       }
     } else {
-      console.log('not search');
       if (userId) {
         searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
+      } else {
+        searchConditions = 'project_proposal_pn01.is_delete = false';
+      }
+
+      if (isWithoutDraft) {
+        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
       } else {
         searchConditions = 'project_proposal_pn01.is_delete = false';
       }

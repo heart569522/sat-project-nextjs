@@ -22,24 +22,32 @@ export default async function Page({
 }) {
   const authResult = (await auth()) as any;
   const { email } = authResult?.user || null;
-  const userData = await getUserLoginData(email)
+  const userData = await getUserLoginData(email);
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
-  console.log("🚀 ~ currentPage:", currentPage)
+  console.log('🚀 ~ currentPage:', currentPage);
 
-  const totalPages = await fetchPages('project-proposal/fetch-page', query, userData.id);
+  const totalPages = await fetchPages(
+    'project-proposal/fetch-page',
+    query,
+    userData.id,
+  );
   console.log('🚀 ~ totalPages:', totalPages);
 
   return (
-    <div className="w-full mb-2">
+    <div className="mb-2 w-full">
       <div className="flex text-xl md:text-2xl">โครงการ/กิจกรรม</div>
       <div className="mt-4">
         <div className="flex items-center justify-between gap-2 md:mt-8">
           <CreateRequestProjectProposal />
           <SearchAuto placeholder="ค้นหาโครงการ/กิจกรรม" />
         </div>
-        <ProjectProposalTable userId={userData.id} query={query} currentPage={currentPage} />
+        <ProjectProposalTable
+          userId={userData.id}
+          query={query}
+          currentPage={currentPage}
+        />
 
         <div className="mt-5 flex w-full justify-center">
           <Pagination totalPages={totalPages} />

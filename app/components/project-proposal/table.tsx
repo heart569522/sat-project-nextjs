@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { fetchFilter } from '@/app/lib/api-service';
+import { fetchFilter, updateData } from '@/app/lib/api-service';
 import { convertISOStringToDateText } from '@/app/lib/services';
 import {
   DeleteButton,
@@ -9,7 +9,7 @@ import {
 } from '@/app/components/buttons/buttons';
 import { useEffect, useState } from 'react';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
-import { IconButton } from '@mui/material';
+import { IconButton, TextField } from '@mui/material';
 import {
   TableRowFullSkeleton,
   TableRowMobileSkeleton,
@@ -20,19 +20,25 @@ import {
   TableRowMobileNotFound,
 } from '@/app/components/not-found';
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
+import { Button } from '../buttons/button';
 
 export default function ProjectProposalTable({
   userId,
   query,
   currentPage,
+  isAdminTable,
 }: {
   userId?: string;
   query?: string;
   currentPage?: number;
+  isAdminTable?: boolean;
 }) {
+  console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showRemark, setShowRemark] = useState<string | null>(null);
+
+  const [remark, setRemark] = useState('');
 
   const fetchData = async () => {
     setLoading(true);
@@ -41,7 +47,8 @@ export default function ProjectProposalTable({
       'project-proposal/fetch-filter',
       query,
       currentPage,
-      userId
+      userId,
+      isAdminTable ? 'isAdminTable' : undefined,
     );
 
     if (res) {
@@ -64,6 +71,20 @@ export default function ProjectProposalTable({
     setShowRemark((prevShowRemark) =>
       prevShowRemark === rowId ? null : rowId,
     );
+  };
+
+  const handleSaveData = async (apiPath: string, rowId: string, data: any) => {
+    try {
+      const response = await updateData(apiPath, data, rowId, true);
+
+      if (response && (response.status === 201 || response.status === 200)) {
+        console.log('update row success');
+        setRemark('');
+        fetchData();
+      }
+    } catch (error) {
+      console.log('update row failed');
+    }
   };
 
   return (
@@ -147,7 +168,9 @@ export default function ProjectProposalTable({
                         <EditButton
                           id={row.id}
                           path="project-proposal"
-                          disabled={!row.is_edit && !row.is_draft}
+                          disabled={
+                            !row.is_edit && !row.is_draft && !isAdminTable
+                          }
                         />
                         <ButtonDialog
                           id={row.id}
@@ -242,12 +265,16 @@ export default function ProjectProposalTable({
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <IconButton
                               onClick={() => handleOpenRemark(row.id)}
-                              disabled={Boolean(!row.status_remark)}
+                              disabled={
+                                Boolean(!row.status_remark) && !isAdminTable
+                              }
                             >
                               <FeedbackOutlinedIcon
                                 className={`${
-                                  Boolean(row.status_remark)
+                                  Boolean(row.status_remark) && !isAdminTable
                                     ? 'text-red-700'
+                                    : isAdminTable
+                                    ? 'text-gray-500'
                                     : 'text-gray-400'
                                 } h-6 w-6 `}
                               />
@@ -262,7 +289,9 @@ export default function ProjectProposalTable({
                               <EditButton
                                 id={row.id}
                                 path="project-proposal"
-                                disabled={!row.is_edit && !row.is_draft}
+                                disabled={
+                                  !row.is_edit && !row.is_draft && !isAdminTable
+                                }
                               />
                               <ButtonDialog
                                 id={row.id}
@@ -290,9 +319,53 @@ export default function ProjectProposalTable({
                                 <p className="text-sm font-medium underline">
                                   หมายเหตุ
                                 </p>
-                                <p className="text-base">
-                                  {row.status_remark || '-'}
-                                </p>
+                                {isAdminTable ? (
+                                  <div className="w-full">
+                                    <div className="my-4 flex justify-between gap-2">
+                                      <p className="w-full border-b border-gray-500 text-base">
+                                        {row.status_remark || '-'}
+                                      </p>
+                                      {/* <Button
+                                        type="button"
+                                        className={`${
+                                          row.status_remark
+                                            ? 'bg-red-500 hover:bg-red-400 focus-visible:outline-red-500 active:bg-red-600'
+                                            : 'bg-gray-400 hover:bg-gray-400 focus-visible:outline-gray-400 active:bg-gray-400'
+                                        } rounded-md `}
+                                        disabled={!row.status_remark}
+                                      >
+                                        ลบหมายเหตุ
+                                      </Button> */}
+                                    </div>
+                                    <div className="mt-2 flex justify-between gap-2">
+                                      <TextField
+                                        className="w-full"
+                                        value={remark}
+                                        onChange={(e) =>
+                                          setRemark(e.target.value)
+                                        }
+                                        placeholder="เพิ่ม/แก้ไขหมายเหตุ"
+                                      />
+                                      <Button
+                                        type="button"
+                                        className="rounded-md"
+                                        onClick={() =>
+                                          handleSaveData(
+                                            'project-proposal/update-remark',
+                                            row.id,
+                                            remark,
+                                          )
+                                        }
+                                      >
+                                        บันทึกหมายเหตุ
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-base">
+                                    {row.status_remark || '-'}
+                                  </p>
+                                )}
                               </div>
                             </td>
                           </tr>

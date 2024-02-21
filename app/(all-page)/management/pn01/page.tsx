@@ -4,6 +4,8 @@ import Table from '@/app/components/management-com/pn01/table';
 import { InvoicesTableSkeleton } from '@/app/components/skeletons';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { fetchPages } from '@/app/lib/api-service';
+import ProjectProposalTable from '@/app/components/project-proposal/table';
 
 export const metadata: Metadata = {
   title: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม พน.01',
@@ -17,20 +19,26 @@ export default async function Page({
     page?: string;
   };
 }) {
+  
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
+
+  const totalPages = await fetchPages('project-proposal/fetch-page', query, undefined, 'isAdminTable');
 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`text-2xl`}>รายการคำร้องขอเสนอโครงการ / กิจกรรม พน.01</h1>
+        <h1 className={`text-2xl`}>
+          รายการคำร้องขอเสนอโครงการ / กิจกรรม พน.01
+        </h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
-        <Table query={query} currentPage={currentPage} />
-      </Suspense>
+      <ProjectProposalTable query={query} currentPage={currentPage} isAdminTable={true}/>
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
+      </div>
     </div>
   );
 }

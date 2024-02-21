@@ -18,7 +18,7 @@ export default function NavHamberger({ userData }: { userData: Users }) {
   };
 
   return (
-    <div className="fixed top-0 w-full z-10 shadow-lg">
+    <div className="fixed top-0 w-full z-10 shadow-lg print:hidden">
       <nav className="flex h-16 items-center justify-between bg-blue-600 p-4 md:hidden">
         <Link href="/" className="pb-1 text-lg font-semibold text-white">
           ระบบระเบียนกิจกรรมนักศึกษา

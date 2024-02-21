@@ -164,7 +164,8 @@ export async function getDataById(apiPath: string, id: string) {
 export async function fetchPages(
   apiPath: string,
   search: string,
-  userId: string | undefined,
+  userId?: string | undefined,
+  isWithoutDraft?: string | undefined,
 ) {
   noStore();
 
@@ -176,6 +177,10 @@ export async function fetchPages(
 
   if (userId) {
     url.searchParams.append('userId', userId);
+  }
+
+  if (isWithoutDraft) {
+    url.searchParams.append('isWithoutDraft', isWithoutDraft);
   }
 
   try {
@@ -196,7 +201,8 @@ export async function fetchFilter(
   apiPath: string,
   search: string | undefined,
   currentPage: number | undefined,
-  userId: string | undefined,
+  userId?: string | undefined,
+  isWithoutDraft?: string | undefined,
 ) {
   noStore();
 
@@ -212,6 +218,10 @@ export async function fetchFilter(
 
   if (userId) {
     url.searchParams.append('userId', userId);
+  }
+
+  if (isWithoutDraft) {
+    url.searchParams.append('isWithoutDraft', isWithoutDraft);
   }
 
   try {
@@ -279,10 +289,10 @@ export async function updateData(
   apiPath: string,
   formData: any,
   id: string,
-  isPN01Draft?: boolean,
+  isPatchMethod?: boolean,
 ) {
   try {
-    const method = isPN01Draft ? 'patch' : 'put';
+    const method = isPatchMethod ? 'patch' : 'put';
 
     const response = await axios[method](
       `${process.env.API_URL}/api/${apiPath}/${id}`,
@@ -294,7 +304,7 @@ export async function updateData(
       },
     );
 
-    console.log('Update project proposal success', response);
+    // console.log('Update project proposal success', response);
     return response;
   } catch (error) {
     console.error('Error while sending data:', error);
@@ -304,10 +314,10 @@ export async function updateData(
 export async function deleteData(
   apiPath: string,
   id: string,
-  isPN01Draft?: boolean,
+  isDeleteMethod?: boolean,
 ) {
   try {
-    const method = isPN01Draft ? 'delete' : 'patch';
+    const method = isDeleteMethod ? 'delete' : 'patch';
 
     const response = await axios[method](
       `${process.env.API_URL}/api/${apiPath}/${id}`,

@@ -16,7 +16,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 // import { ButtonLogoutMoblie } from '../buttons/button-logout';
 import { Users } from '@/app/model/user';
-import { signOut } from '@/auth';
+import { logout } from '@/app/lib/actions';
 
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -206,7 +206,7 @@ export function NavLinksMobile({
       })}
 
       {userData && (
-        <div className="mt-8 flex items-center justify-end px-2 py-0">
+        <div className="mt-8 flex items-center gap-1 justify-end px-2 py-0">
           <div
             onClick={() => {
               closeMobileNav();
@@ -214,13 +214,15 @@ export function NavLinksMobile({
           >
             <ProfileButtonMobile name={userData?.firstname} />
           </div>
-          {/* <ButtonLogoutMoblie /> */}
-          {/* <button
-            onClick={() => signOut()}
-            className="flex h-8 items-center justify-start gap-2 rounded-md bg-gray-200 p-2 px-3 text-sm font-medium text-gray-900 transition hover:bg-gray-300"
+          <button
+            onClick={() => {
+              logout();
+              closeMobileNav();
+            }}
+            className="flex h-9 items-center justify-start gap-2 rounded-sm bg-gray-200 p-2 px-3 text-sm font-medium text-gray-900 transition hover:bg-gray-300"
           >
             ออกจากระบบ
-          </button> */}
+          </button>
         </div>
       )}
     </>

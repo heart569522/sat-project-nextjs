@@ -181,16 +181,16 @@ export default async function HistoryActivityTable({
                         ) : (
                           data.history.map((row: any) => (
                             <tr key={row.id} className="group text-center">
-                              <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
+                              <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-base text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                                 {row.id}
                               </td>
-                              <td className="whitespace-nowrap bg-white px-4 py-5 text-sm text-left">
+                              <td className="whitespace-nowrap bg-white px-4 py-5 text-base text-left">
                                 {row.projectName}
                               </td>
-                              <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                              <td className="whitespace-nowrap bg-white px-4 py-5 text-base">
                                 {row.academicYear}
                               </td>
-                              <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
+                              <td className="whitespace-nowrap bg-white px-4 py-5 text-base group-first-of-type:rounded-md group-last-of-type:rounded-md">
                                 {row.serviceHour}
                               </td>
                             </tr>
