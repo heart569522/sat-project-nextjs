@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { fetchFilter, updateData } from '@/app/lib/api-service';
+import { fetchFilter, getAllData, updateData } from '@/app/lib/api-service';
 import { convertISOStringToDateText } from '@/app/lib/services';
 import {
   DeleteButton,
@@ -9,7 +9,13 @@ import {
 } from '@/app/components/buttons/buttons';
 import { useEffect, useState } from 'react';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
-import { IconButton, TextField } from '@mui/material';
+import {
+  FormControl,
+  IconButton,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
 import {
   TableRowFullSkeleton,
   TableRowMobileSkeleton,
@@ -21,6 +27,7 @@ import {
 } from '@/app/components/not-found';
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
 import { Button } from '../buttons/button';
+import { PN01Status } from '@/app/model/pn01-status';
 
 export default function ProjectProposalTable({
   userId,
@@ -33,12 +40,15 @@ export default function ProjectProposalTable({
   currentPage?: number;
   isAdminTable?: boolean;
 }) {
-  console.log('🚀 ~ isAdminTable:', isAdminTable);
+  // console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
+  const [pn01StatusData, setPN01StatusData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showRemark, setShowRemark] = useState<string | null>(null);
 
   const [remark, setRemark] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState();
+  console.log('🚀 ~ selectedStatus:', selectedStatus);
 
   const fetchData = async () => {
     setLoading(true);
@@ -57,10 +67,19 @@ export default function ProjectProposalTable({
     }
   };
 
+  const fetchPN01Status = async () => {
+    const res = await getAllData('pn01-status');
+
+    if (res) {
+      setPN01StatusData(res);
+    }
+  };
+
   useEffect(() => {
     const fetchDataWithTimeout = () => {
       // setTimeout(() => {
       fetchData();
+      fetchPN01Status();
       // }, 2000);
     };
 
@@ -71,6 +90,23 @@ export default function ProjectProposalTable({
     setShowRemark((prevShowRemark) =>
       prevShowRemark === rowId ? null : rowId,
     );
+  };
+
+  const handleSelectChange = async (
+    event: { target: { value: any } },
+    rowId: any,
+  ) => {
+    try {
+      const newValue = event.target.value;
+      setSelectedStatus((prevSelected: any) => ({
+        ...prevSelected,
+        [rowId]: newValue,
+      }));
+
+      await handleSaveData('project-proposal/update-status', rowId, newValue);
+    } catch (error) {
+      console.log("🚀 ~ error:", error)
+    }
   };
 
   const handleSaveData = async (apiPath: string, rowId: string, data: any) => {
@@ -257,10 +293,39 @@ export default function ProjectProposalTable({
                             {convertISOStringToDateText(row.created_at)}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <StatusBadge
-                              docType={'pn01'}
-                              statusId={row.status_id}
-                            />
+                            {isAdminTable ? (
+                              <FormControl className="flex w-full" size="small">
+                                <Select
+                                  name={`selectStatus-${row.id}`}
+                                  value={
+                                    selectedStatus?.[row.id] || row.status_id
+                                  }
+                                  onChange={(e) =>
+                                    handleSelectChange(e, row.id)
+                                  }
+                                >
+                                  {pn01StatusData
+                                    .filter((item: any) => item.id !== 0)
+                                    .map((item: any) => (
+                                      <MenuItem
+                                        key={item.id}
+                                        divider={true}
+                                        value={item.id}
+                                      >
+                                        <StatusBadge
+                                          docType={'pn01'}
+                                          statusId={item.id}
+                                        />
+                                      </MenuItem>
+                                    ))}
+                                </Select>
+                              </FormControl>
+                            ) : (
+                              <StatusBadge
+                                docType={'pn01'}
+                                statusId={row.status_id}
+                              />
+                            )}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <IconButton
