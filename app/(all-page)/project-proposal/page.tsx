@@ -23,17 +23,16 @@ export default async function Page({
   const authResult = (await auth()) as any;
   const { email } = authResult?.user || null;
   const userData = await getUserLoginData(email);
+  // console.log("🚀 ~ userData:", userData)
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
-  console.log('🚀 ~ currentPage:', currentPage);
 
   const totalPages = await fetchPages(
     'project-proposal/fetch-page',
     query,
     userData.id,
   );
-  console.log('🚀 ~ totalPages:', totalPages);
 
   return (
     <div className="mb-2 w-full">

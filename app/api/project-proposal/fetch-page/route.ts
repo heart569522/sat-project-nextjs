@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   const isWithoutDraft = req.nextUrl.searchParams.get('isWithoutDraft');
 
   try {
-    let searchConditions = '';
+    let searchConditions = `project_proposal_pn01.is_delete = false`;
 
     if (search) {
       searchConditions = `${searchColumns
@@ -52,38 +52,30 @@ export async function GET(req: NextRequest) {
           }
         })
         .join(' OR ')}`;
-    
+
       if (userId) {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
-      } else {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+        searchConditions += ` AND project_proposal_pn01.created_by = '${userId}'`;
       }
 
       if (isWithoutDraft) {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
-      } else {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+        searchConditions += ` AND project_proposal_pn01.is_draft = false`;
       }
     } else {
       if (userId) {
-        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
-      } else {
-        searchConditions = 'project_proposal_pn01.is_delete = false';
+        searchConditions += ` AND project_proposal_pn01.created_by = '${userId}'`;
       }
 
       if (isWithoutDraft) {
-        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
-      } else {
-        searchConditions = 'project_proposal_pn01.is_delete = false';
+        searchConditions += ` AND project_proposal_pn01.is_draft = false`;
       }
     }
-    
+
     const sqlQuery = `
       SELECT COUNT(*) 
       FROM project_proposal_pn01
       LEFT JOIN pn01_status ON project_proposal_pn01.status_id = pn01_status.id
       WHERE ${searchConditions}`;
-    
+
     const count = await pool.query(sqlQuery);
 
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);

@@ -42,7 +42,8 @@ export async function GET(req: NextRequest) {
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
-    let searchConditions = '';
+    let searchConditions = `project_proposal_pn01.is_delete = false`;
+    
     if (search) {
       console.log('search');
       searchConditions = `(${searchColumns
@@ -56,27 +57,19 @@ export async function GET(req: NextRequest) {
         .join(' OR ')})`;
 
       if (userId) {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
-      } else {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+        searchConditions += ` AND project_proposal_pn01.created_by = '${userId}'`;
       }
 
       if (isWithoutDraft) {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
-      } else {
-        searchConditions += ` AND project_proposal_pn01.is_delete = false`;
+        searchConditions += ` AND project_proposal_pn01.is_draft = false`;
       }
     } else {
       if (userId) {
-        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.created_by = '${userId}'`;
-      } else {
-        searchConditions = 'project_proposal_pn01.is_delete = false';
+        searchConditions += ` AND project_proposal_pn01.created_by = '${userId}'`;
       }
 
       if (isWithoutDraft) {
-        searchConditions = `project_proposal_pn01.is_delete = false AND project_proposal_pn01.is_draft = false`;
-      } else {
-        searchConditions = 'project_proposal_pn01.is_delete = false';
+        searchConditions += ` AND project_proposal_pn01.is_draft = false`;
       }
     }
 
