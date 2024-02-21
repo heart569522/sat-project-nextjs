@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     
     if (search) {
       console.log('search');
-      searchConditions = `(${searchColumns
+      searchConditions += ` AND (${searchColumns
         .map((column) => {
           if (column === 'status_id') {
             return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%')`;
@@ -80,6 +80,7 @@ export async function GET(req: NextRequest) {
       WHERE ${searchConditions}
       ORDER BY project_proposal_pn01.created_at DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
+    // console.log("🚀 ~ GET ~ sqlQuery:", sqlQuery)
 
     const projects = await pool.query(sqlQuery);
 

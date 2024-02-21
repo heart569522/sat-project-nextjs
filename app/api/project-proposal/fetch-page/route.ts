@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     let searchConditions = `project_proposal_pn01.is_delete = false`;
 
     if (search) {
-      searchConditions = `${searchColumns
+      searchConditions += ` AND ${searchColumns
         .map((column) => {
           if (column === 'status_id') {
             return `(CAST(pn01_status.name AS TEXT) ILIKE '%${search}%' OR CAST(project_proposal_pn01.${column} AS TEXT) ILIKE '%${search}%')`;

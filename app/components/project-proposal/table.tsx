@@ -105,7 +105,7 @@ export default function ProjectProposalTable({
 
       await handleSaveData('project-proposal/update-status', rowId, newValue);
     } catch (error) {
-      console.log("🚀 ~ error:", error)
+      console.log('🚀 ~ error:', error);
     }
   };
 
@@ -173,9 +173,7 @@ export default function ProjectProposalTable({
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
-                          <p className="text-sm font-medium">
-                            เบอร์โทรศัพท์ผู้รับผิดชอบ
-                          </p>
+                          <p className="text-sm font-medium">เบอร์โทรศัพท์</p>
                           <p className="text-base font-semibold">
                             {row.project_head_phone || '-'}
                           </p>
@@ -231,17 +229,17 @@ export default function ProjectProposalTable({
                     <th scope="col" className="w-[5%] px-4 py-5 sm:pl-6">
                       ลำดับ
                     </th>
-                    <th scope="col" className="w-[10%] px-3 py-5">
+                    <th scope="col" className="w-[5%] px-3 py-5">
                       รหัสเอกสาร
                     </th>
                     <th scope="col" className="px-3 py-5">
                       โครงการ/กิจกรรม
                     </th>
-                    <th scope="col" className="w-[15%] px-3 py-5">
+                    <th scope="col" className="w-[10%] px-3 py-5">
                       ผู้รับผิดชอบโครงการ
                     </th>
-                    <th scope="col" className="w-[15%] px-3 py-5">
-                      เบอร์โทรศัพท์ผู้รับผิดชอบ
+                    <th scope="col" className="w-[10%] px-3 py-5">
+                      เบอร์โทรศัพท์
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       วันที่
@@ -252,6 +250,11 @@ export default function ProjectProposalTable({
                     <th scope="col" className="w-[5%] px-3 py-5">
                       หมายเหตุ
                     </th>
+                    {isAdminTable && (
+                      <th scope="col" className="w-[10%] px-3 py-5">
+                        ตั้งค่า
+                      </th>
+                    )}
                     <th scope="col" className="w-[15%] px-3 py-5">
                       จัดการ
                     </th>
@@ -261,11 +264,11 @@ export default function ProjectProposalTable({
                 <tbody className="divide-y divide-gray-200 text-gray-900">
                   {loading ? (
                     <>
-                      <TableRowFullSkeleton countColumn={9} />
+                      <TableRowFullSkeleton countColumn={isAdminTable ? 10 : 9} />
                     </>
                   ) : data.length === 0 ? (
                     <>
-                      <TableRowFullNotFound countColumn={9} />
+                      <TableRowFullNotFound countColumn={isAdminTable ? 10 : 9} />
                     </>
                   ) : (
                     data?.map((row: any, i: number) => (
@@ -345,6 +348,11 @@ export default function ProjectProposalTable({
                               />
                             </IconButton>
                           </td>
+                          {isAdminTable && (
+                            <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                              
+                            </td>
+                          )}
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
                             <div className="flex justify-center gap-2">
                               <DetailButton
@@ -377,7 +385,7 @@ export default function ProjectProposalTable({
                         {showRemark === row.id && (
                           <tr className="group">
                             <td
-                              colSpan={9}
+                              colSpan={isAdminTable ? 10 : 9}
                               className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
                             >
                               <div className="flex flex-col items-start">
