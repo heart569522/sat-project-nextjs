@@ -14,6 +14,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  Switch,
   TextField,
 } from '@mui/material';
 import {
@@ -27,7 +28,10 @@ import {
 } from '@/app/components/not-found';
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
 import { Button } from '../buttons/button';
-import { PN01Status } from '@/app/model/pn01-status';
+
+interface ToggleCanEditState {
+  [key: string]: boolean;
+}
 
 export default function ProjectProposalTable({
   userId,
@@ -48,7 +52,7 @@ export default function ProjectProposalTable({
 
   const [remark, setRemark] = useState('');
   const [selectedStatus, setSelectedStatus] = useState();
-  console.log('🚀 ~ selectedStatus:', selectedStatus);
+  const [toggleCanEdit, setToggleCanEdit] = useState<ToggleCanEditState>({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -92,6 +96,28 @@ export default function ProjectProposalTable({
     );
   };
 
+  const handleToggle = async (rowId: string) => {
+    try {
+      setToggleCanEdit((prevToggleCanEdit) => {
+        const newToggleCanEdit = {
+          ...prevToggleCanEdit,
+          [rowId]: !prevToggleCanEdit[rowId],
+        };
+
+        handleSaveData(
+          'project-proposal/update-edit-state',
+          rowId,
+          newToggleCanEdit[rowId],
+        );
+
+        // Return the new state
+        return newToggleCanEdit;
+      });
+    } catch (error) {
+      console.log('🚀 ~ error:', error);
+    }
+  };
+
   const handleSelectChange = async (
     event: { target: { value: any } },
     rowId: any,
@@ -110,12 +136,14 @@ export default function ProjectProposalTable({
   };
 
   const handleSaveData = async (apiPath: string, rowId: string, data: any) => {
+    console.log('🚀 ~ handleSaveData ~ data:', data);
     try {
       const response = await updateData(apiPath, data, rowId, true);
 
       if (response && (response.status === 201 || response.status === 200)) {
         console.log('update row success');
         setRemark('');
+        // setToggleCanEdit({});
         fetchData();
       }
     } catch (error) {
@@ -252,7 +280,7 @@ export default function ProjectProposalTable({
                     </th>
                     {isAdminTable && (
                       <th scope="col" className="w-[10%] px-3 py-5">
-                        ตั้งค่า
+                        การแก้ไข
                       </th>
                     )}
                     <th scope="col" className="w-[15%] px-3 py-5">
@@ -264,11 +292,15 @@ export default function ProjectProposalTable({
                 <tbody className="divide-y divide-gray-200 text-gray-900">
                   {loading ? (
                     <>
-                      <TableRowFullSkeleton countColumn={isAdminTable ? 10 : 9} />
+                      <TableRowFullSkeleton
+                        countColumn={isAdminTable ? 10 : 9}
+                      />
                     </>
                   ) : data.length === 0 ? (
                     <>
-                      <TableRowFullNotFound countColumn={isAdminTable ? 10 : 9} />
+                      <TableRowFullNotFound
+                        countColumn={isAdminTable ? 10 : 9}
+                      />
                     </>
                   ) : (
                     data?.map((row: any, i: number) => (
@@ -350,7 +382,16 @@ export default function ProjectProposalTable({
                           </td>
                           {isAdminTable && (
                             <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                              
+                              <div className="flex items-center justify-evenly gap-1">
+                                <p className="text-base">ปิด</p>
+                                <Switch
+                                  checked={
+                                    toggleCanEdit?.[row.id] ?? row.is_edit
+                                  }
+                                  onClick={() => handleToggle(row.id)}
+                                />
+                                <p className="text-base">เปิด</p>
+                              </div>
                             </td>
                           )}
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
