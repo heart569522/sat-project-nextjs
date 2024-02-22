@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import PN01Form from '@/app/components/form/pn01-form';
 import { getDataById } from '@/app/lib/api-service';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'แก้ไขการโครงการ/กิจกรรม (พน.01)',
@@ -12,8 +13,9 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
   const data = await getDataById('project-proposal', id);
-  // console.log("is_draft", data.is_draft)
-  // console.log("is_edit", data.is_edit)
+
+  const authResult = (await auth()) as any;
+  const { user } = authResult;
 
   if (data.error || !id) {
     notFound();
@@ -25,8 +27,8 @@ export default async function Page({ params }: { params: { id: string } }) {
         <Breadcrumbs
           breadcrumbs={[
             {
-              label: 'โครงการ/กิจกรรม',
-              href: '/project-proposal',
+              label: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม',
+              href: '/management/pn01',
               active: false,
             },
             {
@@ -42,7 +44,12 @@ export default async function Page({ params }: { params: { id: string } }) {
       </div>
       {/* <Form invoice={invoice} customers={customers} /> */}
       <div className="mt-4 w-full">
-        <PN01Form editData={data} isEditing={data.is_edit} isDrafting={data.is_draft}/>
+        <PN01Form
+          editData={data}
+          isEditing={data.is_edit || user.role === 'admin'}
+          isDrafting={data.is_draft}
+          isAdminManage={user.role === 'admin'}
+        />
       </div>
     </main>
   );

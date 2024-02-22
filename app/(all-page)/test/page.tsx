@@ -12,6 +12,17 @@ export default function BasicDatePicker() {
   return (
     <div>
       <Form />
+
+      <div
+        className="
+          transition-all
+          delay-300 
+          duration-500 
+          ease-linear
+        "
+      ></div>
+
+      
     </div>
   );
 }

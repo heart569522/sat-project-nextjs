@@ -398,11 +398,19 @@ export default function ProjectProposalTable({
                             <div className="flex justify-center gap-2">
                               <DetailButton
                                 id={row.id}
-                                path="project-proposal/document"
+                                path={
+                                  isAdminTable
+                                    ? 'management/pn01/document'
+                                    : 'project-proposal/document'
+                                }
                               />
                               <EditButton
                                 id={row.id}
-                                path="project-proposal"
+                                path={
+                                  isAdminTable
+                                    ? 'management/pn01'
+                                    : 'project-proposal'
+                                }
                                 disabled={
                                   !row.is_edit && !row.is_draft && !isAdminTable
                                 }

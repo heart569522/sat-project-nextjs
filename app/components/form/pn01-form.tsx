@@ -68,16 +68,21 @@ export default function PN01Form({
   editData,
   isEditing,
   isDrafting,
+  isAdminManage,
 }: {
   userId?: string;
   editData?: any;
   isEditing?: boolean;
   isDrafting?: boolean;
+  isAdminManage?: boolean;
 }) {
   // console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 
-  if ((isEditing && !editData.is_edit) || (isDrafting && !editData.is_draft)) {
+  if (
+    (isEditing && !editData.is_edit && !isAdminManage) ||
+    (isDrafting && !editData.is_draft)
+  ) {
     router.replace('/project-proposal');
   }
 
