@@ -70,16 +70,20 @@ export default function PN01Form({
   isEditing?: boolean;
   isDrafting?: boolean;
   isAdminManage?: boolean;
-}) {
+}) {http://localhost:3000/project-proposal/b889d023-38a7-4a71-b7a8-7ae291b9f5e1/edit
   // console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 
-  if (
-    (isEditing && !editData.is_edit && !isAdminManage) ||
-    (isDrafting && !editData.is_draft) ||
-    (!editData.is_edit && !editData.is_draft && !isAdminManage)
-  ) {
-    // router.replace('/project-proposal');
+  if (isEditing || isDrafting) {
+    if (
+      (isEditing && !editData.is_edit && !isAdminManage) ||
+      (isDrafting && !editData.is_draft) ||
+      (!editData.is_edit && !editData.is_draft && !isAdminManage)
+    ) {
+      // router.replace('/project-proposal');
+      notFound();
+    }
+  } else if (isEditing === false && isDrafting === false) {
     notFound();
   }
 
@@ -296,7 +300,7 @@ export default function PN01Form({
 
   useEffect(() => {
     console.log('fetch list pn01');
-    console.log('🚀 ~ editData:', editData);
+    // console.log('🚀 ~ editData:', editData);
 
     const fetchListData = async () => {
       await Promise.all([
