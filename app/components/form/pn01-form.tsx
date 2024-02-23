@@ -1,13 +1,10 @@
 'use client';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import {
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   IconButton,
   InputAdornment,
-  InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
@@ -26,8 +23,7 @@ import {
   ResponsibleRow,
   TargetRow,
 } from '@/app/model/pn01';
-import { Button } from '../buttons/button';
-import Link from 'next/link';
+import { Button } from '@/app/components/buttons/button';
 import {
   getStrategicIssue,
   getObjective,
@@ -49,10 +45,9 @@ import {
   strategic_plan_kpi_list,
   university_strategic_list,
 } from '@/app/model/pn01-select-list';
-import { ModalQuestion, ModalResponse } from '../modal';
-import { usePathname, useRouter } from 'next/navigation';
-import { OverlayLoading } from '../loading-screen';
-import { useSession } from 'next-auth/react';
+import { ModalQuestion, ModalResponse } from '@/app/components/modal';
+import { notFound, useRouter } from 'next/navigation';
+import { OverlayLoading } from '@/app/components/loading-screen';
 
 interface ValidationError {
   id: number;
@@ -81,9 +76,11 @@ export default function PN01Form({
 
   if (
     (isEditing && !editData.is_edit && !isAdminManage) ||
-    (isDrafting && !editData.is_draft)
+    (isDrafting && !editData.is_draft) ||
+    (!editData.is_edit && !editData.is_draft && !isAdminManage)
   ) {
-    router.replace('/project-proposal');
+    // router.replace('/project-proposal');
+    notFound();
   }
 
   const [loading, setLoading] = useState(false);
@@ -1424,8 +1421,10 @@ export default function PN01Form({
             : 'กรุณาพิมพ์ และนำส่งเอกสาร พน.01 ที่สำนักพัฒนานักศึกษา',
         );
         setButtonLink(
-          isEditing || isDrafting
+          (isEditing || isDrafting) && !isAdminManage
             ? `/project-proposal/document/${editData.id}`
+            : isAdminManage
+            ? `/management/pn01/document/${editData.id}`
             : `/project-proposal/document/${response.data.id}`,
         );
         setButtonText('ไปยังเอกสารเอกสาร พน.01');
@@ -3652,7 +3651,10 @@ export default function PN01Form({
             } else if (action === 'submit') {
               handleSubmit();
             } else if (action === 'cancel') {
-              router.push('/project-proposal', { scroll: false });
+              router.push(
+                isAdminManage ? '/management/pn01' : '/project-proposal',
+                { scroll: false },
+              );
             }
           }}
         />
