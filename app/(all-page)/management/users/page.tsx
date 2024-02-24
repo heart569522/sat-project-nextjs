@@ -5,6 +5,7 @@ import { CreateInvoice } from '@/app/components/buttons/buttons';
 import { InvoicesTableSkeleton } from '@/app/components/skeletons';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { fetchPages } from '@/app/lib/api-service';
 
 export const metadata: Metadata = {
   title: 'จัดการข้อมูลผู้ใช้งานระบบ',
@@ -20,6 +21,8 @@ export default async function Page({
 }) {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
+
+  const totalPages = await fetchPages('users/fetch-page', query);
 
   return (
     <div className="w-full">

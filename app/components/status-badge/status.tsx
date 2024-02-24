@@ -42,7 +42,7 @@ export default function StatusBadge(props: Props) {
 
   return (
     <div>
-      <span className={`${badgeColor()} rounded border px-2 py-1 text-sm font-medium`}>
+      <span className={`${badgeColor()} rounded border px-2 py-1 text-sm font-medium whitespace-nowrap`}>
         {docType == 'pn01'
           ? PN01Status[statusId]
           : docType == 'pn11'

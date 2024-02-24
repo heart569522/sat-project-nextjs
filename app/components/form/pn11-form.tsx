@@ -15,13 +15,54 @@ import { createData, getAllData } from '@/app/lib/api-service';
 import { useRouter } from 'next/navigation';
 import { ModalQuestion } from '../modal';
 
-export default function PN11Form() {
+export default function PN11Form({
+  editData,
+  isEditing,
+}: {
+  editData?: any;
+  isEditing?: boolean;
+}) {
+  console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 
   const [openModal, setOpenModal] = useState(false);
   const [titleModal, setTitleModal] = useState('');
   const [detailModal, setDetailModal] = useState('');
   const [handleAction, setHandleAction] = useState('');
+
+  const [faculties, setFaculties] = useState<Faculties[]>([]);
+  const [majors, setMajors] = useState<Majors[]>([]);
+
+  const getFaculties = async () => {
+    try {
+      const data = await getAllData('faculties');
+      setFaculties(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMajors = async () => {
+    try {
+      const data = await getAllData('majors');
+      setMajors(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('fetch list fac/major');
+
+    const fetchData = async () => {
+      await Promise.all([
+        getFaculties(),
+        getMajors()
+      ])
+    };
+
+    fetchData();
+  }, []);
 
   const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
     console.log('handleOpenModal');
@@ -50,52 +91,20 @@ export default function PN11Form() {
   };
 
   const [formInput, setFormInput] = useState({
-    firstname: '',
-    lastname: '',
-    studentId: '',
-    phone: '',
-    major: '',
-    faculty: '',
-    email: '',
-    recipientName: '',
-    recipientAddress: '',
-    recipientPhone: '',
+    firstname: isEditing ? editData.firstname : '',
+    lastname: isEditing ? editData.lastname : '',
+    studentId: isEditing ? editData.student_id : '',
+    phone: isEditing ? editData.phone : '',
+    major: isEditing ? editData.major_id : '',
+    faculty: isEditing ? editData.faculty_id : '',
+    email: isEditing ? editData.email : '',
+    recipientName: isEditing ? editData.recipient_name : '',
+    recipientAddress: isEditing ? editData.recipient_address : '',
+    recipientPhone: isEditing ? editData.recipient_phone : '',
   });
 
-  const [faculties, setFaculties] = useState<Faculties[]>([]);
-  const [majors, setMajors] = useState<Majors[]>([]);
-
-  const getFaculties = async () => {
-    try {
-      const data = await getAllData('faculties');
-      setFaculties(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getMajors = async () => {
-    try {
-      const data = await getAllData('majors');
-      setMajors(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    console.log('fetch list fac/major');
-
-    const fetchData = async () => {
-      await getFaculties();
-      await getMajors();
-    };
-
-    fetchData();
-  }, []);
-
   const [formRadio, setFormRadio] = useState({
-    deliveryMethod: '',
+    deliveryMethod: isEditing ? editData.delivery_method : '',
   });
 
   const isSending = formRadio.deliveryMethod == 'send';
@@ -226,7 +235,7 @@ export default function PN11Form() {
     const formData = setFinalFormData();
     console.log('formData: ', formData);
 
-    let apiPath = 'activity-transcript'
+    let apiPath = 'activity-transcript';
 
     try {
       const res = await createData(apiPath, formData);
@@ -234,9 +243,8 @@ export default function PN11Form() {
       if (res && res.status === 201) {
         console.log('Create success!');
         console.log('id: ', res.data.id);
-        
-        router.push(`/activity-history/transcript/document/${res.data.id}`);
 
+        router.push(`/activity-history/transcript/document/${res.data.id}`);
       } else {
         console.error('Create failed, please try again later');
       }
@@ -362,7 +370,7 @@ export default function PN11Form() {
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationError.faculty)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="faculty"
@@ -391,7 +399,7 @@ export default function PN11Form() {
               >
                 สาขาวิชา
               </label>
-              <FormControl className="flex w-full" size='small'>
+              <FormControl className="flex w-full" size="small">
                 <Select
                   name="major"
                   value={formInput.major}
@@ -580,12 +588,6 @@ export default function PN11Form() {
         </div>
       </form>
       <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/activity-history/transcript/document/"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Test Document
-        </Link>
         <button
           onClick={() => handleOpenModal(true, false)}
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"

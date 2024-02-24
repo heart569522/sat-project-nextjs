@@ -9,6 +9,7 @@ import {
 } from '@/app/components/buttons/buttons';
 import { useEffect, useState } from 'react';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import {
   FormControl,
   IconButton,
@@ -16,6 +17,7 @@ import {
   Select,
   Switch,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import {
   TableRowFullSkeleton,
@@ -27,28 +29,25 @@ import {
   TableRowMobileNotFound,
 } from '@/app/components/not-found';
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
-import { Button } from '../buttons/button';
+import { Button } from '@/app/components/buttons/button';
 
 interface ToggleCanEditState {
   [key: string]: boolean;
 }
 
-export default function ProjectProposalTable({
-  userId,
+export default function ActivityTranscriptTable({
   query,
   currentPage,
-  isAdminTable,
 }: {
-  userId?: string;
   query?: string;
   currentPage?: number;
-  isAdminTable?: boolean;
 }) {
-  // console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
-  const [pn01StatusData, setPN01StatusData] = useState([]);
+  const [pn11StatusData, setPN11StatusData] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [showRemark, setShowRemark] = useState<string | null>(null);
+  const [showRecipient, setShowRecipient] = useState<string | null>(null);
 
   const [remark, setRemark] = useState('');
   const [selectedStatus, setSelectedStatus] = useState();
@@ -58,11 +57,9 @@ export default function ProjectProposalTable({
     setLoading(true);
 
     const res = await fetchFilter(
-      'project-proposal/fetch-filter',
+      'activity-transcript/fetch-filter',
       query,
       currentPage,
-      userId,
-      isAdminTable ? 'isAdminTable' : undefined,
     );
 
     if (res) {
@@ -71,11 +68,11 @@ export default function ProjectProposalTable({
     }
   };
 
-  const fetchPN01Status = async () => {
-    const res = await getAllData('pn01-status');
+  const fetchPN11Status = async () => {
+    const res = await getAllData('pn11-status');
 
     if (res) {
-      setPN01StatusData(res);
+      setPN11StatusData(res);
     }
   };
 
@@ -83,7 +80,7 @@ export default function ProjectProposalTable({
     const fetchDataWithTimeout = () => {
       // setTimeout(() => {
       fetchData();
-      fetchPN01Status();
+      fetchPN11Status();
       // }, 2000);
     };
 
@@ -94,6 +91,14 @@ export default function ProjectProposalTable({
     setShowRemark((prevShowRemark) =>
       prevShowRemark === rowId ? null : rowId,
     );
+    setShowRecipient(null);
+  };
+
+  const handleOpenRecipientDetail = (rowId: string) => {
+    setShowRecipient((prevShowRecipient) =>
+      prevShowRecipient === rowId ? null : rowId,
+    );
+    setShowRemark(null);
   };
 
   const handleToggle = async (rowId: string) => {
@@ -105,7 +110,7 @@ export default function ProjectProposalTable({
         };
 
         handleSaveData(
-          'project-proposal/update-edit-state',
+          'activity-transcript/update-edit-state',
           rowId,
           newToggleCanEdit[rowId],
         );
@@ -129,7 +134,11 @@ export default function ProjectProposalTable({
         [rowId]: newValue,
       }));
 
-      await handleSaveData('project-proposal/update-status', rowId, newValue);
+      await handleSaveData(
+        'activity-transcript/update-status',
+        rowId,
+        newValue,
+      );
     } catch (error) {
       console.log('🚀 ~ error:', error);
     }
@@ -216,27 +225,44 @@ export default function ProjectProposalTable({
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
                           <p className="text-sm font-medium">สถานะ</p>
-                          <StatusBadge
-                            docType={'pn01'}
-                            statusId={row.status_id}
-                          />
+
+                          <FormControl className="flex w-full" size="small">
+                            <Select
+                              name={`selectStatus-${row.id}`}
+                              value={selectedStatus?.[row.id] || row.status_id}
+                              onChange={(e) => handleSelectChange(e, row.id)}
+                            >
+                              {pn11StatusData
+                                .filter((item: any) => item.id !== 0)
+                                .map((item: any) => (
+                                  <MenuItem
+                                    key={item.id}
+                                    divider={true}
+                                    value={item.id}
+                                  >
+                                    <StatusBadge
+                                      docType={'pn01'}
+                                      statusId={item.id}
+                                    />
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          </FormControl>
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
                         <DetailButton
                           id={row.id}
-                          path="project-proposal/document"
+                          path="activity-transcript/document"
                         />
                         <EditButton
                           id={row.id}
-                          path="project-proposal"
-                          disabled={
-                            !row.is_edit && !row.is_draft && !isAdminTable
-                          }
+                          path="activity-transcript"
+                          disabled={!row.is_edit && !row.is_draft}
                         />
                         <ButtonDialog
                           id={row.id}
-                          apiPath="project-proposal"
+                          apiPath="activity-transcript"
                           action="delete"
                           title="ลบโครงการ/กิจกรรม"
                           detail={`${
@@ -257,20 +283,20 @@ export default function ProjectProposalTable({
                     <th scope="col" className="w-[5%] px-4 py-5 sm:pl-6">
                       ลำดับ
                     </th>
-                    <th scope="col" className="w-[5%] px-3 py-5">
-                      รหัสเอกสาร
+                    <th scope="col" className="w-[10%] px-3 py-5">
+                      รหัสนักศึกษา
                     </th>
                     <th scope="col" className="px-3 py-5">
-                      โครงการ/กิจกรรม
-                    </th>
-                    <th scope="col" className="w-[10%] px-3 py-5">
-                      ผู้รับผิดชอบโครงการ
+                      ชื่อ - สกุล
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       เบอร์โทรศัพท์
                     </th>
-                    <th scope="col" className="w-[10%] px-3 py-5">
+                    <th scope="col" className="w-[5%] px-3 py-5">
                       วันที่
+                    </th>
+                    <th scope="col" className="w-[15%] px-3 py-5">
+                      รูปแบบการรับ
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       สถานะ
@@ -278,11 +304,9 @@ export default function ProjectProposalTable({
                     <th scope="col" className="w-[5%] px-3 py-5">
                       หมายเหตุ
                     </th>
-                    {isAdminTable && (
-                      <th scope="col" className="w-[10%] px-3 py-5">
-                        การแก้ไข
-                      </th>
-                    )}
+                    <th scope="col" className="w-[5%] px-3 py-5">
+                      ส่งการแจ้งเตือน
+                    </th>
                     <th scope="col" className="w-[15%] px-3 py-5">
                       จัดการ
                     </th>
@@ -292,205 +316,212 @@ export default function ProjectProposalTable({
                 <tbody className="divide-y divide-gray-200 text-gray-900">
                   {loading ? (
                     <>
-                      <TableRowFullSkeleton
-                        countColumn={isAdminTable ? 10 : 9}
-                      />
+                      <TableRowFullSkeleton countColumn={10} />
                     </>
                   ) : data.length === 0 ? (
                     <>
-                      <TableRowFullNotFound
-                        countColumn={isAdminTable ? 10 : 9}
-                      />
+                      <TableRowFullNotFound countColumn={10} />
                     </>
                   ) : (
                     data?.map((row: any, i: number) => (
                       <React.Fragment key={row.id}>
                         <tr className="group text-center">
                           <td
-                            rowSpan={showRemark === row.id ? 2 : 1}
+                            rowSpan={
+                              (showRemark || showRecipient) === row.id ? 2 : 1
+                            }
                             className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-base text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6"
                           >
                             {i + 1}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_code || '-'}
+                            {row.student_id || '-'}
+                          </td>
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-left text-sm">
+                            {row.firstname + ' ' + row.lastname || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_name || '-'}
+                            {row.phone || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_head || '-'}
+                            {row.date || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.project_head_phone || '-'}
-                          </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {convertISOStringToDateText(row.created_at)}
-                          </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {isAdminTable ? (
-                              <FormControl className="flex w-full" size="small">
-                                <Select
-                                  name={`selectStatus-${row.id}`}
-                                  value={
-                                    selectedStatus?.[row.id] || row.status_id
-                                  }
-                                  onChange={(e) =>
-                                    handleSelectChange(e, row.id)
-                                  }
-                                >
-                                  {pn01StatusData
-                                    .filter((item: any) => item.id !== 0)
-                                    .map((item: any) => (
-                                      <MenuItem
-                                        key={item.id}
-                                        divider={true}
-                                        value={item.id}
-                                      >
-                                        <StatusBadge
-                                          docType={'pn01'}
-                                          statusId={item.id}
-                                        />
-                                      </MenuItem>
-                                    ))}
-                                </Select>
-                              </FormControl>
+                            {row.delivery_method == 'receive' ? (
+                              <div>รับด้วยตนเอง</div>
+                            ) : row.delivery_method == 'send' ? (
+                              <div className="flex items-center justify-center gap-1">
+                                <p>จัดส่งไปรษณีย์</p>
+                                <Tooltip title='รายละเอียด' arrow={true}>
+                                  <IconButton
+                                    onClick={() =>
+                                      handleOpenRecipientDetail(row.id)
+                                    }
+                                  >
+                                    <ListAltIcon
+                                      className={`h-6 w-6 text-gray-500 `}
+                                    />
+                                  </IconButton>
+                                </Tooltip>
+                              </div>
                             ) : (
-                              <StatusBadge
-                                docType={'pn01'}
-                                statusId={row.status_id}
-                              />
+                              '-' || '-'
                             )}
+                          </td>
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                            <FormControl className="flex w-full" size="small">
+                              <Select
+                                name={`selectStatus-${row.id}`}
+                                value={
+                                  selectedStatus?.[row.id] || row.status_id
+                                }
+                                onChange={(e) => handleSelectChange(e, row.id)}
+                              >
+                                {pn11StatusData
+                                  .filter((item: any) => item.id !== 0)
+                                  .map((item: any) => (
+                                    <MenuItem
+                                      key={item.id}
+                                      divider={true}
+                                      value={item.id}
+                                    >
+                                      <StatusBadge
+                                        docType={'pn11'}
+                                        statusId={item.id}
+                                      />
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <IconButton
                               onClick={() => handleOpenRemark(row.id)}
-                              disabled={
-                                Boolean(!row.status_remark) && !isAdminTable
-                              }
                             >
                               <FeedbackOutlinedIcon
                                 className={`${
-                                  Boolean(row.status_remark) && !isAdminTable
+                                  Boolean(row.status_remark)
                                     ? 'text-red-700'
-                                    : isAdminTable
-                                    ? 'text-gray-500'
-                                    : 'text-gray-400'
+                                    : 'text-gray-500'
                                 } h-6 w-6 `}
                               />
                             </IconButton>
                           </td>
-                          {isAdminTable && (
-                            <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                              <div className="flex items-center justify-evenly gap-1">
-                                <p className="text-base">ปิด</p>
-                                <Switch
-                                  checked={
-                                    toggleCanEdit?.[row.id] ?? row.is_edit
-                                  }
-                                  onClick={() => handleToggle(row.id)}
-                                />
-                                <p className="text-base">เปิด</p>
-                              </div>
-                            </td>
-                          )}
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                            <div className="flex items-center justify-evenly gap-1">
+                              <p className="text-base">ปิด</p>
+                              <Switch
+                                checked={toggleCanEdit?.[row.id] ?? row.is_edit}
+                                onClick={() => handleToggle(row.id)}
+                              />
+                              <p className="text-base">เปิด</p>
+                            </div>
+                          </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
                             <div className="flex justify-center gap-2">
                               <DetailButton
                                 id={row.id}
-                                path={
-                                  isAdminTable
-                                    ? 'management/pn01/document'
-                                    : 'project-proposal/document'
-                                }
+                                path={'management/pn11/document'}
                               />
                               <EditButton
                                 id={row.id}
-                                path={
-                                  isAdminTable
-                                    ? 'management/pn01'
-                                    : 'project-proposal'
-                                }
-                                disabled={
-                                  !row.is_edit && !row.is_draft && !isAdminTable
-                                }
+                                path={'management/pn11'}
                               />
                               <ButtonDialog
                                 id={row.id}
-                                apiPath="project-proposal"
+                                apiPath="activity-transcript"
                                 action="delete"
-                                title="ลบโครงการ/กิจกรรม"
-                                detail={`${
-                                  row.is_draft
-                                    ? 'คุณยืนยันที่จะลบรายการแบบร่างนี้ ?'
-                                    : `คุณยืนยันที่จะลบรายการโครงการ/กิจกรรม "${row.project_name}" ?`
-                                }`}
+                                title="ลบคำร้องระเบียนกิจกรรม"
+                                detail={`คุณยืนยันที่จะลบคำร้องขอระเบียนกิจกรรมฉบับนี้ ?`}
                                 onSuccess={fetchData}
-                                isPN01Draft={row.status_id === 0 ? true : false}
                               />
                             </div>
                           </td>
                         </tr>
-                        {showRemark === row.id && (
+                        {showRemark === row.id ? (
                           <tr className="group">
                             <td
-                              colSpan={isAdminTable ? 10 : 9}
+                              colSpan={9}
                               className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
                             >
                               <div className="flex flex-col items-start">
-                                <p className="text-sm font-medium underline">
+                                <h3 className="text-base font-semibold underline">
                                   หมายเหตุ
-                                </p>
-                                {isAdminTable ? (
-                                  <div className="w-full">
-                                    <div className="my-4 flex justify-between gap-2">
-                                      <p className="w-full border-b border-gray-500 text-base">
-                                        {row.status_remark || '-'}
-                                      </p>
-                                      {/* <Button
-                                        type="button"
-                                        className={`${
-                                          row.status_remark
-                                            ? 'bg-red-500 hover:bg-red-400 focus-visible:outline-red-500 active:bg-red-600'
-                                            : 'bg-gray-400 hover:bg-gray-400 focus-visible:outline-gray-400 active:bg-gray-400'
-                                        } rounded-md `}
-                                        disabled={!row.status_remark}
-                                      >
-                                        ลบหมายเหตุ
-                                      </Button> */}
-                                    </div>
-                                    <div className="mt-2 flex justify-between gap-2">
-                                      <TextField
-                                        className="w-full"
-                                        value={remark}
-                                        onChange={(e) =>
-                                          setRemark(e.target.value)
-                                        }
-                                        placeholder="เพิ่ม/แก้ไขหมายเหตุ"
-                                      />
-                                      <Button
-                                        type="button"
-                                        className="rounded-md"
-                                        onClick={() =>
-                                          handleSaveData(
-                                            'project-proposal/update-remark',
-                                            row.id,
-                                            remark,
-                                          )
-                                        }
-                                      >
-                                        บันทึกหมายเหตุ
-                                      </Button>
-                                    </div>
+                                </h3>
+                                <div className="w-full">
+                                  <div className="my-4 flex justify-between gap-2">
+                                    <p className="w-full border-b border-gray-500 text-base">
+                                      {row.status_remark || '-'}
+                                    </p>
                                   </div>
-                                ) : (
-                                  <p className="text-base">
-                                    {row.status_remark || '-'}
-                                  </p>
-                                )}
+                                  <div className="mt-2 flex justify-between gap-2">
+                                    <TextField
+                                      className="w-full"
+                                      value={remark}
+                                      onChange={(e) =>
+                                        setRemark(e.target.value)
+                                      }
+                                      placeholder="เพิ่ม/แก้ไขหมายเหตุ"
+                                    />
+                                    <Button
+                                      type="button"
+                                      className="rounded-md"
+                                      onClick={() =>
+                                        handleSaveData(
+                                          'activity-transcript/update-remark',
+                                          row.id,
+                                          remark,
+                                        )
+                                      }
+                                    >
+                                      บันทึกหมายเหตุ
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             </td>
                           </tr>
+                        ) : showRecipient === row.id ? (
+                          <tr className="group">
+                            <td
+                              colSpan={9}
+                              className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
+                            >
+                              <div className="flex flex-col items-start">
+                                <h3 className="text-base font-semibold underline">
+                                  ข้อมูลการจัดส่งทางไปรษณีย์
+                                </h3>
+                                <div className="w-full">
+                                  <div className="my-4 flex justify-start gap-2">
+                                    <h4 className="text-base font-medium">
+                                      ชื่อ-นามสกุล (ผู้รับ) :
+                                    </h4>
+                                    <p className="w-full border-b border-gray-500 text-base">
+                                      {row.recipient_name || '-'}
+                                    </p>
+                                  </div>
+                                  <div className="my-4 flex justify-start gap-2">
+                                    <h4 className="text-base font-medium">
+                                      ที่อยู่ในการจัดส่ง (ผู้รับ) :
+                                    </h4>
+                                    <p className="w-full border-b border-gray-500 text-base">
+                                      {row.recipient_address || '-'}
+                                    </p>
+                                  </div>
+                                  <div className="my-4 flex justify-start gap-2">
+                                    <h4 className="text-base font-medium">
+                                      หมายเลขโทรศัพท์ (ผู้รับ) :
+                                    </h4>
+                                    <p className="w-full border-b border-gray-500 text-base">
+                                      {row.recipient_phone || '-'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          ''
                         )}
                       </React.Fragment>
                     ))

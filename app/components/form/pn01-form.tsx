@@ -70,7 +70,7 @@ export default function PN01Form({
   isEditing?: boolean;
   isDrafting?: boolean;
   isAdminManage?: boolean;
-}) {http://localhost:3000/project-proposal/b889d023-38a7-4a71-b7a8-7ae291b9f5e1/edit
+}) {
   // console.log("🚀 ~ editData:", editData)
   const router = useRouter();
 

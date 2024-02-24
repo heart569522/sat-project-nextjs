@@ -123,7 +123,7 @@ export default async function PN11Paper({ data }: { data: any }) {
               </label>
               <DotsPlaceholder
                 numOfDots={170}
-                text={data.major}
+                text={data.major_name}
                 position="left"
               />
             </div>
@@ -133,7 +133,7 @@ export default async function PN11Paper({ data }: { data: any }) {
               </label>
               <DotsPlaceholder
                 numOfDots={162}
-                text={data.faculty}
+                text={data.faculty_name}
                 position="left"
               />
             </div>
