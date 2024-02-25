@@ -21,9 +21,8 @@ export default async function Page({
   };
 }) {
   const authResult = (await auth()) as any;
-  const { email } = authResult?.user || null;
-  const userData = await getUserLoginData(email);
-  // console.log("🚀 ~ userData:", userData)
+  const { id } = authResult?.user || null;
+  const userData = await getUserLoginData(id)
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;

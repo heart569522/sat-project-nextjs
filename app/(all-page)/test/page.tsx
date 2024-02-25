@@ -1,4 +1,3 @@
-'use client';
 import * as React from 'react';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -7,22 +6,13 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import { PN01Status } from '@/app/model/pn01-status';
 import Form from '@/app/components/login-register/form';
+import { auth } from '@/auth';
 
-export default function BasicDatePicker() {
+export default async function Page() {
+  const session = await auth();
   return (
     <div>
-      <Form />
-
-      <div
-        className="
-          transition-all
-          delay-300 
-          duration-500 
-          ease-linear
-        "
-      ></div>
-
-      
+      {JSON.stringify(session)}
     </div>
   );
 }

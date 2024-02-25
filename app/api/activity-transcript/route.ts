@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
           $11, $12, 
           (SELECT id FROM pn11_status WHERE name = $13)
         )
-        RETURNING id;
+        RETURNING *;
       `,
       [
         date,
@@ -77,12 +77,11 @@ export async function POST(req: NextRequest) {
       ],
     );
 
-    console.log(response);
-
     return NextResponse.json(
       {
         message: 'Create request activity transcript success',
         id: response.rows[0].id,
+        data: response.rows[0]
       },
       { status: 201 },
     );

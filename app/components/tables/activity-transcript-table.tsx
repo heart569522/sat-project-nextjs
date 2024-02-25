@@ -352,7 +352,7 @@ export default function ActivityTranscriptTable({
                             ) : row.delivery_method == 'send' ? (
                               <div className="flex items-center justify-center gap-1">
                                 <p>จัดส่งไปรษณีย์</p>
-                                <Tooltip title='รายละเอียด' arrow={true}>
+                                <Tooltip title="รายละเอียด" arrow={true}>
                                   <IconButton
                                     onClick={() =>
                                       handleOpenRecipientDetail(row.id)
@@ -408,13 +408,15 @@ export default function ActivityTranscriptTable({
                             </IconButton>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <div className="flex items-center justify-evenly gap-1">
-                              <p className="text-base">ปิด</p>
-                              <Switch
-                                checked={toggleCanEdit?.[row.id] ?? row.is_edit}
-                                onClick={() => handleToggle(row.id)}
+                            <div className="flex justify-center gap-2">
+                              <ButtonDialog
+                                id={row.id}
+                                apiPath="activity-transcript"
+                                action="delete"
+                                title="ลบคำร้องระเบียนกิจกรรม"
+                                detail={`คุณยืนยันที่จะลบคำร้องขอระเบียนกิจกรรมฉบับนี้ ?`}
+                                onSuccess={fetchData}
                               />
-                              <p className="text-base">เปิด</p>
                             </div>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">

@@ -21,7 +21,7 @@ export function ButtonDialog({
   title,
   detail,
   onSuccess,
-  isPN01Draft
+  isPN01Draft,
 }: {
   id: string;
   apiPath: string;
@@ -93,7 +93,7 @@ export function ButtonDialog({
         className="rounded-md border p-2 hover:bg-gray-100"
       >
         <span className="sr-only">{action}</span>
-        <TrashIcon className="w-5" />
+        {action == 'delete' && <TrashIcon className="w-5" />}
       </button>
       <Dialog
         open={openDialog}
