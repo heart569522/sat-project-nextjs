@@ -139,3 +139,16 @@ export function DeleteButton({
     </button>
   );
 }
+
+
+export function EditProfile() {
+  return (
+    <Link
+      href="/profile/edit/"
+    >
+      <button className="ms-3 w-full h-10 items-center focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 rounded-md text-base font-medium px-4 dark:focus:ring-yellow-900">
+        แก้ไขข้อมูลโปรไฟล์
+      </button>
+    </Link>
+  );
+}

@@ -1,18 +1,13 @@
 'use client';
 import { checkExist, getAllData, register } from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+
 import {
   FormControl,
   FormHelperText,
-  IconButton,
-  InputAdornment,
   MenuItem,
-  OutlinedInput,
   Select,
   TextField,
 } from '@mui/material';
@@ -21,7 +16,10 @@ import { Users } from '@/app/model/user';
 import { ModalResponse } from '@/app/components/modal';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
-export default function RegisterForm() {
+export default function EditProfile({ data }: { data: Users }) {
+
+
+
   const [loading, setLoading] = useState(false);
 
   const [openResponseModal, setOpenResponseModal] = useState(false);
@@ -196,30 +194,6 @@ export default function RegisterForm() {
       }
     }
 
-    // Check if password and confirmPassword match
-    if (formInput.password !== formInput.confirmPassword) {
-      isValid = false;
-
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        confirmPassword: 'รหัสผ่านไม่ตรงกัน',
-      }));
-
-      console.error('Passwords do not match.');
-    }
-
-    // Check if password is at least 6 characters long
-    if (formInput.password.length < 6 && formInput.password.length >= 1) {
-      isValid = false;
-
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        password: 'รหัสผ่านต้องมีจำนวน 6 ตัวอักษรขึ้นไป',
-      }));
-
-      console.error('Password must be at least 6 characters long.');
-    }
-
     return isValid;
   };
 
@@ -240,7 +214,7 @@ export default function RegisterForm() {
         if (response && (response.status === 201 || response.status === 200)) {
           setLoading(false);
           setModalSuccess(true);
-          setTitleModal('สมัครสมาชิกสำเร็จ');
+          setTitleModal('แก้ไขข้อมูลสำเร็จ');
           setDetailModal('กรุณารอการยืนยันบัญชีจากเจ้าหน้าที่');
           setButtonLink(`/#login`);
           setButtonText('ไปยังเข้าสู่ระบบ');
@@ -303,7 +277,7 @@ export default function RegisterForm() {
           <h1
             className={`mb-3 text-center text-2xl font-semibold text-gray-800`}
           >
-            สมัครสมาชิก
+            แก้ไขข้อมูลโปรไฟล์
           </h1>
           <div className="w-full">
             <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
@@ -319,7 +293,7 @@ export default function RegisterForm() {
                   id="firstname"
                   type="text"
                   name="firstname"
-                  value={formInput.firstname}
+                  value=""
                   onChange={handleInputChange}
                   error={Boolean(validationError.firstname)}
                   helperText={validationError.firstname}
@@ -339,7 +313,7 @@ export default function RegisterForm() {
                   id="lastname"
                   type="text"
                   name="lastname"
-                  value={formInput.lastname}
+                  value=""
                   onChange={handleInputChange}
                   error={Boolean(validationError.lastname)}
                   helperText={validationError.lastname}
@@ -523,84 +497,6 @@ export default function RegisterForm() {
                   autoComplete="off"
                 />
               </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="password"
-                >
-                  รหัสผ่าน / Password
-                </label>
-                <FormControl variant="outlined">
-                  <OutlinedInput
-                    className="w-full"
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={formInput.password}
-                    onChange={handleInputChange}
-                    error={Boolean(validationError.password)}
-                    placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
-                    autoComplete="off"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? (
-                            <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          ) : (
-                            <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  <FormHelperText className="text-red-600">
-                    {validationError.password}
-                  </FormHelperText>
-                </FormControl>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="confirmPassword"
-                >
-                  ยืนยันรหัสผ่าน / Confirm Password
-                </label>
-                <FormControl variant="outlined">
-                  <OutlinedInput
-                    className="w-full"
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={formInput.confirmPassword}
-                    onChange={handleInputChange}
-                    error={Boolean(validationError.confirmPassword)}
-                    placeholder=""
-                    autoComplete="off"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle confirm password visibility"
-                          onClick={handleShowConfirmPassword}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          ) : (
-                            <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  <FormHelperText className="text-red-600">
-                    {validationError.confirmPassword}
-                  </FormHelperText>
-                </FormControl>
-              </div>
             </div>
           </div>
         </div>
@@ -612,7 +508,7 @@ export default function RegisterForm() {
             className="flex h-10 items-center rounded-md bg-blue-500 px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
             type="submit"
           >
-            ยืนยัน
+            ยืนยันการแก้ไข
           </button>
         </div>
       </form>
