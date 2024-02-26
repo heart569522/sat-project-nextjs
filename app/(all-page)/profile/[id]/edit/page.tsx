@@ -16,7 +16,9 @@ import { Users } from '@/app/model/user';
 import { ModalResponse } from '@/app/components/modal';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
-export default function EditProfile({ data }: { data: Users }) {
+export default function EditProfile({ params }: { params: { id: string } }) {
+  const id = params.id;
+  console.log("🚀 ~ EditProfile ~ id:", id)
 
 
 
@@ -293,7 +295,7 @@ export default function EditProfile({ data }: { data: Users }) {
                   id="firstname"
                   type="text"
                   name="firstname"
-                  value=""
+                  value={formInput.firstname}
                   onChange={handleInputChange}
                   error={Boolean(validationError.firstname)}
                   helperText={validationError.firstname}

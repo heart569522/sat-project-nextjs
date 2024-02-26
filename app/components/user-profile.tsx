@@ -35,7 +35,7 @@ export default function UserProfile({ data }: { data: Users }) {
       <div className="justify-start">
         อัพเดตรั้งล่าสุด : {data.updated_at}
       </div>
-        <EditProfile />
+        <EditProfile id={data.id}/>
     </div>
   </div>
   );

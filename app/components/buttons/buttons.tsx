@@ -37,7 +37,7 @@ export function CreateRequestTranscript({
       href="/activity-history/transcript"
       className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-base font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
     >
-      <span className="block">{buttonText || 'ร้องขอระเบียนกิจกรรม' }</span>{' '}
+      <span className="block">{buttonText || 'ร้องขอระเบียนกิจกรรม'}</span>{' '}
       <DescriptionOutlinedIcon className="h-5 md:ml-2" />
     </Link>
   );
@@ -147,13 +147,10 @@ export function DeleteButton({ id, apiPath }: { id: string; apiPath: string }) {
   );
 }
 
-
-export function EditProfile() {
+export function EditProfile({ id }: { id: string | undefined }) {
   return (
-    <Link
-      href="/profile/edit/"
-    >
-      <button className="ms-3 w-full h-10 items-center focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 rounded-md text-base font-medium px-4 dark:focus:ring-yellow-900">
+    <Link href={`/profile/${id}/edit`}>
+      <button className="ms-3 h-10 w-full items-center rounded-md bg-yellow-400 px-4 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900">
         แก้ไขข้อมูลโปรไฟล์
       </button>
     </Link>
