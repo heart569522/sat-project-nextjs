@@ -1,6 +1,6 @@
 'use client';
 import { deleteData } from '@/app/lib/api-service';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import {
   Box,
   Dialog,
@@ -63,6 +63,10 @@ export function ButtonDialog({
         response = await deleteData(apiPath, id, isPN01Draft);
         break;
 
+      case 'sendEmail':
+        response = await deleteData(apiPath, id, isPN01Draft);
+        break;
+
       default:
         break;
     }
@@ -94,6 +98,7 @@ export function ButtonDialog({
       >
         <span className="sr-only">{action}</span>
         {action == 'delete' && <TrashIcon className="w-5" />}
+        {action == 'sendEmail' && <EnvelopeIcon className="w-5" />}
       </button>
       <Dialog
         open={openDialog}
@@ -128,7 +133,11 @@ export function ButtonDialog({
             </button>
             <button
               type="button"
-              className="flex w-auto justify-center rounded-md border border-transparent bg-red-500 px-4 py-2 text-base font-medium text-white hover:bg-red-600"
+              className={`${
+                action == 'delete'
+                  ? 'bg-red-500 text-white hover:bg-red-600'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              } flex w-auto justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium `}
               onClick={handleAction}
             >
               ตกลง

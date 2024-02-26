@@ -1,11 +1,8 @@
 import Pagination from '@/app/components/pagination';
 import SearchAuto from '@/app/components/search-box/search-auto';
-import Table from '@/app/components/management-com/userManagement/table';
-import { CreateInvoice } from '@/app/components/buttons/buttons';
-import { InvoicesTableSkeleton } from '@/app/components/skeletons';
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { fetchPages } from '@/app/lib/api-service';
+import UsersTable from '@/app/components/tables/users-table';
 
 export const metadata: Metadata = {
   title: 'จัดการข้อมูลผู้ใช้งานระบบ',
@@ -30,12 +27,13 @@ export default async function Page({
         <h1 className={`text-2xl`}>รายการผู้ใช้งานระบบ</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <CreateInvoice />
+        {/* <CreateInvoice /> */}
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
-        <Table query={query} currentPage={currentPage} />
-      </Suspense>
+      <UsersTable query={query} currentPage={currentPage} />
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
+      </div>
     </div>
   );
 }

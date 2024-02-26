@@ -35,7 +35,7 @@ interface ToggleCanEditState {
   [key: string]: boolean;
 }
 
-export default function ActivityTranscriptTable({
+export default function UsersTable({
   query,
   currentPage,
 }: {
@@ -43,7 +43,6 @@ export default function ActivityTranscriptTable({
   currentPage?: number;
 }) {
   const [data, setData] = useState([]);
-  const [pn11StatusData, setPN11StatusData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [showRemark, setShowRemark] = useState<string | null>(null);
@@ -51,16 +50,12 @@ export default function ActivityTranscriptTable({
 
   const [remark, setRemark] = useState('');
   const [selectedStatus, setSelectedStatus] = useState();
-  const [toggleCanEdit, setToggleCanEdit] = useState<ToggleCanEditState>({});
+  const [toggleVerify, setToggleVerify] = useState<ToggleCanEditState>({});
 
   const fetchData = async () => {
     setLoading(true);
 
-    const res = await fetchFilter(
-      'activity-transcript/fetch-filter',
-      query,
-      currentPage,
-    );
+    const res = await fetchFilter('users/fetch-filter', query, currentPage);
 
     if (res) {
       setData(res);
@@ -68,19 +63,10 @@ export default function ActivityTranscriptTable({
     }
   };
 
-  const fetchPN11Status = async () => {
-    const res = await getAllData('pn11-status');
-
-    if (res) {
-      setPN11StatusData(res);
-    }
-  };
-
   useEffect(() => {
     const fetchDataWithTimeout = () => {
       // setTimeout(() => {
       fetchData();
-      fetchPN11Status();
       // }, 2000);
     };
 
@@ -112,11 +98,29 @@ export default function ActivityTranscriptTable({
         [rowId]: newValue,
       }));
 
-      await handleSaveData(
-        'activity-transcript/update-status',
-        rowId,
-        newValue,
-      );
+      await handleSaveData('users/update-status', rowId, newValue);
+    } catch (error) {
+      console.log('🚀 ~ error:', error);
+    }
+  };
+
+  const handleToggle = async (rowId: string) => {
+    try {
+      setToggleVerify((prevToggleCanEdit) => {
+        const newToggleVerify = {
+          ...prevToggleCanEdit,
+          [rowId]: !prevToggleCanEdit[rowId],
+        };
+
+        handleSaveData(
+          'users/update-edit-state',
+          rowId,
+          newToggleVerify[rowId],
+        );
+
+        // Return the new state
+        return newToggleVerify;
+      });
     } catch (error) {
       console.log('🚀 ~ error:', error);
     }
@@ -202,29 +206,6 @@ export default function ActivityTranscriptTable({
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
                           <p className="text-sm font-medium">สถานะ</p>
-
-                          <FormControl className="flex w-full" size="small">
-                            <Select
-                              name={`selectStatus-${row.id}`}
-                              value={selectedStatus?.[row.id] || row.status_id}
-                              onChange={(e) => handleSelectChange(e, row.id)}
-                            >
-                              {pn11StatusData
-                                .filter((item: any) => item.id !== 0)
-                                .map((item: any) => (
-                                  <MenuItem
-                                    key={item.id}
-                                    divider={true}
-                                    value={item.id}
-                                  >
-                                    <StatusBadge
-                                      docType={'pn01'}
-                                      statusId={item.id}
-                                    />
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          </FormControl>
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
@@ -239,7 +220,7 @@ export default function ActivityTranscriptTable({
                         />
                         <ButtonDialog
                           id={row.id}
-                          apiPath="activity-transcript"
+                          apiPath="users"
                           action="delete"
                           title="ลบโครงการ/กิจกรรม"
                           detail={`${
@@ -261,28 +242,28 @@ export default function ActivityTranscriptTable({
                       ลำดับ
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
-                      รหัสนักศึกษา
+                      ชื่อผู้ใช้
                     </th>
-                    <th scope="col" className="px-3 py-5">
+                    <th scope="col" className="w-[15%] px-3 py-5">
                       ชื่อ - สกุล
+                    </th>
+                    <th scope="col" className="w-[10%] px-3 py-5">
+                      คณะ/วิทยาลัย
+                    </th>
+                    <th scope="col" className="w-[10%] px-3 py-5">
+                      สาขาวิชา
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       เบอร์โทรศัพท์
                     </th>
-                    <th scope="col" className="w-[5%] px-3 py-5">
-                      วันที่
+                    <th scope="col" className="w-[10%] px-3 py-5">
+                      อีเมล
                     </th>
-                    <th scope="col" className="w-[15%] px-3 py-5">
-                      รูปแบบการรับ
+                    <th scope="col" className="w-[5%] px-3 py-5">
+                      สิทธ์
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       สถานะ
-                    </th>
-                    <th scope="col" className="w-[5%] px-3 py-5">
-                      หมายเหตุ
-                    </th>
-                    <th scope="col" className="w-[5%] px-3 py-5">
-                      ส่งการแจ้งเตือน
                     </th>
                     <th scope="col" className="w-[15%] px-3 py-5">
                       จัดการ
@@ -312,88 +293,43 @@ export default function ActivityTranscriptTable({
                             {i + 1}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.student_id || '-'}
+                            {row.username || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-left text-sm">
                             {row.firstname + ' ' + row.lastname || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                            {row.faculty_name || '-'}
+                          </td>
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                            {row.major_name || '-'}
+                          </td>
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {row.phone || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.date || '-'}
+                            {row.email || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            {row.delivery_method == 'receive' ? (
-                              <div>รับด้วยตนเอง</div>
-                            ) : row.delivery_method == 'send' ? (
-                              <div className="flex items-center justify-center gap-1">
-                                <p>จัดส่งไปรษณีย์</p>
-                                <Tooltip title="รายละเอียด" arrow={true}>
-                                  <IconButton
-                                    onClick={() =>
-                                      handleOpenRecipientDetail(row.id)
-                                    }
-                                  >
-                                    <ListAltIcon
-                                      className={`h-6 w-6 text-gray-500 `}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </div>
-                            ) : (
-                              '-' || '-'
-                            )}
+                            {row.role == 'teacher'
+                              ? 'อาจารย์'
+                              : row.role == 'admin'
+                              ? 'เจ้าหน้าที่'
+                              : '' || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <FormControl className="flex w-full" size="small">
-                              <Select
-                                name={`selectStatus-${row.id}`}
-                                value={
-                                  selectedStatus?.[row.id] || row.status_id
+                            <div className="flex items-center justify-evenly gap-1">
+                              {/* <p className="text-base">ปิด</p> */}
+                              <Switch
+                                checked={
+                                  toggleVerify?.[row.id] ?? row.is_verify
                                 }
-                                onChange={(e) => handleSelectChange(e, row.id)}
-                              >
-                                {pn11StatusData
-                                  .filter((item: any) => item.id !== 0)
-                                  .map((item: any) => (
-                                    <MenuItem
-                                      key={item.id}
-                                      divider={true}
-                                      value={item.id}
-                                    >
-                                      <StatusBadge
-                                        docType={'pn11'}
-                                        statusId={item.id}
-                                      />
-                                    </MenuItem>
-                                  ))}
-                              </Select>
-                            </FormControl>
-                          </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <IconButton
-                              onClick={() => handleOpenRemark(row.id)}
-                            >
-                              <FeedbackOutlinedIcon
-                                className={`${
-                                  Boolean(row.status_remark)
-                                    ? 'text-red-700'
-                                    : 'text-gray-500'
-                                } h-6 w-6 `}
+                                onClick={() => handleToggle(row.id)}
+                                color="success"
                               />
-                            </IconButton>
-                          </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <div className="flex justify-center gap-2">
-                              <ButtonDialog
-                                id={row.id}
-                                apiPath="activity-transcript"
-                                action="sendEmail"
-                                title="ส่งการแจ้งเตือน"
-                                detail={`ระบบจะทำการส่งการแจ้งเตือนไปยังอีเมล : ${row.email}`}
-                                onSuccess={fetchData}
-                              />
+                              <p className="text-base">
+                                {row.is_verify ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยีน'}
+                              </p>
                             </div>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
@@ -408,7 +344,7 @@ export default function ActivityTranscriptTable({
                               />
                               <ButtonDialog
                                 id={row.id}
-                                apiPath="activity-transcript"
+                                apiPath="users"
                                 action="delete"
                                 title="ลบคำร้องระเบียนกิจกรรม"
                                 detail={`คุณยืนยันที่จะลบคำร้องขอระเบียนกิจกรรมฉบับนี้ ?`}
@@ -417,91 +353,6 @@ export default function ActivityTranscriptTable({
                             </div>
                           </td>
                         </tr>
-                        {showRemark === row.id ? (
-                          <tr className="group">
-                            <td
-                              colSpan={9}
-                              className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
-                            >
-                              <div className="flex flex-col items-start">
-                                <h3 className="text-base font-semibold underline">
-                                  หมายเหตุ
-                                </h3>
-                                <div className="w-full">
-                                  <div className="my-4 flex justify-between gap-2">
-                                    <p className="w-full border-b border-gray-500 text-base">
-                                      {row.status_remark || '-'}
-                                    </p>
-                                  </div>
-                                  <div className="mt-2 flex justify-between gap-2">
-                                    <TextField
-                                      className="w-full"
-                                      value={remark}
-                                      onChange={(e) =>
-                                        setRemark(e.target.value)
-                                      }
-                                      placeholder="เพิ่ม/แก้ไขหมายเหตุ"
-                                    />
-                                    <Button
-                                      type="button"
-                                      className="rounded-md"
-                                      onClick={() =>
-                                        handleSaveData(
-                                          'activity-transcript/update-remark',
-                                          row.id,
-                                          remark,
-                                        )
-                                      }
-                                    >
-                                      บันทึกหมายเหตุ
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : showRecipient === row.id ? (
-                          <tr className="group">
-                            <td
-                              colSpan={9}
-                              className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
-                            >
-                              <div className="flex flex-col items-start">
-                                <h3 className="text-base font-semibold underline">
-                                  ข้อมูลการจัดส่งทางไปรษณีย์
-                                </h3>
-                                <div className="w-full">
-                                  <div className="my-4 flex justify-start gap-2">
-                                    <h4 className="text-base font-medium">
-                                      ชื่อ-นามสกุล (ผู้รับ) :
-                                    </h4>
-                                    <p className="w-full border-b border-gray-500 text-base">
-                                      {row.recipient_name || '-'}
-                                    </p>
-                                  </div>
-                                  <div className="my-4 flex justify-start gap-2">
-                                    <h4 className="text-base font-medium">
-                                      ที่อยู่ในการจัดส่ง (ผู้รับ) :
-                                    </h4>
-                                    <p className="w-full border-b border-gray-500 text-base">
-                                      {row.recipient_address || '-'}
-                                    </p>
-                                  </div>
-                                  <div className="my-4 flex justify-start gap-2">
-                                    <h4 className="text-base font-medium">
-                                      หมายเลขโทรศัพท์ (ผู้รับ) :
-                                    </h4>
-                                    <p className="w-full border-b border-gray-500 text-base">
-                                      {row.recipient_phone || '-'}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          ''
-                        )}
                       </React.Fragment>
                     ))
                   )}
