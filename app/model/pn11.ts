@@ -5,8 +5,8 @@ export interface PN11 {
   lastname?: string;
   studentId?: string;
   phone?: string;
-  faculty?: string;
-  major?: string;
+  faculty?: any;
+  major?: any;
   email?: string;
   deliveryMethod?: string;
   recipientName?: string | null;

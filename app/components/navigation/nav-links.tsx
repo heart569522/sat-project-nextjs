@@ -60,7 +60,7 @@ const links = [
   },
   {
     name: 'จัดการข้อมูลผู้ใช้งานระบบ',
-    href: '/management/user-management',
+    href: '/management/users',
     icon: FindInPageOutlinedIcon,
   },
   {

@@ -4,14 +4,14 @@ import { Users } from '@/app/model/user';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { email: string } },
+  context: { params: { id: string } },
 ) {
-  const { email } = context.params;
+  const { id } = context.params;
 
   try {
     const res = await pool.query<Users>(
-      `SELECT * FROM users WHERE is_delete = false AND email = $1`,
-      [email],
+      `SELECT * FROM users WHERE is_delete = false AND id = $1`,
+      [id],
     );
 
     return NextResponse.json(res.rows[0], { status: 200 });

@@ -2,7 +2,7 @@ import Breadcrumbs from '@/app/components/breadcrumbs';
 import { CreateRequestProjectProposal } from '@/app/components/buttons/buttons';
 import PN01Form from '@/app/components/form/pn01-form';
 import Pagination from '@/app/components/pagination';
-import ProjectProposalTable from '@/app/components/project-proposal/table';
+import ProjectProposalTable from '@/app/components/tables/project-proposal-table';
 import SearchAuto from '@/app/components/search-box/search-auto';
 import { fetchPages, getUserLoginData } from '@/app/lib/api-service';
 import { auth } from '@/auth';
@@ -21,9 +21,8 @@ export default async function Page({
   };
 }) {
   const authResult = (await auth()) as any;
-  const { email } = authResult?.user || null;
-  const userData = await getUserLoginData(email);
-  // console.log("🚀 ~ userData:", userData)
+  const { id } = authResult?.user || null;
+  const userData = await getUserLoginData(id)
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;

@@ -5,7 +5,8 @@ import { InvoicesTableSkeleton } from '@/app/components/skeletons';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { fetchPages } from '@/app/lib/api-service';
-import ProjectProposalTable from '@/app/components/project-proposal/table';
+import ProjectProposalTable from '@/app/components/tables/project-proposal-table';
+import { CreateRequestProjectProposal } from '@/app/components/buttons/buttons';
 
 export const metadata: Metadata = {
   title: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม พน.01',
@@ -33,6 +34,7 @@ export default async function Page({
         </h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+        <CreateRequestProjectProposal buttonText='เพิ่มโครงการ/กิจกรรม'/>
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
       <ProjectProposalTable query={query} currentPage={currentPage} isAdminTable={true}/>

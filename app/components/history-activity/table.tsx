@@ -11,7 +11,7 @@ const fetchHistoryActivity = async (
 ): Promise<HistoryActivity[]> => {
   try {
     const res = await fetch(
-      `${process.env.APP_SCRIPT_SHEET}?studentId=${query}`,
+      `${process.env.APP_SCRIPT_ACTIVITY_SHEET}?studentId=${query}`,
     );
 
     if (!res.ok) {

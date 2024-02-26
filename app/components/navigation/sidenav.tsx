@@ -10,8 +10,8 @@ export default async function SideNav() {
   const authResult = (await auth()) as any;
   const user = authResult?.user || null;
 
-  const email = authResult?.user?.email ?? null;
-  const userData = email ? await getUserLoginData(email) : null;
+  const id = authResult?.user?.id ?? null;
+  const userData = id ? await getUserLoginData(id) : null;
 
   return (
     <div className="z-10 flex w-full flex-col md:fixed md:h-screen md:w-80 md:px-2 md:py-4">

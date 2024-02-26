@@ -9,25 +9,35 @@ import Link from 'next/link';
 import { deleteInvoice } from '@/app/lib/actions';
 import { deleteData } from '@/app/lib/api-service';
 
-export function CreateRequestProjectProposal() {
+export function CreateRequestProjectProposal({
+  buttonText,
+}: {
+  buttonText?: string;
+}) {
   return (
     <Link
       href="/project-proposal/request"
       className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-base font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
     >
-      <span className="hidden md:block">เสนอโครงการ/กิจกรรม</span>{' '}
+      <span className="hidden md:block">
+        {buttonText || 'เสนอโครงการ/กิจกรรม'}
+      </span>{' '}
       <DescriptionOutlinedIcon className="h-6 md:ml-2" />
     </Link>
   );
 }
 
-export function CreateRequestTranscript() {
+export function CreateRequestTranscript({
+  buttonText,
+}: {
+  buttonText?: string;
+}) {
   return (
     <Link
       href="/activity-history/transcript"
       className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-base font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
     >
-      <span className="block">ร้องขอระเบียนกิจกรรม</span>{' '}
+      <span className="block">{buttonText || 'ร้องขอระเบียนกิจกรรม' }</span>{' '}
       <DescriptionOutlinedIcon className="h-5 md:ml-2" />
     </Link>
   );
@@ -121,19 +131,16 @@ export function EditButton({
   );
 }
 
-export function DeleteButton({
-  id,
-  apiPath,
-}: {
-  id: string;
-  apiPath: string;
-}) {
+export function DeleteButton({ id, apiPath }: { id: string; apiPath: string }) {
   const handleDelete = async () => {
     await deleteData(apiPath, id);
   };
 
   return (
-    <button onClick={handleDelete} className="rounded-md border p-2 hover:bg-gray-100">
+    <button
+      onClick={handleDelete}
+      className="rounded-md border p-2 hover:bg-gray-100"
+    >
       <span className="sr-only">Delete</span>
       <TrashIcon className="w-5" />
     </button>

@@ -250,7 +250,7 @@ export async function createData(apiPath: string, formData: any) {
       },
     );
 
-    console.log('Create project proposal success', response);
+    console.log('Create data success', response);
 
     if (response.data.id) {
       const insertedId = response.data.id;

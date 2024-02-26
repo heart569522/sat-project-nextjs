@@ -216,10 +216,37 @@ export default function ProjectProposalTable({
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
                           <p className="text-sm font-medium">สถานะ</p>
-                          <StatusBadge
-                            docType={'pn01'}
-                            statusId={row.status_id}
-                          />
+                          {isAdminTable ? (
+                            <FormControl className="flex w-full" size="small">
+                              <Select
+                                name={`selectStatus-${row.id}`}
+                                value={
+                                  selectedStatus?.[row.id] || row.status_id
+                                }
+                                onChange={(e) => handleSelectChange(e, row.id)}
+                              >
+                                {pn01StatusData
+                                  .filter((item: any) => item.id !== 0)
+                                  .map((item: any) => (
+                                    <MenuItem
+                                      key={item.id}
+                                      divider={true}
+                                      value={item.id}
+                                    >
+                                      <StatusBadge
+                                        docType={'pn01'}
+                                        statusId={item.id}
+                                      />
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <StatusBadge
+                              docType={'pn01'}
+                              statusId={row.status_id}
+                            />
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
@@ -438,7 +465,7 @@ export default function ProjectProposalTable({
                               className="whitespace-nowrap rounded-md bg-white px-4 pb-5 pt-2 text-sm"
                             >
                               <div className="flex flex-col items-start">
-                                <p className="text-sm font-medium underline">
+                                <p className="text-base font-semibold underline">
                                   หมายเหตุ
                                 </p>
                                 {isAdminTable ? (
@@ -447,17 +474,6 @@ export default function ProjectProposalTable({
                                       <p className="w-full border-b border-gray-500 text-base">
                                         {row.status_remark || '-'}
                                       </p>
-                                      {/* <Button
-                                        type="button"
-                                        className={`${
-                                          row.status_remark
-                                            ? 'bg-red-500 hover:bg-red-400 focus-visible:outline-red-500 active:bg-red-600'
-                                            : 'bg-gray-400 hover:bg-gray-400 focus-visible:outline-gray-400 active:bg-gray-400'
-                                        } rounded-md `}
-                                        disabled={!row.status_remark}
-                                      >
-                                        ลบหมายเหตุ
-                                      </Button> */}
                                     </div>
                                     <div className="mt-2 flex justify-between gap-2">
                                       <TextField

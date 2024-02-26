@@ -32,7 +32,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const { username, password } = parsedCredentials.data;
 
           const user = await login(username);
-          console.log('🚀 ~ authorize ~ user:', user);
           if (!user) return null;
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
@@ -46,11 +45,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
+      if (!token.sub) return token;
+
+      // const userData = await getDataById("users/id", token.sub)
+      // console.log("🚀 ~ jwt ~ userData:", userData)
+      // if (!userData) return token;
+
       if (user) token.role = user.role;
       return token;
     },
     async session({ session, token }: { session: Session; token: any }) {
-      if (session?.user) session.user.role = token.role;
+      if (token.sub && session.user) {
+        session.user.id = token.sub
+        session.user.role = token.role
+      };
+
       return session;
     },
   },

@@ -10,9 +10,8 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const authResult = (await auth()) as any;
-  const { email } = authResult?.user || null;
-
-  const userData = await getUserLoginData(email)
+  const { id } = authResult?.user || null;
+  const userData = await getUserLoginData(id)
   
   return (
     <>

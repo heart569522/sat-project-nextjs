@@ -11,56 +11,32 @@ import Link from 'next/link';
 import { Button } from '../buttons/button';
 import { PN11 } from '@/app/model/pn11';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
-import { createData, getAllData } from '@/app/lib/api-service';
+import { createData, getAllData, updateData } from '@/app/lib/api-service';
 import { useRouter } from 'next/navigation';
-import { ModalQuestion } from '../modal';
+import { ModalQuestion, ModalResponse } from '../modal';
+import { OverlayLoading } from '../loading-screen';
 
-export default function PN11Form() {
+export default function PN11Form({
+  editData,
+  isEditing,
+}: {
+  editData?: any;
+  isEditing?: boolean;
+}) {
   const router = useRouter();
 
-  const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [openQuestionModal, setOpenQuestionModal] = useState(false);
+  const [openResponseModal, setOpenResponseModal] = useState(false);
   const [titleModal, setTitleModal] = useState('');
   const [detailModal, setDetailModal] = useState('');
   const [handleAction, setHandleAction] = useState('');
-
-  const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
-    console.log('handleOpenModal');
-
-    if (isCancel) {
-      setTitleModal('ยกเลิกการร้องขอระเบียนกิจกรรม');
-      setDetailModal('คุณยืนยันที่จะยกเลิกคำร้องขอระเบียนกิจกรรม');
-      setHandleAction('cancel');
-      setOpenModal(true);
-    }
-
-    if (isSubmit) {
-      const isFormValid = validateForm();
-
-      if (isFormValid) {
-        setTitleModal('ร้องขอระเบียนกิจกรรม');
-        setDetailModal('คุณยืนยันที่จะส่งข้อมูลคำร้องขอระเบียนกิจกรรม');
-        setHandleAction('submit');
-        setOpenModal(true);
-      }
-    }
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
-
-  const [formInput, setFormInput] = useState({
-    firstname: '',
-    lastname: '',
-    studentId: '',
-    phone: '',
-    major: '',
-    faculty: '',
-    email: '',
-    recipientName: '',
-    recipientAddress: '',
-    recipientPhone: '',
-  });
+  const [modalSuccess, setModalSuccess] = useState(false);
+  const [modalError, setModalError] = useState(false);
+  const [modalNextPage, setModalNextPage] = useState(true);
+  const [buttonLink, setButtonLink] = useState('');
+  const [buttonText, setButtonText] = useState('');
 
   const [faculties, setFaculties] = useState<Faculties[]>([]);
   const [majors, setMajors] = useState<Majors[]>([]);
@@ -87,15 +63,65 @@ export default function PN11Form() {
     console.log('fetch list fac/major');
 
     const fetchData = async () => {
-      await getFaculties();
-      await getMajors();
+      await Promise.all([getFaculties(), getMajors()]);
     };
 
     fetchData();
   }, []);
 
+  const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
+    console.log('handleOpenModal');
+
+    if (isCancel) {
+      setTitleModal(
+        isEditing
+          ? 'ยกเลิกการแก้ไขคำร้องขอระเบียนกิจกรรม'
+          : 'ยกเลิกการร้องขอระเบียนกิจกรรม',
+      );
+      setDetailModal(
+        isEditing
+          ? 'คุณยืนยันที่จะยกเลิกการแก้ไขคำร้องขอระเบียนกิจกรรม'
+          : 'คุณยืนยันที่จะยกเลิกคำร้องขอระเบียนกิจกรรม',
+      );
+      setHandleAction('cancel');
+      setOpenQuestionModal(true);
+    }
+
+    if (isSubmit) {
+      const isFormValid = validateForm();
+
+      if (isFormValid) {
+        setTitleModal(
+          isEditing
+            ? 'แก้ไขข้อมูลคำร้องขอระเบียนกิจกรรม'
+            : 'ร้องขอระเบียนกิจกรรม',
+        );
+        setDetailModal(
+          isEditing
+            ? 'คุณยืนยันที่แก้ไขข้อมูลคำร้องขอระเบียนกิจกรรม'
+            : 'คุณยืนยันที่จะส่งข้อมูลคำร้องขอระเบียนกิจกรรม',
+        );
+        setHandleAction('submit');
+        setOpenQuestionModal(true);
+      }
+    }
+  };
+
+  const [formInput, setFormInput] = useState({
+    firstname: isEditing ? editData.firstname : '',
+    lastname: isEditing ? editData.lastname : '',
+    studentId: isEditing ? editData.student_id : '',
+    phone: isEditing ? editData.phone : '',
+    major: isEditing ? editData.major_id : '',
+    faculty: isEditing ? editData.faculty_id : '',
+    email: isEditing ? editData.email : '',
+    recipientName: isEditing ? editData.recipient_name : '',
+    recipientAddress: isEditing ? editData.recipient_address : '',
+    recipientPhone: isEditing ? editData.recipient_phone : '',
+  });
+
   const [formRadio, setFormRadio] = useState({
-    deliveryMethod: '',
+    deliveryMethod: isEditing ? editData.delivery_method : '',
   });
 
   const isSending = formRadio.deliveryMethod == 'send';
@@ -222,26 +248,67 @@ export default function PN11Form() {
     return isValid;
   };
 
+  const resetResponseModal = () => {
+    setModalSuccess(false);
+    setModalError(false);
+    setTitleModal('');
+    setDetailModal('');
+    setButtonLink('');
+    setButtonText('');
+  };
+
+  const handleCloseModal = () => {
+    setOpenQuestionModal(false);
+    setOpenResponseModal(false);
+  };
+
+  const handleSubmissionError = () => {
+    setLoading(false);
+    setModalError(true);
+    setTitleModal(isEditing ? 'แก้ไขข้อมูลผิดพลาด' : 'ผิดพลาด');
+    setDetailModal('โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
+    setOpenResponseModal(true);
+  };
+
   const handleSubmit = async () => {
+    setLoading(true);
+    resetResponseModal();
+
     const formData = setFinalFormData();
     console.log('formData: ', formData);
 
-    let apiPath = 'activity-transcript'
-
     try {
-      const res = await createData(apiPath, formData);
+      let response: any;
 
-      if (res && res.status === 201) {
-        console.log('Create success!');
-        console.log('id: ', res.data.id);
-        
-        router.push(`/activity-history/transcript/document/${res.data.id}`);
-
+      if (isEditing) {
+        response = await updateData('activity-transcript', formData, editData.id);
       } else {
-        console.error('Create failed, please try again later');
+        response = await createData('activity-transcript', formData);
+      }
+
+      if (response && (response.status === 201 || response.status === 200)) {
+        // console.log('Create success!');
+        setLoading(false);
+        setModalSuccess(true);
+        setTitleModal(isEditing ? 'แก้ไขข้อมูลสำเร็จ' : 'สำเร็จ');
+        setDetailModal(
+          isEditing
+            ? ''
+            : `ส่งอีเมลยืนยันตัวตนไปยัง : ${response.data.data.email} 
+              , กรุณาคลิกลิงก์ในอีเมลเพื่อยืนยันตัวตน และรอการแจ้งเตือนเพื่อรับเอกสารระเบียนกิจกรรม`,
+        );
+        setButtonLink(
+          isEditing
+            ? `/management/pn11/document/${editData.id}`
+            : `/activity-history/transcript/document/${response.data.id}`,
+        );
+        setButtonText('ไปยังเอกสารเอกสาร พน.11');
+        setOpenResponseModal(true);
+      } else {
+        handleSubmissionError();
       }
     } catch (error) {
-      console.error('Error while submitting data:', error);
+      handleSubmissionError();
     }
   };
 
@@ -362,7 +429,7 @@ export default function PN11Form() {
               <FormControl
                 className="flex w-full"
                 error={Boolean(validationError.faculty)}
-                size='small'
+                size="small"
               >
                 <Select
                   name="faculty"
@@ -391,7 +458,7 @@ export default function PN11Form() {
               >
                 สาขาวิชา
               </label>
-              <FormControl className="flex w-full" size='small'>
+              <FormControl className="flex w-full" size="small">
                 <Select
                   name="major"
                   value={formInput.major}
@@ -580,12 +647,6 @@ export default function PN11Form() {
         </div>
       </form>
       <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/activity-history/transcript/document/"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Test Document
-        </Link>
         <button
           onClick={() => handleOpenModal(true, false)}
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
@@ -596,7 +657,7 @@ export default function PN11Form() {
       </div>
 
       <ModalQuestion
-        openModal={openModal}
+        openModal={openQuestionModal}
         onCloseModal={handleCloseModal}
         title={titleModal}
         detail={detailModal}
@@ -610,6 +671,20 @@ export default function PN11Form() {
           }
         }}
       />
+
+      <ModalResponse
+        openModal={openResponseModal}
+        onCloseModal={handleCloseModal}
+        title={titleModal}
+        detail={detailModal}
+        isSuccess={modalSuccess}
+        isError={modalError}
+        buttonLink={buttonLink}
+        buttonText={buttonText}
+        haveNextPage={modalNextPage}
+      />
+
+      <OverlayLoading showLoading={loading} />
     </>
   );
 }
