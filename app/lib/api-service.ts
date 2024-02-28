@@ -157,8 +157,8 @@ export async function getDataById(apiPath: string, id: string) {
   // if (!res.ok) {
   //   throw new Error('Failed to fetch data');
   // }
-
   return res.json();
+  
 }
 
 export async function fetchPages(

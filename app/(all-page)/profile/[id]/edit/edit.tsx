@@ -1,18 +1,13 @@
 'use client';
 import { checkExist, getAllData, register } from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+
 import {
   FormControl,
   FormHelperText,
-  IconButton,
-  InputAdornment,
   MenuItem,
-  OutlinedInput,
   Select,
   TextField,
 } from '@mui/material';
@@ -21,7 +16,7 @@ import { Users } from '@/app/model/user';
 import { ModalResponse } from '@/app/components/modal';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
-export default function ProfileEditForm() {
+export default function RegisterForm({editData} : {editData:any}) {
   const [loading, setLoading] = useState(false);
 
   const [openResponseModal, setOpenResponseModal] = useState(false);
@@ -34,13 +29,13 @@ export default function ProfileEditForm() {
   const [nextTab, setNextTab] = useState(false);
 
   const [formInput, setFormInput] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    phone: '',
-    faculty: '',
-    major: '',
-    username: '',
+    firstname: editData.firstname,
+    lastname: editData.lastname,
+    email: editData.email,
+    phone: editData.phone,
+    faculty: editData.faculty_id,
+    major: editData.major_id,
+    username: editData.username,
     password: '',
     confirmPassword: '',
   });
@@ -48,19 +43,9 @@ export default function ProfileEditForm() {
   const [existEmail, setExistEmail] = useState(null);
   const [existUsername, setExistUsername] = useState(null);
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [faculties, setFaculties] = useState<Faculties[]>([]);
   const [majors, setMajors] = useState<Majors[]>([]);
-
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
 
   const getFaculties = async () => {
     try {
@@ -105,24 +90,6 @@ export default function ProfileEditForm() {
       [name]: value,
     }));
 
-    if (name === 'confirmPassword') {
-      if (value !== formInput.password) {
-        setValidationError((prevErrors) => ({
-          ...prevErrors,
-          [name]: 'รหัสผ่านไม่ตรงกัน',
-        }));
-      } else {
-        setValidationError((prevErrors) => ({
-          ...prevErrors,
-          [name]: '',
-        }));
-      }
-    } else {
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        [name]: '',
-      }));
-    }
   };
 
   const handleCheckEmailExist = async () => {
@@ -303,7 +270,7 @@ export default function ProfileEditForm() {
           <h1
             className={`mb-3 text-center text-2xl font-semibold text-gray-800`}
           >
-            สมัครสมาชิก
+            แก้ไขข้อมูลโปรไฟล์
           </h1>
           <div className="w-full">
             <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
@@ -523,84 +490,6 @@ export default function ProfileEditForm() {
                   autoComplete="off"
                 />
               </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="password"
-                >
-                  รหัสผ่าน / Password
-                </label>
-                <FormControl variant="outlined">
-                  <OutlinedInput
-                    className="w-full"
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={formInput.password}
-                    onChange={handleInputChange}
-                    error={Boolean(validationError.password)}
-                    placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
-                    autoComplete="off"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? (
-                            <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          ) : (
-                            <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  <FormHelperText className="text-red-600">
-                    {validationError.password}
-                  </FormHelperText>
-                </FormControl>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="confirmPassword"
-                >
-                  ยืนยันรหัสผ่าน / Confirm Password
-                </label>
-                <FormControl variant="outlined">
-                  <OutlinedInput
-                    className="w-full"
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={formInput.confirmPassword}
-                    onChange={handleInputChange}
-                    error={Boolean(validationError.confirmPassword)}
-                    placeholder=""
-                    autoComplete="off"
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle confirm password visibility"
-                          onClick={handleShowConfirmPassword}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          ) : (
-                            <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  <FormHelperText className="text-red-600">
-                    {validationError.confirmPassword}
-                  </FormHelperText>
-                </FormControl>
-              </div>
             </div>
           </div>
         </div>
@@ -612,7 +501,7 @@ export default function ProfileEditForm() {
             className="flex h-10 items-center rounded-md bg-blue-500 px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
             type="submit"
           >
-            ยืนยัน
+            ยืนยันการแก้ไขข้อมูล
           </button>
         </div>
       </form>

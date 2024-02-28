@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import React from 'react'
 
 export default async function Profile() {
+  
   const authResult = (await auth()) as any;
   const { id } = authResult?.user || null;
   const userData = await getUserLoginData(id)

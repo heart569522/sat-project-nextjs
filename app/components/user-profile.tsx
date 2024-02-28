@@ -5,6 +5,16 @@ import { EditProfile } from '@/app/components/buttons/buttons';
 
 export default function UserProfile({ data }: { data: Users }) {
 
+  const CheckRole = () => {
+    if (data.role === 'admin') {
+      return "ผู้ดูแลระบบ";
+    } else if (data.role === 'teacher') {
+      return "อาจารย์";
+    } else {
+      return null; 
+    }
+  };
+
 
   return (
   <div className="flex flex-col p-5 border shadow-sm rounded-md">
@@ -14,7 +24,7 @@ export default function UserProfile({ data }: { data: Users }) {
     <div className="grid grid-cols-2 mt-6 text-start text-xs md:text-2xl">
       <div className="w-full">
         <p className="mb-3">ชื่อ - นามสกุล : {data.firstname} {data.lastname}</p>
-        <p className="mb-3">ตำแหน่ง : {data.role}</p>
+        <p className="mb-3">ตำแหน่ง : <CheckRole /></p>
         <p className="mb-3">คณะ : {data.faculty_name}</p>
         <p className="mb-3">สาขา : {data.major_name}</p>
         <p className="mb-3">ชื่อผู้ใช้งาน : {data.username}</p>
