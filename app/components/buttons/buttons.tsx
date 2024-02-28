@@ -135,7 +135,6 @@ export function DeleteButton({ id, apiPath }: { id: string; apiPath: string }) {
   const handleDelete = async () => {
     await deleteData(apiPath, id);
   };
-
   return (
     <button
       onClick={handleDelete}
