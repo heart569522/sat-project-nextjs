@@ -16,7 +16,7 @@ import { Users } from '@/app/model/user';
 import { ModalResponse } from '@/app/components/modal';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
-export default function RegisterForm({editData} : {editData:any}) {
+export default function ProfileEditForm({editData ,isEditing} : {editData:any ,isEditing?:boolean}) {
   const [loading, setLoading] = useState(false);
 
   const [openResponseModal, setOpenResponseModal] = useState(false);
@@ -29,16 +29,15 @@ export default function RegisterForm({editData} : {editData:any}) {
   const [nextTab, setNextTab] = useState(false);
 
   const [formInput, setFormInput] = useState({
-    firstname: editData.firstname,
-    lastname: editData.lastname,
-    email: editData.email,
-    phone: editData.phone,
-    faculty: editData.faculty_id,
-    major: editData.major_id,
-    username: editData.username,
-    password: '',
-    confirmPassword: '',
+    firstname:isEditing ? editData.firstname : '',
+    lastname:isEditing ? editData.lastname : '',
+    email:isEditing ?  editData.email  : '',
+    phone:isEditing ?  editData.phone  : '',
+    faculty:isEditing ?  editData.faculty_id  : '',
+    major:isEditing ?  editData.major_id  : '',
+    username:isEditing ?  editData.username  : '',
   });
+  
 
   const [existEmail, setExistEmail] = useState(null);
   const [existUsername, setExistUsername] = useState(null);
@@ -163,29 +162,7 @@ export default function RegisterForm({editData} : {editData:any}) {
       }
     }
 
-    // Check if password and confirmPassword match
-    if (formInput.password !== formInput.confirmPassword) {
-      isValid = false;
 
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        confirmPassword: 'รหัสผ่านไม่ตรงกัน',
-      }));
-
-      console.error('Passwords do not match.');
-    }
-
-    // Check if password is at least 6 characters long
-    if (formInput.password.length < 6 && formInput.password.length >= 1) {
-      isValid = false;
-
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        password: 'รหัสผ่านต้องมีจำนวน 6 ตัวอักษรขึ้นไป',
-      }));
-
-      console.error('Password must be at least 6 characters long.');
-    }
 
     return isValid;
   };
@@ -207,10 +184,8 @@ export default function RegisterForm({editData} : {editData:any}) {
         if (response && (response.status === 201 || response.status === 200)) {
           setLoading(false);
           setModalSuccess(true);
-          setTitleModal('สมัครสมาชิกสำเร็จ');
-          setDetailModal('กรุณารอการยืนยันบัญชีจากเจ้าหน้าที่');
-          setButtonLink(`/#login`);
-          setButtonText('ไปยังเข้าสู่ระบบ');
+          setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
+          setButtonLink(`/profile`);
           setNextTab(true);
           setOpenResponseModal(true);
         } else {
@@ -236,7 +211,7 @@ export default function RegisterForm({editData} : {editData:any}) {
       faculty_id: Number(formInput.faculty),
       major_id: Number(formInput.major),
       username: formInput.username.toLowerCase(),
-      password: formInput.password,
+
     };
 
     return finalFormData;

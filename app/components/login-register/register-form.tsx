@@ -21,7 +21,7 @@ import { Users } from '@/app/model/user';
 import { ModalResponse } from '@/app/components/modal';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
-export default function ProfileEditForm() {
+export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
 
   const [openResponseModal, setOpenResponseModal] = useState(false);
