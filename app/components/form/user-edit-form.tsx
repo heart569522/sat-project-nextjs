@@ -42,7 +42,6 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
   const [existEmail, setExistEmail] = useState(null);
   const [existUsername, setExistUsername] = useState(null);
 
-
   const [faculties, setFaculties] = useState<Faculties[]>([]);
   const [majors, setMajors] = useState<Majors[]>([]);
 
@@ -88,7 +87,6 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
       ...prevValues,
       [name]: value,
     }));
-
   };
 
   const handleCheckEmailExist = async () => {
