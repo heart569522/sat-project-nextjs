@@ -1,5 +1,5 @@
 'use client';
-import { deleteData } from '@/app/lib/api-service';
+import { deleteData, sendEmail } from '@/app/lib/api-service';
 import { TrashIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
 import {
   Box,
@@ -22,14 +22,16 @@ export function ButtonDialog({
   detail,
   onSuccess,
   isPN01Draft,
+  formData
 }: {
   id: string;
   apiPath: string;
   action: string;
   title: string;
   detail: string;
-  onSuccess: any;
+  onSuccess?: any;
   isPN01Draft?: boolean;
+  formData?: any;
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -64,7 +66,7 @@ export function ButtonDialog({
         break;
 
       case 'sendEmail':
-        response = await deleteData(apiPath, id, isPN01Draft);
+        response = await sendEmail(apiPath, formData);
         break;
 
       default:
@@ -74,9 +76,18 @@ export function ButtonDialog({
     if (response && (response.status === 201 || response.status === 200)) {
       setLoading(false);
       setIsCloseButton(true);
-      setTitleModal('ลบข้อมูลสำเร็จ');
+      setTitleModal(
+        action === 'sendEmail'
+          ? 'ส่งอีเมลแจ้งเตือนสำเร็จ'
+          : action === 'delete'
+          ? 'ลบข้อมูลสำเร็จ'
+          : '',
+      );
       setOpenResponseModal(true);
-      onSuccess();
+
+      if (action === 'delete') {
+        onSuccess();
+      }
     } else {
       handleSubmissionError();
     }

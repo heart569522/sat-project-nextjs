@@ -47,10 +47,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (!token.sub) return token;
 
-      // const userData = await getDataById("users/id", token.sub)
-      // console.log("🚀 ~ jwt ~ userData:", userData)
-      // if (!userData) return token;
-
       if (user) token.role = user.role;
       return token;
     },

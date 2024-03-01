@@ -11,10 +11,13 @@ import { useEffect, useState } from 'react';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {
+  Fade,
   FormControl,
   IconButton,
   MenuItem,
   Select,
+  Slide,
+  Snackbar,
   Switch,
   TextField,
   Tooltip,
@@ -33,6 +36,10 @@ import { Button } from '@/app/components/buttons/button';
 
 interface ToggleCanEditState {
   [key: string]: boolean;
+}
+
+function SlideTransition(props: any) {
+  return <Slide {...props} direction="up" />;
 }
 
 export default function ActivityTranscriptTable({
@@ -135,6 +142,25 @@ export default function ActivityTranscriptTable({
     } catch (error) {
       console.log('update row failed');
     }
+  };
+
+  const [state, setState] = useState({
+    open: false,
+    Transition: Fade,
+  });
+
+  const handleOpenAlert = (Transition: any) => () => {
+    setState({
+      open: true,
+      Transition,
+    });
+  };
+
+  const handleClose = () => {
+    setState({
+      ...state,
+      open: false,
+    });
   };
 
   return (
@@ -388,11 +414,11 @@ export default function ActivityTranscriptTable({
                             <div className="flex justify-center gap-2">
                               <ButtonDialog
                                 id={row.id}
-                                apiPath="activity-transcript"
+                                apiPath="send-email/notification"
                                 action="sendEmail"
                                 title="ส่งการแจ้งเตือน"
                                 detail={`ระบบจะทำการส่งการแจ้งเตือนไปยังอีเมล : ${row.email}`}
-                                onSuccess={fetchData}
+                                // formData={data}
                               />
                             </div>
                           </td>
@@ -511,6 +537,15 @@ export default function ActivityTranscriptTable({
           </div>
         </div>
       </div>
+      <Snackbar
+        open={state.open}
+        onClose={handleClose}
+        TransitionComponent={state.Transition}
+        message="ส่งอีเมลแจ้งเตือนสำเร็จ"
+        key={state.Transition.name}
+        autoHideDuration={1200}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      />
     </div>
   );
 }

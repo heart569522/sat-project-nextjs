@@ -1,8 +1,5 @@
 import Pagination from '@/app/components/pagination';
 import SearchAuto from '@/app/components/search-box/search-auto';
-import Table from '@/app/components/management-com/pn01/table';
-import { InvoicesTableSkeleton } from '@/app/components/skeletons';
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { fetchPages } from '@/app/lib/api-service';
 import ProjectProposalTable from '@/app/components/tables/project-proposal-table';

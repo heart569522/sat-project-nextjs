@@ -9,7 +9,7 @@
     "prettier:check": "prettier --check --ignore-unknown .",
     "seed": "node -r dotenv/config ./scripts/seed.js",
     "start": "next start",
-    "clean": "rmdir /s /q dist || true"
+    "email": "email dev --dir app/components/email-templates"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -19,6 +19,8 @@
     "@mui/material": "^5.14.20",
     "@mui/x-date-pickers": "^6.18.1",
     "@prisma/client": "^5.7.1",
+    "@react-email/components": "0.0.15",
+    "@react-email/render": "^0.0.12",
     "@tailwindcss/forms": "^0.5.7",
     "@types/node": "20.5.7",
     "@vercel/postgres": "^0.5.0",
@@ -35,10 +37,12 @@
     "moment-timezone": "^0.5.43",
     "next": "^14.0.2",
     "next-auth": "^5.0.0-beta.4",
+    "nodemailer": "^6.9.11",
     "pg": "^8.11.3",
     "postcss": "8.4.31",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-email": "2.1.0",
     "react-to-pdf": "^1.0.1",
     "sass": "^1.69.5",
     "sharp": "^0.33.1",
@@ -50,6 +54,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.1",
+    "@types/nodemailer": "^6.4.14",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.14",
     "@vercel/style-guide": "^5.0.1",

@@ -10,8 +10,8 @@ export default async function Profile() {
   const userData = await getUserLoginData(id)
 
   return (
-    <div className="w-full">
-      <div className="flex text-xl md:text-2xl">จัดการโปรไฟล์</div>
+    <div className="">
+      <div className="flex text-xl md:text-2xl">ข้อมูลโปรไฟล์</div>
       <div className="mt-4">
         <UserProfile data={userData}/>
       </div>

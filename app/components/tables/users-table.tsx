@@ -113,7 +113,7 @@ export default function UsersTable({
         };
 
         handleSaveData(
-          'users/update-edit-state',
+          'users/update-verify-state',
           rowId,
           newToggleVerify[rowId],
         );
@@ -334,10 +334,10 @@ export default function UsersTable({
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
                             <div className="flex justify-center gap-2">
-                              <DetailButton
+                              {/* <DetailButton
                                 id={row.id}
                                 path={'management/pn11/document'}
-                              />
+                              /> */}
                               <EditButton
                                 id={row.id}
                                 path={'management/pn11'}
@@ -346,8 +346,8 @@ export default function UsersTable({
                                 id={row.id}
                                 apiPath="users"
                                 action="delete"
-                                title="ลบคำร้องระเบียนกิจกรรม"
-                                detail={`คุณยืนยันที่จะลบคำร้องขอระเบียนกิจกรรมฉบับนี้ ?`}
+                                title={`ลบผู้ใช้`}
+                                detail={`คุณยืนยันที่จะลบบัญชีผู้ใช้ : ${row.firstname} ${row.lastname} ?`}
                                 onSuccess={fetchData}
                               />
                             </div>

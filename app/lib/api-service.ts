@@ -158,7 +158,6 @@ export async function getDataById(apiPath: string, id: string) {
   //   throw new Error('Failed to fetch data');
   // }
   return res.json();
-  
 }
 
 export async function fetchPages(
@@ -322,6 +321,26 @@ export async function deleteData(
     const response = await axios[method](
       `${process.env.API_URL}/api/${apiPath}/${id}`,
     );
+
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
+export async function sendEmail(apiPath: string, formData?: any) {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/api/${apiPath}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    console.log('Email sending success', response);
 
     return response;
   } catch (error) {
