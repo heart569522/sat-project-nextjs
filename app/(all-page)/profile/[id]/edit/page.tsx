@@ -15,20 +15,17 @@ export default async function EditProfile({ params }: { params: { id: string } }
       <Breadcrumbs
         breadcrumbs={[
           {
-            label: 'โครงการ/กิจกรรม',
-            href: '/project-proposal',
+            label: 'จัดการโปรไฟล์',
+            href: '/profile',
             active: false,
           },
           {
-            label: 'แก้ไขโครงการ/กิจกรรม (พน.01)',
+            label: 'แก้ไขข้อมูลโปรไฟล์',
             href: '',
             active: true,
           },
         ]}
       />
-      <div className="flex text-xl md:text-2xl">
-        แก้ไขการเสนอโครงการ/กิจกรรม (พน.01)
-      </div>
     </div>
     <ProfileEditForm editData={data} isEditing={true} />
     </>
