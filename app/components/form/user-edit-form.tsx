@@ -456,6 +456,7 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
                   helperText={validationError.username}
                   placeholder="ตัวอักษรภาษาอังกฤษ(พิมพ์เล็ก) หรือตัวเลขจำนวน 6 ตัวขึ้นไป"
                   autoComplete="off"
+                  disabled
                 />
               </div>
             </div>
