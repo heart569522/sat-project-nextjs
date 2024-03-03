@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
-    let searchConditions = `activity_transcript_pn11.is_delete = false`;
+    let searchConditions = `activity_transcript_pn11.is_delete = false AND is_verify = true`;
 
     if (search) {
       console.log('search');

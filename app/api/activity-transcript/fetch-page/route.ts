@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams.get('query');
 
   try {
-    let searchConditions = `activity_transcript_pn11.is_delete = false`;
+    let searchConditions = `activity_transcript_pn11.is_delete = false AND is_verify = true`;
 
     if (search) {
       searchConditions += ` AND ${searchColumns

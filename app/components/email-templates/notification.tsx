@@ -83,14 +83,6 @@ export default function NotificationEmail(props: any) {
           </Container>
 
           <Section style={footer}>
-            {/* <Row>
-            <Column align="right" style={{ width: '50%', paddingRight: '8px' }}>
-              <Img src={`${baseUrl}/static/twitch-icon-twitter.png`} />
-            </Column>
-            <Column align="left" style={{ width: '50%', paddingLeft: '8px' }}>
-              <Img src={`${baseUrl}/static/twitch-icon-facebook.png`} />
-            </Column>
-          </Row> */}
             <Row>
               <Text style={{ textAlign: 'center', color: '#706a7b' }}>
                 © 2024 Payap University, All Rights Reserved <br />
