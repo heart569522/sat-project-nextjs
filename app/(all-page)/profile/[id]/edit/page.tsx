@@ -27,6 +27,7 @@ export default async function EditProfile({ params }: { params: { id: string } }
         ]}
       />
     </div>
+    <div className="flex text-xl md:text-2xl">แก้ไขข้อมูลโปรไฟล์</div>
     <ProfileEditForm editData={data} isEditing={true} />
     </>
   );

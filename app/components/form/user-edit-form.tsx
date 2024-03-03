@@ -240,11 +240,6 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
     <React.Fragment>
       <form action={handleSubmit} className="space-y-3">
         <div className="flex-1 rounded-lg px-6 pb-4 pt-8">
-          <h1
-            className={`mb-3 text-center text-2xl font-semibold text-gray-800`}
-          >
-            แก้ไขข้อมูลโปรไฟล์
-          </h1>
           <div className="w-full">
             <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
               <div className="flex flex-col">
