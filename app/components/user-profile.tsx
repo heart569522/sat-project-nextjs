@@ -15,14 +15,14 @@ export default function UserProfile({ data }: { data: Users }) {
   };
 
   return (
-    <div className="w-2/3">
+    <div className="">
       <div className="w-full rounded-md border p-5 shadow-sm">
-        {/* <div className="w-full rounded-md bg-blue-500 p-3 py-4">
+        <div className="w-full rounded-md bg-blue-500 p-3 py-4">
           <h1 className="text-md text-center font-bold text-zinc-50 md:text-2xl">
             ข้อมูลโปรไฟล์
           </h1>
-        </div> */}
-        {/* <div className="grid grid-cols-2 text-start text-xs md:text-2xl">
+        </div>
+        <div className="grid grid-cols-2 text-start text-xs md:text-2xl">
           <div className="w-full">
             <p className="mb-3">
               ชื่อ - นามสกุล : {data.firstname} {data.lastname}
@@ -50,8 +50,8 @@ export default function UserProfile({ data }: { data: Users }) {
         </div>
         <div className="mb-2 mt-6 flex flex-col gap-5">
           <EditProfile id={data.id} />
-        </div> */}
-        <div className="flex flex-col gap-y-6">
+        </div>
+        {/* <div className="flex flex-col gap-y-6">
           <h2 className="text-4xl font-bold tracking-wide">
             คุณ{data.firstname}&nbsp;{data.lastname}
           </h2>
@@ -85,7 +85,7 @@ export default function UserProfile({ data }: { data: Users }) {
             <p className="text-2xl font-semibold">ชื่อผู้ใช้ :</p>
             <p className="text-2xl">{data.username}</p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

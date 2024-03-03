@@ -11,10 +11,17 @@ import Link from 'next/link';
 import { Button } from '../buttons/button';
 import { PN11 } from '@/app/model/pn11';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
-import { createData, getAllData, updateData } from '@/app/lib/api-service';
+import {
+  createData,
+  getAllData,
+  sendEmail,
+  updateData,
+  createVerifyToken,
+} from '@/app/lib/api-service';
 import { useRouter } from 'next/navigation';
 import { ModalQuestion, ModalResponse } from '../modal';
 import { OverlayLoading } from '../loading-screen';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function PN11Form({
   editData,
@@ -281,34 +288,87 @@ export default function PN11Form({
       let response: any;
 
       if (isEditing) {
-        response = await updateData('activity-transcript', formData, editData.id);
+        response = await updateData(
+          'activity-transcript',
+          formData,
+          editData.id,
+        );
       } else {
         response = await createData('activity-transcript', formData);
       }
 
       if (response && (response.status === 201 || response.status === 200)) {
-        // console.log('Create success!');
-        setLoading(false);
-        setModalSuccess(true);
-        setTitleModal(isEditing ? 'แก้ไขข้อมูลสำเร็จ' : 'สำเร็จ');
-        setDetailModal(
-          isEditing
-            ? ''
-            : `ส่งอีเมลยืนยันตัวตนไปยัง : ${response.data.data.email} 
+        if (isEditing) {
+          setLoading(false);
+          setModalSuccess(true);
+          setTitleModal('แก้ไขข้อมูลสำเร็จ');
+          setDetailModal('');
+          setButtonLink(`/management/pn11/document/${editData.id}`);
+          setButtonText('ไปยังเอกสารเอกสาร พน.11');
+          setOpenResponseModal(true);
+        } else {
+          const verificationToken = generateUniqueToken();
+          await storeVerificationToken(
+            response.data.id,
+            response.data.data.email,
+            verificationToken,
+          );
+
+          const verifyLink = `${process.env.API_URL}/verify/pn11/${verificationToken}`;
+
+          const formDataEmail = {
+            firstname: response.data.data.firstname,
+            lastname: response.data.data.lastname,
+            email: response.data.data.email,
+            verifyLink: verifyLink,
+          };
+
+          const emailResponse = await sendEmail(
+            'send-email/verify/pn11',
+            formDataEmail,
+          );
+          if (emailResponse && emailResponse.status === 200) {
+            setLoading(false);
+            setModalSuccess(true);
+            setTitleModal('สำเร็จ');
+            setDetailModal(
+              `ส่งอีเมลยืนยันตัวตนไปยัง : ${response.data.data.email} 
               , กรุณาคลิกลิงก์ในอีเมลเพื่อยืนยันตัวตน และรอการแจ้งเตือนเพื่อรับเอกสารระเบียนกิจกรรม`,
-        );
-        setButtonLink(
-          isEditing
-            ? `/management/pn11/document/${editData.id}`
-            : `/activity-history/transcript/document/${response.data.id}`,
-        );
-        setButtonText('ไปยังเอกสารเอกสาร พน.11');
-        setOpenResponseModal(true);
+            );
+            setButtonLink(`/activity-history`);
+            setButtonText('ตกลง');
+            setOpenResponseModal(true);
+          }
+        }
       } else {
         handleSubmissionError();
       }
     } catch (error) {
       handleSubmissionError();
+    }
+  };
+
+  const generateUniqueToken = () => {
+    return uuidv4();
+  };
+
+  const storeVerificationToken = async (
+    id: string,
+    email: string,
+    token: string,
+  ) => {
+    const formDataToken = {
+      email: email,
+      token: token,
+    };
+    try {
+      await createVerifyToken(
+        'activity-transcript/verify-token',
+        id,
+        formDataToken,
+      );
+    } catch (error) {
+      console.log('🚀 ~ storeVerificationToken ~ error:', error);
     }
   };
 

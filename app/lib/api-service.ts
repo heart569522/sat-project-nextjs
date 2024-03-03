@@ -328,7 +328,7 @@ export async function deleteData(
   }
 }
 
-export async function sendEmail(apiPath: string, formData?: any) {
+export async function sendEmail(apiPath: string, formData: any) {
   try {
     const response = await axios.post(
       `${process.env.API_URL}/api/${apiPath}`,
@@ -345,5 +345,39 @@ export async function sendEmail(apiPath: string, formData?: any) {
     return response;
   } catch (error) {
     console.error('Error while sending data:', error);
+  }
+}
+
+export async function createVerifyToken(
+  apiPath: string,
+  id: string,
+  formData: any,
+) {
+  try {
+    const response = await axios.patch(
+      `${process.env.API_URL}/api/${apiPath}/${id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
+export async function verifyData(apiPath: string, token: string) {
+  try {
+    const response = await axios.patch(
+      `${process.env.API_URL}/api/${apiPath}/${token}`,
+    );
+
+    return response;
+  } catch (error) {
+    // console.error('Error while sending data:', error);
   }
 }

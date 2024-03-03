@@ -7,40 +7,32 @@ import {
   Html,
   Img,
   Link,
-  Preview,
   Row,
   Section,
   Text,
   Tailwind,
+  Button,
 } from '@react-email/components';
 import * as React from 'react';
-
-interface NotificationEmailProps {
-  username?: string;
-  updatedDate?: Date;
-}
 
 // const baseUrl = process.env.VERCEL_URL
 //   ? `https://${process.env.VERCEL_URL}`
 //   : '';
 
-export default function NotificationEmail(props: any) {
+export default function VerifyEmail(props: any) {
   return (
     <Html>
       <Head />
-      {/* <Preview>สถานะคำร้องขอเอกสารระเบียนกิจกรรม</Preview> */}
       <Body style={main}>
         <Tailwind>
           <Container style={container}>
             <Section style={logo}>
-              <Column style={containerCenter}>
-                <Img
-                  width={150}
-                  src={
-                    'https://onedrive.live.com/embed?resid=DCF10387FCEEEA77%217719&authkey=%21AHsXEtq8vLT6tSA&width=416&height=122'
-                  }
-                />
-              </Column>
+              <Img
+                width={150}
+                src={
+                  'https://onedrive.live.com/embed?resid=DCF10387FCEEEA77%217719&authkey=%21AHsXEtq8vLT6tSA&width=416&height=122'
+                }
+              />
             </Section>
             <Section className="flex w-full items-center justify-center">
               <Row>
@@ -50,28 +42,24 @@ export default function NotificationEmail(props: any) {
             <Section style={content}>
               <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
               <Text style={paragraph}>
-                You updated the password for your Twitch account If this was
-                you, then no further action is required.
+                คุณได้ส่งคำร้องขอเอกสารระเบียนกิจกรรม เมื่อวันที่{' '}
+                {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
-                However if you did NOT perform this password change, please{' '}
-                <Link href="#" style={link}>
-                  reset your account password
-                </Link>{' '}
-                immediately.
+                กรุณาคลิกปุ่ม "ยืนยัน"
+                เพื่อให้คำร้องขอเอกสารระเบียนกิจกรรมของคุณเสร็จสมบูรณ์
               </Text>
+              <Row>
+                <Column style={containerCenter}>
+                  <Button style={button} href={props.verifyLink}>
+                    ยืนยัน
+                  </Button>
+                </Column>
+              </Row>
               <Text style={paragraph}>
-                Remember to use a password that is both strong and unique to
-                your Twitch account. To learn more about how to create a strong
-                and unique password,{' '}
-                <Link href="#" style={link}>
-                  click here.
-                </Link>
-              </Text>
-              <Text style={paragraph}>
-                Still have questions? Please contact{' '}
-                <Link href="#" style={link}>
-                  Twitch Support
+                หากไม่สามารถคลิกปุ่มได้ กรุณาคลิกลิ้งค์นี้{' '}
+                <Link href={props.verifyLink} style={link}>
+                  {props.verifyLink}
                 </Link>
               </Text>
               <Text style={paragraph}>
@@ -81,16 +69,7 @@ export default function NotificationEmail(props: any) {
               </Text>
             </Section>
           </Container>
-
           <Section style={footer}>
-            {/* <Row>
-            <Column align="right" style={{ width: '50%', paddingRight: '8px' }}>
-              <Img src={`${baseUrl}/static/twitch-icon-twitter.png`} />
-            </Column>
-            <Column align="left" style={{ width: '50%', paddingLeft: '8px' }}>
-              <Img src={`${baseUrl}/static/twitch-icon-facebook.png`} />
-            </Column>
-          </Row> */}
             <Row>
               <Text style={{ textAlign: 'center', color: '#706a7b' }}>
                 © 2024 Payap University, All Rights Reserved <br />
@@ -132,6 +111,9 @@ const content = {
 };
 
 const logo = {
+  display: 'flex',
+  justifyContent: 'center',
+  alingItems: 'center',
   padding: 30,
 };
 
@@ -148,4 +130,18 @@ const containerCenter = {
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
+};
+
+const button = {
+  backgroundColor: '#007ee6',
+  borderRadius: '4px',
+  color: '#fff',
+  fontFamily: "'Open Sans', 'Helvetica Neue', Arial",
+  fontSize: '18px',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'block',
+  width: '210px',
+  padding: '14px 7px',
+  cursor: 'pointer',
 };
