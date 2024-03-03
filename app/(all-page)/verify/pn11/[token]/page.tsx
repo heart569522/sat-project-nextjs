@@ -1,6 +1,6 @@
 'use client';
 
-import { verifyData } from '@/app/lib/api-service';
+import { sendEmail, verifyData } from '@/app/lib/api-service';
 import { CircularProgress } from '@mui/material';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -32,9 +32,23 @@ export default function Verify({ params }: { params: { token: string } }) {
       );
 
       if (response && response.status === 200) {
-        setLoading(false);
-        setVerified(true);
-        setPN11Data(response.data.data);
+        const documentLink = `${process.env.API_URL}/activity-history/transcript/document/${response.data.id}`;
+        const formDataEmail = {
+          firstname: response.data.data.firstname,
+          lastname: response.data.data.lastname,
+          email: response.data.data.email,
+          documentLink: documentLink,
+        };
+
+        const emailResponse = await sendEmail(
+          'send-email/notification/pn11',
+          formDataEmail,
+        );
+        if (emailResponse && emailResponse.status === 200) {
+          setLoading(false);
+          setVerified(true);
+          setPN11Data(response.data.data);
+        }
       } else {
         setLoading(false);
         setVerifiedError(true);
@@ -77,8 +91,8 @@ export default function Verify({ params }: { params: { token: string } }) {
                 <p className="text-2xl">ยืนยันสำเร็จ</p>
               </div>
               <p className="mb-2 text-lg">
-                ระบบได้ส่งเอกสารคำร้องขอระเบียนกิจกรรม <br /> ไปยังอีเมล{' '}
-                {pn11Data.email}
+                ระบบได้ส่งลิ้งค์คำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) <br />
+                ไปยังอีเมล {pn11Data.email}
               </p>
               <Link
                 href={`/activity-history/transcript/document/${pn11Data.id}`}

@@ -371,13 +371,9 @@ export async function createVerifyToken(
 }
 
 export async function verifyData(apiPath: string, token: string) {
-  try {
-    const response = await axios.patch(
-      `${process.env.API_URL}/api/${apiPath}/${token}`,
-    );
+  const response = await axios.patch(
+    `${process.env.API_URL}/api/${apiPath}/${token}`,
+  );
 
-    return response;
-  } catch (error) {
-    // console.error('Error while sending data:', error);
-  }
+  return response;
 }

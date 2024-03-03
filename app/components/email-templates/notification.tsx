@@ -118,7 +118,7 @@ const paragraph = {
 
 const container = {
   maxWidth: '580px',
-  margin: '30px auto',
+  margin: '30px auto 10px auto',
   backgroundColor: '#ffffff',
 };
 

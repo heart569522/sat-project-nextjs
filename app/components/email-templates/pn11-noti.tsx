@@ -7,19 +7,15 @@ import {
   Html,
   Img,
   Link,
+  Preview,
   Row,
   Section,
   Text,
   Tailwind,
-  Button,
 } from '@react-email/components';
 import * as React from 'react';
 
-// const baseUrl = process.env.VERCEL_URL
-//   ? `https://${process.env.VERCEL_URL}`
-//   : '';
-
-export default function VerifyEmail(props: any) {
+export default function PN11NotificationEmail(props: any) {
   return (
     <Html>
       <Head />
@@ -27,12 +23,14 @@ export default function VerifyEmail(props: any) {
         <Tailwind>
           <Container style={container}>
             <Section style={logo}>
-              <Img
-                width={150}
-                src={
-                  'https://onedrive.live.com/embed?resid=DCF10387FCEEEA77%217719&authkey=%21AHsXEtq8vLT6tSA&width=416&height=122'
-                }
-              />
+              <Column style={containerCenter}>
+                <Img
+                  width={150}
+                  src={
+                    'https://onedrive.live.com/embed?resid=DCF10387FCEEEA77%217719&authkey=%21AHsXEtq8vLT6tSA&width=416&height=122'
+                  }
+                />
+              </Column>
             </Section>
             <Section className="flex w-full items-center justify-center">
               <Row>
@@ -42,25 +40,18 @@ export default function VerifyEmail(props: any) {
             <Section style={content}>
               <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
               <Text style={paragraph}>
-                คุณได้ส่งคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) เมื่อวันที่{' '}
+                คุณได้ยืนยันคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)
+                เมื่อวันที่{' '}
                 {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
-                กรุณาคลิกปุ่ม "ยืนยัน"
-                เพื่อให้คำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) ของคุณเสร็จสมบูรณ์
-              </Text>
-              <Row>
-                <Column style={containerCenter}>
-                  <Button style={button} href={props.verifyLink}>
-                    ยืนยัน
-                  </Button>
-                </Column>
-              </Row>
-              <Text style={paragraph}>
-                หากไม่สามารถคลิกปุ่มได้ กรุณาคลิกลิ้งค์นี้{' '}
-                <Link href={props.verifyLink} style={link}>
-                  {props.verifyLink}
+                คลิกลิ้งค์นี้เพื่อไปยังหน้าเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) <br />
+                <Link href={props.documentLink} style={link}>
+                  {props.documentLink}
                 </Link>
+              </Text>
+              <Text style={paragraph}>
+                โปรดพิมพ์และส่งเอกสารฉบับนี้พร้อมลายเซ็นต์ที่สำนักพัฒนานักศึกษา มหาวิทยาลัยพายัพ
               </Text>
               <Text style={paragraph}>
                 ขอบคุณ,
@@ -69,6 +60,7 @@ export default function VerifyEmail(props: any) {
               </Text>
             </Section>
           </Container>
+
           <Section style={footer}>
             <Row>
               <Text style={{ textAlign: 'center', color: '#706a7b' }}>
@@ -111,9 +103,6 @@ const content = {
 };
 
 const logo = {
-  display: 'flex',
-  justifyContent: 'center',
-  alingItems: 'center',
   padding: 30,
 };
 
@@ -130,18 +119,4 @@ const containerCenter = {
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
-};
-
-const button = {
-  backgroundColor: '#007ee6',
-  borderRadius: '4px',
-  color: '#fff',
-  fontFamily: "'Open Sans', 'Helvetica Neue', Arial",
-  fontSize: '18px',
-  textDecoration: 'none',
-  textAlign: 'center' as const,
-  display: 'block',
-  width: '210px',
-  padding: '14px 7px',
-  cursor: 'pointer',
 };
