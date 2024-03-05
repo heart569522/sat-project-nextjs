@@ -46,7 +46,7 @@ export default function VerifyEmail(props: any) {
                 {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
-                กรุณาคลิกปุ่ม "ยืนยัน"
+                กรุณาคลิกปุ่มยืนยัน
                 เพื่อให้คำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) ของคุณเสร็จสมบูรณ์
               </Text>
               <Row>

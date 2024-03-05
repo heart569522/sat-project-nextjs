@@ -5,8 +5,8 @@ import ConvertReactToEmail from '@/app/lib/email-convert';
 
 const sendingEmail = process.env.SENDING_EMAIL;
 
-export async function POST(req?: NextRequest) {
-  //   const formData = await req.json();
+export async function POST(req: NextRequest) {
+    const formData = await req.json();
 
   try {
     const htmlEmail = ConvertReactToEmail({
