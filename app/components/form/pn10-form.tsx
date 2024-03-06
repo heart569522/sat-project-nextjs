@@ -1,38 +1,45 @@
 'use client';
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
-import StepButton from '@mui/material/StepButton';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import { notoThai } from '@/app/components/fonts';
-import { Alert, IconButton, StepLabel } from '@mui/material';
+import { Alert, CircularProgress, IconButton, StepLabel } from '@mui/material';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import ClearIcon from '@mui/icons-material/Clear';
-import pn01Data from '@/app/model/pn10Data.json';
 import { convertISOStringToDateTimeText } from '@/app/lib/services';
+import {
+  createData,
+  searchProjectProposalCode,
+  updateData,
+} from '@/app/lib/api-service';
+import { PaperPN01 } from '@/app/model/pn01';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 
 const steps = ['รหัสโครงการ', 'บันทึกรายการนักศึกษา', 'สรุปผล'];
 
-export default function PN10Form() {
-  const [validationError, setValidationError] = useState<{
-    [key: string]: string;
-  }>({});
-
-  const [formInput, setFormInput] = useState({});
-
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-  };
-
+export default function PN10Form({
+  userID,
+  userRole,
+}: {
+  userID: string;
+  userRole: string;
+}) {
   const [activeStep, setActiveStep] = useState(0);
 
   const [searchValue, setSearchValue] = useState('');
   const [studentId, setStudentId] = useState('');
   const [studentIdList, setStudentIdList] = useState<string[]>([]);
-  const [dateRecord, setDateRecord] = useState('')
+  const [dateRecord, setDateRecord] = useState('');
   const [alertError, setAlertError] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
+
+  const [pn01Data, setPN01Data] = useState<PaperPN01>();
 
   const handleSearchChange = (event: any) => {
     const numericValue = event.target.value.replace(/\D/g, '').slice(0, 5);
@@ -44,18 +51,25 @@ export default function PN10Form() {
     setStudentId(numericValue);
   };
 
-  const handleCheckProjectCode = () => {
-    const projectCodeData = pn01Data.projectCode;
+  const handleCheckProjectCode = async () => {
+    setLoading(true);
 
-    if (!searchValue) {
-      setAlertError(false);
-    } else if (searchValue !== projectCodeData) {
-      console.log('nooo');
+    try {
+      const response = await searchProjectProposalCode(
+        searchValue,
+        userID,
+        userRole,
+      );
+
+      if (response && response.status === 200) {
+        setPN01Data(response.data);
+        setLoading(false);
+        setAlertError(false);
+        handleNext();
+      }
+    } catch (error) {
+      setLoading(false);
       setAlertError(true);
-    } else {
-      console.log('yesss');
-      setAlertError(false);
-      handleNext();
     }
   };
 
@@ -80,7 +94,7 @@ export default function PN10Form() {
 
   const handleSummaryRecord = () => {
     if (studentIdList.length >= 1) {
-      setDateRecord(new Date().toISOString())
+      setDateRecord(new Date().toISOString());
       handleNext();
     } else {
       console.log(`Not have Student ID in the list.`);
@@ -90,13 +104,12 @@ export default function PN10Form() {
   const handleDisableNextButton = () => {
     if (activeStep === 0 && !searchValue) {
       console.log(`Not have value in project coode.`);
-      return true
-    } else if(activeStep === 1 && studentIdList.length < 1) {
+      return true;
+    } else if (activeStep === 1 && studentIdList.length < 1) {
       console.log(`Not have Student ID in the list.`);
-      return true
+      return true;
     } else {
-      console.log('next!');
-      return false
+      return false;
     }
   };
 
@@ -116,6 +129,48 @@ export default function PN10Form() {
     setActiveStep(0);
   };
 
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    handleNext();
+    setLoadingSave(true);
+
+    try {
+      const formData = await setFromData();
+
+      const response = await createData('attendance', formData);
+
+      if (response && (response.status === 200 || response.status === 201)) {
+        setLoadingSave(false);
+        setIsSuccess(true);
+        setIsFailed(false);
+        resetFeild();
+      }
+    } catch (error) {
+      setLoadingSave(false);
+      setIsSuccess(false);
+      setIsFailed(true);
+      console.log('🚀 ~ handleSubmit ~ error:', error);
+    }
+  };
+
+  const setFromData = async () => {
+    const formData = {
+      projectCode: pn01Data?.project_code,
+      students: studentIdList,
+      projectYear: pn01Data?.project_year,
+      userId: userID,
+      pn01Id: pn01Data?.id,
+    };
+
+    return formData;
+  };
+
+  const resetFeild = () => {
+    setSearchValue('');
+    setStudentIdList([]);
+    setPN01Data({});
+  };
+
   return (
     <main>
       <div className="w-full">
@@ -132,26 +187,81 @@ export default function PN10Form() {
         </Stepper>
         {activeStep === steps.length ? (
           <>
-            <div className="flex items-center justify-center py-6">
-              <p>All steps completed - you&apos;re finished</p>
-            </div>
-            <div className="flex justify-center pt-2">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-              >
-                Reset
-              </button>
-            </div>
+            {loadingSave && (
+              <div className="mt-4 flex items-center justify-center bg-gray-50 py-10">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <CircularProgress />
+                  <div className="text-center">
+                    <span className="text-lg font-semibold">
+                      กำลังบันทึกข้อมูล
+                    </span>
+                    <p className="text-base">โปรดอย่าออกจากหน้านี้</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isSuccess && (
+              <>
+                <div className="mt-4 flex items-center justify-center bg-gray-50 py-10">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
+                    <span className="text-lg font-semibold">
+                      บันทึกข้อมูลเรียบร้อยแล้ว
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+                  >
+                    ปิด
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
+                  >
+                    ไปยังหน้าแบบฟอร์ม
+                  </button>
+                </div>
+              </>
+            )}
+
+            {isFailed && (
+              <>
+                <div className="mt-4 flex items-center justify-center bg-gray-50 py-10">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <ErrorOutlineOutlinedIcon className="h-14 w-14 text-red-500" />
+                    <span className="text-lg font-semibold">ผิดพลาด</span>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
+                  >
+                    ลองอีกครั้ง
+                  </button>
+                  {/* <button
+                    type="submit"
+                    className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
+                  >
+                    ไปยังหน้าแบบฟอร์ม
+                  </button> */}
+                </div>
+              </>
+            )}
           </>
         ) : (
           <>
             <div className="flex items-center justify-center py-6">
-              <div className="h-full w-3/4 rounded-lg bg-gray-50 px-6 py-4 max-md:w-full">
+              <div className="h-full w-full rounded-lg bg-gray-50 px-6 py-4 max-md:w-full">
                 {activeStep === 0 ? (
                   <section className="block">
-                    <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                    <h3 className="mb-2 text-xl font-semibold text-gray-900">
                       รหัสโครงการ/กิจกรรม (พน.01)
                     </h3>
                     <label
@@ -173,10 +283,21 @@ export default function PN10Form() {
                       />
                       <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
                     </div>
+                    {loading && (
+                      <div className="mt-4 w-full bg-white p-3">
+                        <div className="flex items-center justify-center">
+                          <CircularProgress />
+                          <span className="ml-4 text-base font-medium">
+                            Loading...
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     {alertError && (
                       <div className="w-full py-2">
                         <Alert severity="error">
-                          ไม่พบข้อมูล — โปรดตรวจสอบรหัสและลองใหม่อีกครั้ง
+                          ไม่พบรหัสโครงการหรือรหัสโครงการนี้ยังไม่ได้รับอนุมัติ
+                          — โปรดลองใหม่อีกครั้ง
                         </Alert>
                       </div>
                     )}
@@ -185,7 +306,7 @@ export default function PN10Form() {
                   <section>
                     <div className="mb-4 block">
                       <h3 className="mb-4 text-center text-xl font-semibold text-gray-900">
-                        {pn01Data.projectName}
+                        {pn01Data?.project_name}
                       </h3>
                       <form
                         onSubmit={(e) => {
@@ -247,14 +368,18 @@ export default function PN10Form() {
                   <section>
                     <div className="mb-2 block">
                       <h3 className="mb-4 text-center text-xl font-semibold text-gray-900">
-                        {pn01Data.projectName}
+                        {pn01Data?.project_name}
                       </h3>
-                      <div className='flex items-center mb-2'>
-                        <label className='font-semibold text-gray-900'>วันที่บันทึก :&nbsp;</label>
+                      <div className="mb-2 flex items-center">
+                        <label className="font-semibold text-gray-900">
+                          วันที่บันทึก :&nbsp;
+                        </label>
                         <p>{convertISOStringToDateTimeText(dateRecord)}</p>
                       </div>
-                      <div className='flex items-center mb-2'>
-                        <label className='font-semibold text-gray-900'>จำนวนนักศึกษาที่เข้าร่วมทั้งหมด :&nbsp;</label>
+                      <div className="mb-2 flex items-center">
+                        <label className="font-semibold text-gray-900">
+                          จำนวนนักศึกษาที่เข้าร่วมทั้งหมด :&nbsp;
+                        </label>
                         <p>{studentIdList.length.toLocaleString()}</p>
                         <label>&nbsp;คน</label>
                       </div>
@@ -303,14 +428,14 @@ export default function PN10Form() {
                     ? handleCheckProjectCode
                     : activeStep === 1
                     ? handleSummaryRecord
-                    : handleNext
+                    : handleSubmit
                 }
                 disabled={handleDisableNextButton()}
                 className={`${
                   handleDisableNextButton()
                     ? 'bg-blue-300'
                     : 'bg-blue-500 hover:bg-blue-400'
-                } flex h-10 items-center text-white rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
+                } flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
               >
                 {activeStep === 0
                   ? 'ถัดไป'

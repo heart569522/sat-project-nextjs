@@ -45,9 +45,11 @@ import {
   strategic_plan_kpi_list,
   university_strategic_list,
 } from '@/app/model/pn01-select-list';
-import { ModalQuestion, ModalResponse } from '@/app/components/modal';
+import ModalQuestion from '@/app/components/modal/modal-question';
+import ModalResponse from '@/app/components/modal/modal-response';
 import { notFound, useRouter } from 'next/navigation';
 import { OverlayLoading } from '@/app/components/loading-screen';
+
 
 interface ValidationError {
   id: number;

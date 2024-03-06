@@ -41,7 +41,7 @@ export default function Verify({ params }: { params: { token: string } }) {
         };
 
         const emailResponse = await sendEmail(
-          'send-email/notification/pn11',
+          'send-email/notification/pn11/link-document',
           formDataEmail,
         );
         if (emailResponse && emailResponse.status === 200) {

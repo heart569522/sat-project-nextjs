@@ -1,4 +1,3 @@
-import { convertISOStringToDateTimeText } from '@/app/lib/services';
 import {
   Body,
   Container,
@@ -14,15 +13,6 @@ import {
   Tailwind,
 } from '@react-email/components';
 import * as React from 'react';
-
-interface NotificationEmailProps {
-  username?: string;
-  updatedDate?: Date;
-}
-
-// const baseUrl = process.env.VERCEL_URL
-//   ? `https://${process.env.VERCEL_URL}`
-//   : '';
 
 export default function NotificationEmail(props: any) {
   return (
@@ -48,31 +38,10 @@ export default function NotificationEmail(props: any) {
               </Row>
             </Section>
             <Section style={content}>
+              <Text style={paragraph} className='text-xl font-bold text-center'>{props.title}</Text>
               <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
               <Text style={paragraph}>
-                You updated the password for your Twitch account If this was
-                you, then no further action is required.
-              </Text>
-              <Text style={paragraph}>
-                However if you did NOT perform this password change, please{' '}
-                <Link href="#" style={link}>
-                  reset your account password
-                </Link>{' '}
-                immediately.
-              </Text>
-              <Text style={paragraph}>
-                Remember to use a password that is both strong and unique to
-                your Twitch account. To learn more about how to create a strong
-                and unique password,{' '}
-                <Link href="#" style={link}>
-                  click here.
-                </Link>
-              </Text>
-              <Text style={paragraph}>
-                Still have questions? Please contact{' '}
-                <Link href="#" style={link}>
-                  Twitch Support
-                </Link>
+                {props.detail}
               </Text>
               <Text style={paragraph}>
                 ขอบคุณ,

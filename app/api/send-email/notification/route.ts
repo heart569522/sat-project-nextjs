@@ -7,11 +7,14 @@ const sendingEmail = process.env.SENDING_EMAIL;
 
 export async function POST(req: NextRequest) {
     const formData = await req.json();
+    const { email, name, title, detail } = formData
 
   try {
     const htmlEmail = ConvertReactToEmail({
       EmailComponent: NotificationEmail,
-      recipientName: 'ทดสอบ สวัสดี',
+      recipientName: name,
+      title: title,
+      detail: detail
     });
 
     const transporter = nodemailer.createTransport({
@@ -27,8 +30,8 @@ export async function POST(req: NextRequest) {
 
     const mailOptions = {
       from: sendingEmail,
-      to: 'wirunrom@gmail.com',
-      subject: 'test email 2',
+      to: email,
+      subject: title,
       html: htmlEmail,
     };
 

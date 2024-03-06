@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Users } from '@/app/model/user';
-import { ModalResponse } from '@/app/components/modal';
+import { ModalResponse } from '@/app/components/modal/modal-question';
 import { OverlayLoading } from '@/app/components/loading-screen';
 
 export default function ProfileEditForm({editData ,isEditing} : {editData:any ,isEditing?:boolean}) {

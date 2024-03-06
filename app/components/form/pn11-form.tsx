@@ -19,7 +19,8 @@ import {
   createVerifyToken,
 } from '@/app/lib/api-service';
 import { useRouter } from 'next/navigation';
-import { ModalQuestion, ModalResponse } from '../modal';
+import ModalQuestion from '@/app/components/modal/modal-question';
+import ModalResponse from '@/app/components/modal/modal-response';
 import { OverlayLoading } from '../loading-screen';
 import { v4 as uuidv4 } from 'uuid';
 

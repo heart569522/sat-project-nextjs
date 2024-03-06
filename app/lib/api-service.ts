@@ -1,100 +1,6 @@
 import axios from 'axios';
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 
-export async function getStrategicIssue() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/strategic_issue_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getObjective() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/objective_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getUniversityStrategic() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/university_strategic_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getStrategicPlanKPI() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/strategic_plan_kpi_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getOperationPlanKPI() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/operational_plan_kpi_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getProjectKPI() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/project_kpi_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getProjectStatus() {
-  const res = await fetch(
-    `${process.env.API_URL}/api/pn01-select-list/project_status_list`,
-  );
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
-export async function getProjectProposals() {
-  const res = await fetch(`${process.env.API_URL}/api/project-proposal`);
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return res.json();
-}
-
 export async function register(formData: any) {
   try {
     const response = await axios.post(
@@ -158,6 +64,34 @@ export async function getDataById(apiPath: string, id: string) {
   //   throw new Error('Failed to fetch data');
   // }
   return res.json();
+}
+
+export async function searchProjectProposalCode(
+  search: string,
+  userId: string,
+  userRole: string,
+) {
+  noStore();
+
+  const url = new URL(
+    `${process.env.API_URL}/api/project-proposal/search-project-code`,
+  );
+
+  if (search) {
+    url.searchParams.append('search', search);
+  }
+
+  if (userId) {
+    url.searchParams.append('userId', userId);
+  }
+
+  if (userRole) {
+    url.searchParams.append('userRole', userRole);
+  }
+
+  const res = await axios.get(url.toString());
+
+  return res;
 }
 
 export async function fetchPages(
@@ -249,8 +183,6 @@ export async function createData(apiPath: string, formData: any) {
       },
     );
 
-    console.log('Create data success', response);
-
     if (response.data.id) {
       const insertedId = response.data.id;
       console.log('Inserted ID:', insertedId);
@@ -261,6 +193,7 @@ export async function createData(apiPath: string, formData: any) {
     }
   } catch (error) {
     console.error('Error while sending data:', error);
+    throw error;
   }
 }
 
@@ -307,6 +240,7 @@ export async function updateData(
     return response;
   } catch (error) {
     console.error('Error while sending data:', error);
+    throw error;
   }
 }
 
@@ -339,8 +273,6 @@ export async function sendEmail(apiPath: string, formData: any) {
         },
       },
     );
-
-    console.log('Email sending success', response);
 
     return response;
   } catch (error) {

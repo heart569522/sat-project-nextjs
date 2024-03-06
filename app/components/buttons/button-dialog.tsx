@@ -8,11 +8,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  TextField,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { notoThai } from '@/app/components/fonts';
 import { OverlayLoading } from '@/app/components/loading-screen';
-import { ModalResponse } from '@/app/components/modal';
+import ModalResponse from '@/app/components/modal/modal-response';
 
 export function ButtonDialog({
   id,
@@ -22,7 +23,7 @@ export function ButtonDialog({
   detail,
   onSuccess,
   isPN01Draft,
-  formData
+  formData,
 }: {
   id: string;
   apiPath: string;
@@ -42,6 +43,54 @@ export function ButtonDialog({
   const [isCloseButton, setIsCloseButton] = useState(false);
   const [modalError, setModalError] = useState(false);
 
+  const [formEmailInput, setFormEmailInput] = useState({
+    title: '',
+    detail: '',
+  });
+
+  const [validationError, setValidationError] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const handleInputChange = (event: {
+    target: { name: string; value: string | null };
+  }) => {
+    const { name, value } = event.target;
+
+    setFormEmailInput((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate formInput
+    for (const key in formEmailInput) {
+      if (Object.prototype.hasOwnProperty.call(formEmailInput, key)) {
+        const value = formEmailInput[key as keyof typeof formEmailInput];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          isValid = false;
+
+          setValidationError((prevErrors) => ({
+            ...prevErrors,
+            [key]: `โปรดกรอกข้อมูล`,
+          }));
+
+          // console.error(`${key} is required.`);
+        }
+      }
+    }
+
+    return isValid;
+  };
+
   const handleCloseModal = () => {
     setOpenResponseModal(false);
   };
@@ -51,11 +100,14 @@ export function ButtonDialog({
   };
 
   const handleDialogClose = () => {
+    setValidationError({});
     setOpenDialog(false);
   };
 
   const handleAction = async () => {
-    handleDialogClose();
+    if (action === 'delete') {
+      handleDialogClose();
+    }
     setLoading(true);
 
     let response: any;
@@ -66,7 +118,19 @@ export function ButtonDialog({
         break;
 
       case 'sendEmail':
-        response = await sendEmail(apiPath, formData);
+        const isFormValid = validateForm();
+        if (isFormValid) {
+          const formDataEmail = {
+            email: formData.email,
+            name: formData.name,
+            title: formEmailInput.title,
+            detail: formEmailInput.detail
+          }
+          handleDialogClose();
+          response = await sendEmail(apiPath, formDataEmail);
+        } else {
+          setLoading(false);
+        }
         break;
 
       default:
@@ -89,7 +153,17 @@ export function ButtonDialog({
         onSuccess();
       }
     } else {
-      handleSubmissionError();
+      if (action === 'delete') {
+        handleSubmissionError();
+      }
+      if (action === 'sendEmail') {
+        const isFormValid = validateForm();
+        if (isFormValid) {
+          handleSubmissionError();
+        } else {
+          setLoading(false);
+        }
+      }
     }
   };
 
@@ -130,6 +204,57 @@ export function ButtonDialog({
             >
               {detail}
             </p>
+            {action === 'sendEmail' && (
+              <form action="">
+                <div className="py-2">
+                  <label
+                    htmlFor="title"
+                    className={`mb-2 underline block text-base font-medium ${
+                      validationError.title ? 'text-red-600' : 'text-gray-900'
+                    }`}
+                  >
+                    หัวข้อ
+                  </label>
+                  <TextField
+                    type="text"
+                    name="title"
+                    className="flex w-full"
+                    value={formEmailInput.title}
+                    onChange={handleInputChange}
+                    placeholder=""
+                    error={Boolean(validationError.title)}
+                    helperText={validationError.title}
+                  />
+                </div>
+                <div className="py-2">
+                  <label
+                    htmlFor="detail"
+                    className={`mb-2 underline block text-base font-medium ${
+                      validationError.detail ? 'text-red-600' : 'text-gray-900'
+                    }`}
+                  >
+                    รายละเอียด
+                  </label>
+                  <TextField
+                    type="text"
+                    name="detail"
+                    className="flex w-full"
+                    value={formEmailInput.detail}
+                    onChange={handleInputChange}
+                    placeholder=""
+                    multiline
+                    rows={4}
+                    sx={{
+                      '.MuiOutlinedInput-root': {
+                        padding: 1,
+                      },
+                    }}
+                    error={Boolean(validationError.detail)}
+                    helperText={validationError.detail}
+                  />
+                </div>
+              </form>
+            )}
           </DialogContentText>
         </DialogContent>
 

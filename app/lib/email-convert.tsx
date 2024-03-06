@@ -5,6 +5,8 @@ interface EmailProps {
   recipientName?: string;
   verifyLink?: string;
   documentLink?: string;
+  title?: string;
+  detail?: string;
 }
 
 export default function ConvertReactToEmail({
@@ -12,12 +14,16 @@ export default function ConvertReactToEmail({
   recipientName,
   verifyLink,
   documentLink,
+  title,
+  detail,
 }: EmailProps) {
   const htmlEmail = render(
     <EmailComponent
       recipientName={recipientName}
       verifyLink={verifyLink}
       documentLink={documentLink}
+      title={title}
+      detail={detail}
     />,
     {
       pretty: true,
