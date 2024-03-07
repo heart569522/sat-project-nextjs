@@ -155,3 +155,12 @@ export function EditProfile({ id }: { id: string | undefined }) {
     </Link>
   );
 }
+
+export function ForgetPassword(){
+  return (
+    <Link href={`/forgetpassword`}
+      className="flex cursor-pointer justify-center text-gray-600 underline">
+      ลืมรหัสผ่าน
+    </Link>
+  );
+}

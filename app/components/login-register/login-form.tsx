@@ -14,6 +14,8 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { Button } from '@/app/components/buttons/button';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
+import { link } from 'fs';
+import { ForgetPassword } from '@/app/components/buttons/buttons';
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -98,9 +100,7 @@ export default function LoginForm() {
           )}
         </div>
         <div className="mt-4">
-          <div className="flex cursor-pointer justify-center text-gray-600 underline">
-            ลืมรหัสผ่าน
-          </div>
+          <ForgetPassword   />
         </div>
       </div>
     </form>
