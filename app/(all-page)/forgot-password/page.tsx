@@ -56,7 +56,7 @@ export default function ForgetPassForm() {
           </h1>
           <div className="flex flex-col w-full gap-2">
             <label
-              className="my-3 text-base text-center font-medium text-gray-900"
+              className="text-base font-medium text-gray-900"
               htmlFor="email"
             >
               กรุณากรอกอีเมลเพื่อยืนยันตัวตน และ
