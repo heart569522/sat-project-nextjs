@@ -123,10 +123,14 @@ export default function PN10Form({
       setStudentId('');
     }
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setIsSuccess(false);
+    setIsFailed(false);
   };
 
   const handleReset = () => {
     setActiveStep(0);
+    setIsSuccess(false);
+    setIsFailed(false);
   };
 
   const handleSubmit = async (event: any) => {
@@ -149,7 +153,6 @@ export default function PN10Form({
       setLoadingSave(false);
       setIsSuccess(false);
       setIsFailed(true);
-      console.log('🚀 ~ handleSubmit ~ error:', error);
     }
   };
 
@@ -157,6 +160,7 @@ export default function PN10Form({
     const formData = {
       projectCode: pn01Data?.project_code,
       students: studentIdList,
+      projectName: pn01Data?.project_name,
       projectYear: pn01Data?.project_year,
       userId: userID,
       pn01Id: pn01Data?.id,
@@ -240,7 +244,7 @@ export default function PN10Form({
                 <div className="flex justify-center gap-2 pt-2">
                   <button
                     type="button"
-                    onClick={handleSubmit}
+                    onClick={handleBack}
                     className="flex h-10 items-center rounded-lg border border-blue-500 px-4 text-sm font-medium text-blue-600 transition hover:bg-blue-100"
                   >
                     ลองอีกครั้ง
