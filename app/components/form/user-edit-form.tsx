@@ -13,8 +13,9 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Users } from '@/app/model/user';
-import { ModalResponse } from '@/app/components/modal/modal-question';
+
 import { OverlayLoading } from '@/app/components/loading-screen';
+import ModalResponse from '../modal/modal-response';
 
 export default function ProfileEditForm({editData ,isEditing} : {editData:any ,isEditing?:boolean}) {
   const [loading, setLoading] = useState(false);
