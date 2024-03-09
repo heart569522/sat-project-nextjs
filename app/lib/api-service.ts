@@ -353,3 +353,17 @@ export async function verifyData(
 
   return response;
 }
+
+export async function forgotPassword(password: string, id: string) {
+  const response = await axios.patch(
+    `${process.env.API_URL}/api/auth/forgot-password/${id}`,
+    password,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  return response;
+}

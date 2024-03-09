@@ -1,6 +1,6 @@
 'use client';
 
-import { sendEmail, verifyData } from '@/app/lib/api-service';
+import { forgotPassword, sendEmail, verifyData } from '@/app/lib/api-service';
 import {
   CircularProgress,
   FormControl,
@@ -24,11 +24,14 @@ export default function Verify({ params }: { params: { token: string } }) {
     notFound();
   }
 
-  const [loading, setLoading] = useState(true);
+  const [verifyLoading, setVerifyLoading] = useState(true);
+  const [formLoading, setFormLoading] = useState(false);
+
   const [verified, setVerified] = useState(false);
   const [verifiedError, setVerifiedError] = useState(false);
   const [userId, setUserId] = useState('');
-  console.log('🚀 ~ Verify ~ userId:', userId);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
 
   const [validationError, setValidationError] = useState<{
     [key: string]: string;
@@ -76,6 +79,38 @@ export default function Verify({ params }: { params: { token: string } }) {
         ...prevErrors,
         [name]: '',
       }));
+    }
+  };
+
+  useEffect(() => {
+    verifyToken();
+  }, [token]);
+
+  const verifyToken = async () => {
+    try {
+      const response = await verifyData(
+        'auth/forgot-password/token/check-expire',
+        token,
+        false,
+      );
+
+      if (response && response.status === 200) {
+        if (response.data.token_valid) {
+          setVerifyLoading(false);
+          setVerified(true);
+          setVerifiedError(false);
+          setUserId(response.data.id);
+        } else {
+          setVerifyLoading(false);
+          setVerifiedError(true);
+          setVerified(false);
+        }
+      }
+    } catch (error) {
+      //   console.log("🚀 ~ verifyToken ~ error:", error)
+      setVerifyLoading(false);
+      setVerifiedError(true);
+      setVerified(false);
     }
   };
 
@@ -128,35 +163,25 @@ export default function Verify({ params }: { params: { token: string } }) {
     return isValid;
   };
 
-  useEffect(() => {
-    verifyToken();
-  }, [token]);
+  const handleSubmit = async () => {
+    setFormLoading(true);
 
-  const verifyToken = async () => {
-    try {
-      const response = await verifyData(
-        'auth/forgot-password/token/check-expire',
-        token,
-        false,
-      );
+    const isFormValid = validateForm();
 
-      if (response && response.status === 200) {
-        if (response.data.token_valid) {
-          setLoading(false);
-          setVerified(true);
-          setVerifiedError(false);
-          setUserId(response.data.id);
-        } else {
-          setLoading(false);
-          setVerifiedError(true);
-          setVerified(false);
+    if (isFormValid) {
+      try {
+        const response = await forgotPassword(formInput.password, userId);
+
+        if (response && response.status === 200) {
+          setFormLoading(false);
+          setIsSuccess(true);
+          setIsFailed(false);
         }
+      } catch (error) {
+        setFormLoading(false);
+        setIsSuccess(false);
+        setIsFailed(true);
       }
-    } catch (error) {
-      console.log("🚀 ~ verifyToken ~ error:", error)
-      setLoading(false);
-      setVerifiedError(true);
-      setVerified(false);
     }
   };
 
@@ -164,7 +189,7 @@ export default function Verify({ params }: { params: { token: string } }) {
     <div className="flex h-modal items-center justify-center">
       <div className="rounded-md border border-gray-400 p-4 shadow-md max-md:w-full">
         <div className="text-center">
-          {loading && (
+          {verifyLoading && (
             <>
               <div className="mb-2 flex flex-col items-center justify-center gap-3">
                 <CircularProgress />
@@ -184,100 +209,148 @@ export default function Verify({ params }: { params: { token: string } }) {
             </>
           )}
 
-          {verified && (
-            <form>
-              <div className="mb-2 flex flex-col items-center justify-center gap-3">
-                <p className="text-2xl">กรอกรหัสผ่านใหม่</p>
-              </div>
-              <div className="mb-2">
-                <div className="flex flex-col">
-                  <label
-                    className="my-3 text-left text-base font-medium text-gray-900"
-                    htmlFor="password"
-                  >
-                    รหัสผ่าน / Password
-                  </label>
-                  <FormControl variant="outlined">
-                    <OutlinedInput
-                      className="w-full"
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formInput.password}
-                      onChange={handleInputChange}
-                      error={Boolean(validationError.password)}
-                      placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
-                      autoComplete="off"
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleShowPassword}
-                            edge="end"
-                          >
-                            {showPassword ? (
-                              <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                            ) : (
-                              <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                    <FormHelperText className="text-red-600">
-                      {validationError.password}
-                    </FormHelperText>
-                  </FormControl>
+          {verified &&
+            (formLoading ? (
+              <>
+                <div className="mb-4 flex flex-col items-center justify-center gap-3">
+                  <p className="text-2xl">แก้ไขรหัสผ่าน</p>
                 </div>
-                <div className="flex flex-col">
-                  <label
-                    className="my-3 text-left text-base font-medium text-gray-900"
-                    htmlFor="confirmPassword"
-                  >
-                    ยืนยันรหัสผ่าน / Confirm Password
-                  </label>
-                  <FormControl variant="outlined">
-                    <OutlinedInput
-                      className="w-full"
-                      id="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      value={formInput.confirmPassword}
-                      onChange={handleInputChange}
-                      error={Boolean(validationError.confirmPassword)}
-                      placeholder=""
-                      autoComplete="off"
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={handleShowConfirmPassword}
-                            edge="end"
-                          >
-                            {showConfirmPassword ? (
-                              <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
-                            ) : (
-                              <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                    <FormHelperText className="text-red-600">
-                      {validationError.confirmPassword}
-                    </FormHelperText>
-                  </FormControl>
+                <div className="mb-1 flex flex-col items-center justify-center gap-3">
+                  <CircularProgress />
+                  <p className="text-lg">ตรวจสอบข้อมูล...</p>
                 </div>
-              </div>
+                <p className="text-base">โปรดรอจนกว่าระบบจะตรวจสอบเสร็จ</p>
+              </>
+            ) : (
+              <>
+                {isSuccess && (
+                  <>
+                    <div className="mb-2 flex flex-col items-center justify-center gap-3">
+                      <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
+                      <p className="text-2xl">สำเร็จ</p>
+                    </div>
+                    <p className="text-lg mb-4">แก้ไขรหัสผ่านสำเร็จ, กลับไปหน้าเข้าสู่ระบบ</p>
+                    <Link
+                      href={`/`}
+                      className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                    >
+                      ตกลง
+                    </Link>
+                  </>
+                )}
 
-              <button
-                type="submit"
-                className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
-              >
-                ไปยังเอกสารคำร้องขอระเบียนกิจกรรม
-              </button>
-            </form>
-          )}
+                {isFailed && (
+                  <>
+                    <div className="mb-2 flex flex-col items-center justify-center gap-3">
+                      <ErrorOutlineOutlinedIcon className="h-14 w-14 text-red-500" />
+                      <p className="text-2xl">ผิดพลาด</p>
+                    </div>
+                    <p className="text-lg">โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง</p>
+                    <button
+                      type="button"
+                      onClick={() => setIsFailed(false)}
+                      className="mt-4 inline-flex w-full justify-center rounded-md border border-red-500 py-2 text-red-700 hover:bg-red-50"
+                    >
+                      ตกลง
+                    </button>
+                  </>
+                )}
+
+                {!isFailed && !isSuccess && (
+                  <form action={handleSubmit}>
+                    <div className="mb-2 flex flex-col items-center justify-center gap-3">
+                      <p className="text-2xl">แก้ไขรหัสผ่าน</p>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex flex-col">
+                        <label
+                          className="my-3 text-left text-base font-medium text-gray-900"
+                          htmlFor="password"
+                        >
+                          รหัสผ่านใหม่ / New Password
+                        </label>
+                        <FormControl variant="outlined">
+                          <OutlinedInput
+                            className="w-full"
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            value={formInput.password}
+                            onChange={handleInputChange}
+                            error={Boolean(validationError.password)}
+                            placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
+                            autoComplete="off"
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="toggle password visibility"
+                                  onClick={handleShowPassword}
+                                  edge="end"
+                                >
+                                  {showPassword ? (
+                                    <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
+                                  ) : (
+                                    <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                          />
+                          <FormHelperText className="text-red-600">
+                            {validationError.password}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
+                      <div className="flex flex-col">
+                        <label
+                          className="my-3 text-left text-base font-medium text-gray-900"
+                          htmlFor="confirmPassword"
+                        >
+                          ยืนยันรหัสผ่าน / Confirm Password
+                        </label>
+                        <FormControl variant="outlined">
+                          <OutlinedInput
+                            className="w-full"
+                            id="confirmPassword"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            name="confirmPassword"
+                            value={formInput.confirmPassword}
+                            onChange={handleInputChange}
+                            error={Boolean(validationError.confirmPassword)}
+                            placeholder=""
+                            autoComplete="off"
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="toggle confirm password visibility"
+                                  onClick={handleShowConfirmPassword}
+                                  edge="end"
+                                >
+                                  {showConfirmPassword ? (
+                                    <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
+                                  ) : (
+                                    <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                          />
+                          <FormHelperText className="text-red-600">
+                            {validationError.confirmPassword}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                    >
+                      ยืนยัน
+                    </button>
+                  </form>
+                )}
+              </>
+            ))}
         </div>
       </div>
     </div>
