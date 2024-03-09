@@ -25,16 +25,10 @@ import {
 } from '@/app/model/pn01';
 import { Button } from '@/app/components/buttons/button';
 import {
-  getStrategicIssue,
-  getObjective,
-  getUniversityStrategic,
-  getOperationPlanKPI,
-  getProjectKPI,
-  getProjectStatus,
-  getStrategicPlanKPI,
   createData,
   updateData,
   createDraft,
+  getAllData,
 } from '@/app/lib/api-service';
 import {
   objective_list,
@@ -49,7 +43,6 @@ import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { notFound, useRouter } from 'next/navigation';
 import { OverlayLoading } from '@/app/components/loading-screen';
-
 
 interface ValidationError {
   id: number;
@@ -214,7 +207,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getStrategicIssue();
+      const data = await getAllData('strategic_issue_list');
       setLoading(false);
       setStrategicIssueList(data);
     } catch (error) {
@@ -227,7 +220,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getObjective();
+      const data = await getAllData('objective_list');
       setLoading(false);
       setObjectiveList(data);
     } catch (error) {
@@ -240,7 +233,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getUniversityStrategic();
+      const data = await getAllData('university_strategic_list');
       setLoading(false);
       setUniversityStrategicList(data);
     } catch (error) {
@@ -253,7 +246,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getStrategicPlanKPI();
+      const data = await getAllData('strategic_plan_kpi_list');
       setLoading(false);
       setStrategicPlanKPI(data);
     } catch (error) {
@@ -266,7 +259,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getOperationPlanKPI();
+      const data = await getAllData('operational_plan_kpi_list');
       setLoading(false);
       setOperationPlanKPI(data);
     } catch (error) {
@@ -279,7 +272,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getProjectKPI();
+      const data = await getAllData('project_kpi_list');
       setLoading(false);
       setProjectKPI(data);
     } catch (error) {
@@ -292,7 +285,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getProjectStatus();
+      const data = await getAllData('project_status_list');
       setLoading(false);
       setProjectStatus(data);
     } catch (error) {

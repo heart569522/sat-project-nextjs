@@ -60,7 +60,7 @@ export default function TabLoginRegister() {
             สมัครสมาชิก
           </Link>
         </div>
-        <div className="rounded-md border border-gray-200 p-4">
+        <div className="rounded-md border height-login-register border-gray-200 p-4 pb-8">
           {activeTab === 'login' && (
             <div className="flex justify-center">
               <div className="w-2/4 max-lg:w-full">

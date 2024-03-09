@@ -31,6 +31,14 @@ export async function checkExist(type: string, data: string) {
   return res.data.exists;
 }
 
+export async function checkAvaliable(apiPath: string, data: string) {
+  const res = await axios.get(
+    `${process.env.API_URL}/api/${apiPath}/${encodeURIComponent(data)}`,
+  );
+
+  return res.data.avaliable;
+}
+
 export async function checkRole(data: string) {
   const res = await fetch(`${process.env.API_URL}/api/auth/check-role/${data}`);
 
@@ -53,6 +61,14 @@ export async function getAllData(apiPath: string) {
   }
 
   return res.json();
+}
+
+export async function getOneData(apiPath: string, data: any) {
+  noStore();
+
+  const res = await axios.get(`${process.env.API_URL}/api/${apiPath}/${data}`);
+
+  return res;
 }
 
 export async function getDataById(apiPath: string, id: string) {
@@ -302,8 +318,36 @@ export async function createVerifyToken(
   }
 }
 
-export async function verifyData(apiPath: string, token: string) {
-  const response = await axios.patch(
+export async function createForgotPasswordToken(
+  apiPath: string,
+  email: string,
+  formData: any,
+) {
+  try {
+    const response = await axios.patch(
+      `${process.env.API_URL}/api/${apiPath}/${email}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+  }
+}
+
+export async function verifyData(
+  apiPath: string,
+  token: string,
+  isPatchMethod?: boolean,
+) {
+  const method = isPatchMethod ? 'patch' : 'get';
+
+  const response = await axios[method](
     `${process.env.API_URL}/api/${apiPath}/${token}`,
   );
 

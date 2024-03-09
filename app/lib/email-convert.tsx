@@ -5,6 +5,7 @@ interface EmailProps {
   recipientName?: string;
   verifyLink?: string;
   documentLink?: string;
+  forgotPasswordLink?: string;
   title?: string;
   detail?: string;
 }
@@ -13,6 +14,7 @@ export default function ConvertReactToEmail({
   EmailComponent,
   recipientName,
   verifyLink,
+  forgotPasswordLink,
   documentLink,
   title,
   detail,
@@ -21,6 +23,7 @@ export default function ConvertReactToEmail({
     <EmailComponent
       recipientName={recipientName}
       verifyLink={verifyLink}
+      forgotPasswordLink={forgotPasswordLink}
       documentLink={documentLink}
       title={title}
       detail={detail}

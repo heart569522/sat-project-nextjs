@@ -12,9 +12,7 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Button } from '@/app/components/buttons/button';
-import Link from 'next/link';
-import { useRef, useState } from 'react';
-import { link } from 'fs';
+import { useState } from 'react';
 import { ForgotPassword } from '@/app/components/buttons/buttons';
 
 export default function LoginForm() {
@@ -28,7 +26,7 @@ export default function LoginForm() {
 
   return (
     <form action={dispatch} className="space-y-3">
-      <div className="flex-1 rounded-lg h-[740px] px-6 pb-4 pt-8">
+      <div className="flex-1 rounded-lg px-6 pb-4 pt-8">
         <h1 className={`mb-3 text-center text-2xl font-semibold text-gray-800`}>
           เข้าสู่ระบบ
         </h1>
@@ -100,7 +98,7 @@ export default function LoginForm() {
           )}
         </div>
         <div className="mt-4">
-          <ForgotPassword   />
+          <ForgotPassword />
         </div>
       </div>
     </form>

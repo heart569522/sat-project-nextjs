@@ -309,7 +309,7 @@ export default function PN11Form({
           setOpenResponseModal(true);
         } else {
           const verificationToken = generateUniqueToken();
-          await storeVerificationToken(
+          await storeToken(
             response.data.id,
             response.data.data.email,
             verificationToken,
@@ -353,7 +353,7 @@ export default function PN11Form({
     return uuidv4();
   };
 
-  const storeVerificationToken = async (
+  const storeToken = async (
     id: string,
     email: string,
     token: string,
