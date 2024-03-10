@@ -1,6 +1,7 @@
 import { pool } from '@/app/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
+
 export async function PUT(
     req: NextRequest,
     context: { params: { id: string } },
@@ -12,56 +13,44 @@ export async function PUT(
       const {
         firstname,
         lastname,
-        studentId,
-        phone,
-        faculty,
-        major,
         email,
-        deliveryMethod,
-        recipientName,
-        recipientAddress,
-        recipientPhone,
+        phone,
+        faculty_id,
+        major_id,
+        username,
       } = formData;
   
       const response = await pool.query(
         `
-          UPDATE activity_transcript_pn11
+          UPDATE users
           SET
             firstname = $1,
             lastname = $2,
-            student_id = $3,
+            email = $3,
             phone = $4,
             faculty_name = (SELECT name FROM faculties WHERE id = $5),
             faculty_id = $5,
             major_name = (SELECT name FROM majors WHERE id = $6),
             major_id = $6,
-            email = $7,
-            delivery_method = $8,
-            recipient_name = $9,
-            recipient_address = $10,
-            recipient_phone = $11
+            username = $7
           WHERE
-            id = $12
+            id = $8
         `,
         [
           firstname,
           lastname,
-          studentId,
-          phone,
-          faculty,
-          major,
           email,
-          deliveryMethod,
-          recipientName,
-          recipientAddress,
-          recipientPhone,
+          phone,
+          faculty_id,
+          major_id,
+          username,
           id
         ]
       );
   
       return NextResponse.json(
         {
-          message: 'Update activity transcript success',
+          message: 'Update profile success',
         },
         { status: 200 },
       );

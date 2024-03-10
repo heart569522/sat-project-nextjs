@@ -1,5 +1,5 @@
 'use client';
-import { checkExist, getAllData, register } from '@/app/lib/api-service';
+import { checkExist, getAllData, updateData } from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
@@ -136,67 +136,35 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
     setValidationError((prevError) => ({ ...prevError, major: '' }));
   };
 
-  const validateForm = () => {
-    console.log('--validateForm--');
-
-    let isValid = true;
-
-    // Validate formInput
-    for (const key in formInput) {
-      if (Object.prototype.hasOwnProperty.call(formInput, key)) {
-        const value = formInput[key as keyof typeof formInput];
-        if (!value || (typeof value === 'string' && value.trim() === '')) {
-          isValid = false;
-
-          setValidationError((prevErrors) => ({
-            ...prevErrors,
-            [key]:
-              key == 'faculty' || key == 'major'
-                ? 'โปรดเลือกข้อมูล'
-                : `โปรดกรอกข้อมูล`,
-          }));
-
-          console.error(`${key} is required.`);
-        }
-      }
-    }
 
 
 
-    return isValid;
-  };
 
   const handleSubmit = async () => {
     setLoading(true);
     resetResponseModal();
+    
+    const formData = setFinalFormData();
+    console.log(formData);
+    try {
+      let response: any;
+      response = await updateData('profile/update-profile' ,formData , editData.id);
 
-    const isFormValid = validateForm();
-
-    if (isFormValid) {
-      const formData = setFinalFormData();
-
-      try {
-        let response: any;
-
-        response = await register(formData);
-
-        if (response && (response.status === 201 || response.status === 200)) {
-          setLoading(false);
-          setModalSuccess(true);
-          setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
-          setButtonLink(`/profile`);
-          setNextTab(true);
-          setOpenResponseModal(true);
-        } else {
-          handleSubmissionError();
-        }
-      } catch (error) {
+      if (response && (response.status === 201 || response.status === 200)) {
+        setLoading(false);
+        setModalSuccess(true);
+        setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
+        setButtonLink(`/profile`);
+        setButtonText('ไปยังหน้าโปรไฟล์');
+        setNextTab(true);
+        setOpenResponseModal(true);
+      } else {
         handleSubmissionError();
       }
-    } else {
-      setLoading(false);
-      console.error('Form is Invalid');
+    } catch (error) {
+      handleSubmissionError();
     }
+
   };
 
   const setFinalFormData = () => {
