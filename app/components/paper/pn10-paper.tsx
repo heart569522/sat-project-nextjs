@@ -25,7 +25,7 @@ const DotsPlaceholder = ({
       ))}
       {text && (
         <span
-          className={`absolute ${positionClasses[position]} lef -translate-x-1/2 left transform whitespace-nowrap pb-3`}
+          className={`absolute ${positionClasses[position]} lef left -translate-x-1/2 transform whitespace-nowrap pb-3`}
         >
           {text}
         </span>
@@ -34,7 +34,7 @@ const DotsPlaceholder = ({
   );
 };
 
-export default function PN10Paper({ data }: { data: PN10 }) {
+export default function PN10Paper({ data }: { data: any }) {
   const paperRef = useRef<HTMLDivElement>(null);
   const theadRef = useRef<HTMLTableSectionElement>(null);
   const headerRef = useRef<HTMLHeadElement>(null);
@@ -64,7 +64,8 @@ export default function PN10Paper({ data }: { data: PN10 }) {
   useEffect(() => {
     const checkPageBreak = () => {
       if (paperRef.current) {
-        const headerPageHeight = headerRef.current?.getBoundingClientRect().height;
+        const headerPageHeight =
+          headerRef.current?.getBoundingClientRect().height;
         const theadHeight = theadRef.current?.getBoundingClientRect().height;
 
         let currentPage = createNewPage(paperRef.current);
@@ -141,20 +142,20 @@ export default function PN10Paper({ data }: { data: PN10 }) {
                 <p className={`whitespace-nowrap`}>โครงการ/กิจกรรม</p>
                 <DotsPlaceholder
                   numOfDots={90}
-                  text={`${data.projectName}`}
+                  text={`${data.project_name}`}
                   position="left"
                 />
                 <p className={`whitespace-nowrap`}>จำนวน</p>
                 <DotsPlaceholder
                   numOfDots={10}
-                  text={data.projectHour}
+                  text={data.project_hour}
                   position="center"
                 />
                 <p className="whitespace-nowrap">ชั่วโมง</p>
                 <p className="whitespace-nowrap pl-1">วันที่</p>
                 <DotsPlaceholder
                   numOfDots={29}
-                  text={convertISOStringToDateText(data.projectDate)}
+                  text={convertISOStringToDateText(data.created_at)}
                   position="center"
                 />
               </div>
@@ -167,11 +168,11 @@ export default function PN10Paper({ data }: { data: PN10 }) {
                       <td className="table-p w-[10%] border border-black">
                         ลำดับ
                       </td>
-                      <td className="table-p w-[45%] border border-black">
-                        ชื่อ-นามสกุล
-                      </td>
                       <td className="table-p w-[25%] border border-black">
                         รหัสนักศึกษา
+                      </td>
+                      <td className="table-p w-[45%] border border-black">
+                        ชื่อ-นามสกุล
                       </td>
                       <td className="table-p w-[20%] border border-black">
                         หมายเหตุ
@@ -179,16 +180,16 @@ export default function PN10Paper({ data }: { data: PN10 }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.studentList.map((row, i) => (
+                    {data.students.map((row: any, i: any) => (
                       <tr className="part bg-white" key={i}>
                         <td className="table-p border border-black text-center">
                           {i + 1}
                         </td>
-                        <td className="table-p border border-black text-left">
-                          {`${row.firstname} ${row.lastname}`}
-                        </td>
                         <td className="table-p border border-black text-center">
-                          {row.studentId}
+                          {row.Std}
+                        </td>
+                        <td className="table-p border border-black text-left">
+                          {row.Name}
                         </td>
                         <td className="table-p border border-black text-center"></td>
                       </tr>

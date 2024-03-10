@@ -1,15 +1,20 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import { sarabun } from '@/app/components/fonts';
+import { DocumentLoading } from '@/app/components/loading-screen';
 import PN10Paper from '@/app/components/paper/pn10-paper';
 import ToolBox from '@/app/components/paper/tool-box';
-import pn10Data from '@/app/model/pn10Data.json';
+import { getDataById } from '@/app/lib/api-service';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'แบบฟอร์มลงชื่อเข้าร่วมโครงการ/กิจกรรม (พน.10)',
 };
 
-export default async function Page() {
+export default async function Page(context: { params: { id: string } }) {
+  const { id } = context.params;
+  const pn10Data = await getDataById('attendance', id);
+
   return (
     <main>
       <div className="mb-6 print:hidden">
@@ -38,7 +43,9 @@ export default async function Page() {
       </div>
       <div className="flex justify-center">
         <div id="pdf-content" className={`${sarabun.className}`}>
-          <PN10Paper data={pn10Data} />
+          <Suspense fallback={<DocumentLoading />}>
+            <PN10Paper data={pn10Data} />
+          </Suspense>
         </div>
         <ToolBox
           downloadFileName="แบบฟอร์มลงชื่อเข้าร่วมโครงการ/กิจกรรม(พน.10)"

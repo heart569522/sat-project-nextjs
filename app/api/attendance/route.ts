@@ -13,6 +13,8 @@ export async function POST(req: NextRequest) {
   const googleSheetsInsertAttendance =
     process.env.APP_SCRIPT_INSERT_ATTENDANCE_SHEET;
 
+  let dataToJSON : any
+
   try {
     await client.query('BEGIN');
 
@@ -20,29 +22,6 @@ export async function POST(req: NextRequest) {
     const { projectCode, students, projectName, projectYear, userId, pn01Id } =
       formData;
     const studentList = JSON.stringify(students);
-
-    const response = await client.query(
-      `
-        INSERT INTO student_attendance_pn10 (
-          project_code, students, project_year, created_by
-        )
-        VALUES (
-          $1, $2, $3,
-          (SELECT id FROM users WHERE id = $4)
-        )
-        RETURNING *;
-      `,
-      [projectCode, studentList, projectYear, userId],
-    );
-
-    await client.query(
-      `
-        UPDATE project_proposal_pn01
-        SET is_create_attendance = true
-        WHERE id = $1;
-      `,
-      [pn01Id],
-    );
 
     const studentDetailsPromises = students.map((studentId: string) =>
       fetchStudentDetails(studentId),
@@ -67,7 +46,7 @@ export async function POST(req: NextRequest) {
       );
       console.log("🚀 ~ POST ~ googleSheetsDataArray:", googleSheetsDataArray)
 
-      const dataToJSON = JSON.stringify(googleSheetsDataArray);
+      dataToJSON = JSON.stringify(googleSheetsDataArray);
       console.log("🚀 ~ POST ~ dataToJSON:", dataToJSON)
 
       try {
@@ -85,6 +64,29 @@ export async function POST(req: NextRequest) {
         console.error('Error inserting data into Google Sheets:', error);
       }
     }
+
+    const response = await client.query(
+      `
+        INSERT INTO student_attendance_pn10 (
+          project_code, project_name, students, project_year, created_by
+        )
+        VALUES (
+          $1, $2, $3, $4, 
+          (SELECT id FROM users WHERE id = $5)
+        )
+        RETURNING *;
+      `,
+      [projectCode, projectName, dataToJSON, projectYear, userId],
+    );
+
+    await client.query(
+      `
+        UPDATE project_proposal_pn01
+        SET is_create_attendance = true
+        WHERE id = $1;
+      `,
+      [pn01Id],
+    );
 
     await client.query('COMMIT');
 

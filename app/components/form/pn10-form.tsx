@@ -15,6 +15,7 @@ import {
 import { PaperPN01 } from '@/app/model/pn01';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import Link from 'next/link';
 
 const steps = ['รหัสโครงการ', 'บันทึกรายการนักศึกษา', 'สรุปผล'];
 
@@ -40,6 +41,7 @@ export default function PN10Form({
   const [isFailed, setIsFailed] = useState(false);
 
   const [pn01Data, setPN01Data] = useState<PaperPN01>();
+  const [responseId, setResponseId] = useState('');
 
   const handleSearchChange = (event: any) => {
     const numericValue = event.target.value.replace(/\D/g, '').slice(0, 5);
@@ -131,6 +133,7 @@ export default function PN10Form({
     setActiveStep(0);
     setIsSuccess(false);
     setIsFailed(false);
+    setResponseId('');
   };
 
   const handleSubmit = async (event: any) => {
@@ -147,6 +150,7 @@ export default function PN10Form({
         setLoadingSave(false);
         setIsSuccess(true);
         setIsFailed(false);
+        setResponseId(response.data.id);
         resetFeild();
       }
     } catch (error) {
@@ -223,12 +227,12 @@ export default function PN10Form({
                   >
                     ปิด
                   </button>
-                  <button
-                    type="submit"
+                  <Link
+                    href={`activity-record/document/${responseId}`}
                     className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
                   >
                     ไปยังหน้าแบบฟอร์ม
-                  </button>
+                  </Link>
                 </div>
               </>
             )}
