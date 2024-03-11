@@ -191,7 +191,9 @@ export default function PN10Paper({ data }: { data: any }) {
                         <td className="table-p border border-black text-left">
                           {row.Name}
                         </td>
-                        <td className="table-p border border-black text-center"></td>
+                        <td className="table-p border border-black text-center">
+                          {row.remark || ''}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

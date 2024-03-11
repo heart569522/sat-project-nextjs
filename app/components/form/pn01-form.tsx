@@ -207,7 +207,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('strategic_issue_list');
+      const data = await getAllData('pn01-select-list/strategic_issue_list');
       setLoading(false);
       setStrategicIssueList(data);
     } catch (error) {
@@ -220,7 +220,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('objective_list');
+      const data = await getAllData('pn01-select-list/objective_list');
       setLoading(false);
       setObjectiveList(data);
     } catch (error) {
@@ -233,7 +233,9 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('university_strategic_list');
+      const data = await getAllData(
+        'pn01-select-list/university_strategic_list',
+      );
       setLoading(false);
       setUniversityStrategicList(data);
     } catch (error) {
@@ -246,7 +248,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('strategic_plan_kpi_list');
+      const data = await getAllData('pn01-select-list/strategic_plan_kpi_list');
       setLoading(false);
       setStrategicPlanKPI(data);
     } catch (error) {
@@ -259,7 +261,9 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('operational_plan_kpi_list');
+      const data = await getAllData(
+        'pn01-select-list/operational_plan_kpi_list',
+      );
       setLoading(false);
       setOperationPlanKPI(data);
     } catch (error) {
@@ -272,7 +276,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('project_kpi_list');
+      const data = await getAllData('pn01-select-list/project_kpi_list');
       setLoading(false);
       setProjectKPI(data);
     } catch (error) {
@@ -285,7 +289,7 @@ export default function PN01Form({
       setLoading(true);
     }
     try {
-      const data = await getAllData('project_status_list');
+      const data = await getAllData('pn01-select-list/project_status_list');
       setLoading(false);
       setProjectStatus(data);
     } catch (error) {
@@ -1459,7 +1463,7 @@ export default function PN01Form({
       operationPlanKPI: selectedValues.operationPlanKPI,
       projectKPI: selectedValues.projectKPI,
       projectStatus: selectedValues.projectStatus,
-      responsibleRows: responsibleRows,
+      studentRows: responsibleRows,
       OIVTRows: OIVTRows,
       expectedResultRows: expectedResultRows,
       operationDurationRows: operationDurationRows,

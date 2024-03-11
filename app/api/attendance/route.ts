@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
     const formData = await req.json();
     const { projectCode, students, projectName, projectYear, userId, pn01Id } =
       formData;
-    const studentList = JSON.stringify(students);
 
     const studentDetailsPromises = students.map((studentId: string) =>
       fetchStudentDetails(studentId),
@@ -37,10 +36,12 @@ export async function POST(req: NextRequest) {
           const lastname = studentData.lastname || '';
 
           return {
+            id: index + 1,
             Name: `${firstname} ${lastname}`,
             Std: students[index],
             ProjectName: projectName,
             AcademicYear: projectYear,
+            remark: ''
           };
         },
       );

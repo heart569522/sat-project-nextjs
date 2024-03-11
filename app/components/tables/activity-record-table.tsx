@@ -35,6 +35,7 @@ import {
 } from '@/app/components/not-found';
 import { ButtonDialog } from '@/app/components/buttons/button-dialog';
 import { Button } from '../buttons/button';
+import { PN10, StudentList } from '@/app/model/pn10';
 
 interface ToggleCanEditState {
   [key: string]: boolean;
@@ -52,7 +53,7 @@ export default function ActivityRecordTable({
   isAdminTable?: boolean;
 }) {
   // console.log('🚀 ~ isAdminTable:', isAdminTable);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<PN10[]>([]);
   const [loading, setLoading] = useState(true);
   const [showStudents, setShowStudents] = useState<string | null>(null);
 
@@ -98,7 +99,7 @@ export default function ActivityRecordTable({
 
       if (response && (response.status === 201 || response.status === 200)) {
         setHour('');
-        setIsEditHour(false)
+        setIsEditHour(false);
         fetchData();
       }
     } catch (error) {
@@ -220,7 +221,12 @@ export default function ActivityRecordTable({
                     <th scope="col" className="w-[10%] px-3 py-5">
                       ปีการศึกษา
                     </th>
-                    <th scope="col" className="w-[20%] px-3 py-5">
+                    <th
+                      scope="col"
+                      className={`${
+                        isAdminTable ? 'w-[20%]' : 'w-[10%]'
+                      } px-3 py-5`}
+                    >
                       จำนวนชั่วโมง
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
@@ -258,7 +264,7 @@ export default function ActivityRecordTable({
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {row.project_code || '-'}
                           </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-left text-sm">
+                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {row.project_name || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
@@ -276,52 +282,56 @@ export default function ActivityRecordTable({
                             {row.project_year || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <div className="mt-2 flex justify-center items-center gap-2">
-                              {isEditHour ? (
-                                <>
-                                  <TextField
-                                    className="w-full"
-                                    value={hour}
-                                    onChange={(e) => setHour(e.target.value)}
-                                    placeholder=""
-                                    type="number"
-                                  />
-                                  <button
-                                    type="button"
-                                    className="rounded-md border-blue-500 text-blue-600 hover:bg-blue-100 px-3 h-10 border"
-                                    onClick={() => setIsEditHour(false)}
-                                  >
-                                    ยกเลิก
-                                  </button>
-                                  <Button
-                                    type="button"
-                                    className="rounded-md"
-                                    onClick={() =>
-                                      handleSaveData(
-                                        'attendance/update-hour',
-                                        row.id,
-                                        hour,
-                                      )
-                                    }
-                                  >
-                                    บันทึก
-                                  </Button>
-                                </>
-                              ) : (
-                                <>
-                                  <p className='text-center text-base'>
-                                    {row.project_hour || '0'} ชั่วโมง
-                                  </p>
-                                  <Button
-                                    type="button"
-                                    className="rounded-md h-8"
-                                    onClick={() => setIsEditHour(true)}
-                                  >
-                                    แก้ไข
-                                  </Button>
-                                </>
-                              )}
-                            </div>
+                            {isAdminTable ? (
+                              <div className="mt-2 flex items-center justify-center gap-2">
+                                {isEditHour ? (
+                                  <>
+                                    <TextField
+                                      className="w-full"
+                                      value={hour}
+                                      onChange={(e) => setHour(e.target.value)}
+                                      placeholder=""
+                                      type="number"
+                                    />
+                                    <button
+                                      type="button"
+                                      className="h-10 rounded-md border border-blue-500 px-3 text-blue-600 hover:bg-blue-100"
+                                      onClick={() => setIsEditHour(false)}
+                                    >
+                                      ยกเลิก
+                                    </button>
+                                    <Button
+                                      type="button"
+                                      className="rounded-md"
+                                      onClick={() =>
+                                        handleSaveData(
+                                          'attendance/update-hour',
+                                          row.id,
+                                          hour,
+                                        )
+                                      }
+                                    >
+                                      บันทึก
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="text-center text-base">
+                                      {row.project_hour || '0'} ชั่วโมง
+                                    </p>
+                                    <Button
+                                      type="button"
+                                      className="h-8 rounded-md"
+                                      onClick={() => setIsEditHour(true)}
+                                    >
+                                      แก้ไข
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <>{row.project_hour || '0'}&nbsp;ชั่วโมง</>
+                            )}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {convertISOStringToDateText(row.created_at)}
@@ -403,28 +413,36 @@ export default function ActivityRecordTable({
                                         <td className="w-[10%] border border-black p-3">
                                           ลำดับ
                                         </td>
-                                        <td className="w-[25%] border border-black p-3">
+                                        <td className="w-[15%] border border-black p-3">
                                           รหัสนักศึกษา
                                         </td>
-                                        <td className="w-[45%] border border-black p-3">
+                                        <td className="border border-black p-3">
                                           ชื่อ-นามสกุล
+                                        </td>
+                                        <td className="w-[25%] border border-black p-3">
+                                          หมายเหตุ
                                         </td>
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {row.students.map((list: any, i: any) => (
-                                        <tr className="text-base" key={i}>
-                                          <td className="border border-black p-1 text-center">
-                                            {i + 1}
-                                          </td>
-                                          <td className="border border-black p-1 text-center">
-                                            {list.Std}
-                                          </td>
-                                          <td className="border border-black px-2 py-1 text-left">
-                                            {list.Name}
-                                          </td>
-                                        </tr>
-                                      ))}
+                                      {row.students.map(
+                                        (list: StudentList, i: number) => (
+                                          <tr className="text-base" key={i}>
+                                            <td className="border border-black p-1 text-center">
+                                              {i + 1}
+                                            </td>
+                                            <td className="border border-black p-1 text-center">
+                                              {list.Std}
+                                            </td>
+                                            <td className="border border-black px-2 py-1 text-left">
+                                              {list.Name}
+                                            </td>
+                                            <td className="border border-black p-1 text-center">
+                                              {list.remark}
+                                            </td>
+                                          </tr>
+                                        ),
+                                      )}
                                     </tbody>
                                   </table>
                                 )}

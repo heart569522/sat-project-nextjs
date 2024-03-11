@@ -142,7 +142,7 @@ export default function PN10Form({
     setLoadingSave(true);
 
     try {
-      const formData = await setFromData();
+      const formData = await setFormData();
 
       const response = await createData('attendance', formData);
 
@@ -160,7 +160,7 @@ export default function PN10Form({
     }
   };
 
-  const setFromData = async () => {
+  const setFormData = async () => {
     const formData = {
       projectCode: pn01Data?.project_code,
       students: studentIdList,
