@@ -79,6 +79,8 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
     [key: string]: string;
   }>({});
 
+  const [isFormEdited, setIsFormEdited] = useState(false);
+
   const handleInputChange = (event: {
     target: { name: string; value: string | null };
   }) => {
@@ -88,6 +90,7 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
       ...prevValues,
       [name]: value,
     }));
+    setIsFormEdited(true);
   };
 
   const handleCheckEmailExist = async () => {
@@ -128,12 +131,16 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
       major: '', // Reset major when changing faculty
     }));
     setValidationError((prevError) => ({ ...prevError, faculty: '' }));
+
+    setIsFormEdited(true);
   };
 
   const handleMajorChange = (event: { target: { value: any } }) => {
     const majorValue = event.target.value;
     setFormInput((prevInput) => ({ ...prevInput, major: majorValue }));
     setValidationError((prevError) => ({ ...prevError, major: '' }));
+
+    setIsFormEdited(true);
   };
 
 
@@ -155,7 +162,7 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
         setModalSuccess(true);
         setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
         setButtonLink(`/profile`);
-        setButtonText('ไปยังหน้าโปรไฟล์');
+        setButtonText('ตกลง');
         setNextTab(true);
         setOpenResponseModal(true);
       } else {
@@ -432,12 +439,20 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
           </div>
         </div>
         <div className="mb-2 mt-6 flex justify-center gap-2">
-          <button className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200">
+          <button 
+          className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
+          >
             ยกเลิก
           </button>
+          
           <button
-            className="flex h-10 items-center rounded-md bg-blue-500 px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+            className={
+            !isFormEdited
+            ? 'flex h-10 items-center rounded-md bg-gray-300 px-4 text-base font-medium text-gray-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+            : 'flex h-10 items-center rounded-md bg-blue-500  px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+            }
             type="submit"
+            disabled={!isFormEdited}
           >
             ยืนยันการแก้ไขข้อมูล
           </button>

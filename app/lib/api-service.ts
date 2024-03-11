@@ -367,3 +367,4 @@ export async function forgotPassword(password: string, id: string) {
 
   return response;
 }
+

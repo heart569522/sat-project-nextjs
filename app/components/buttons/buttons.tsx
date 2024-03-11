@@ -164,3 +164,13 @@ export function ForgotPassword(){
     </Link>
   );
 }
+
+export function EditPassword({ id }: { id: string | undefined }){
+  return (
+    <Link href={`/profile/checkPasswds`}
+      className="ms-3 items-center rounded-md bg-yellow-400 px-4 py-2 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900"
+      type="button">
+      แก้ไขรหัสผ่าน
+    </Link>
+  );
+}

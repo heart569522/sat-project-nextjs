@@ -2,7 +2,8 @@
 import React from 'react';
 import { Users } from '@/app/model/user';
 import { EditProfile } from '@/app/components/buttons/buttons';
-
+import Link from 'next/link';
+import {EditPassword} from '@/app/components/buttons/buttons';
 export default function UserProfile({ data }: { data: Users }) {
   const CheckRole = () => {
     if (data.role === 'admin') {
@@ -22,7 +23,7 @@ export default function UserProfile({ data }: { data: Users }) {
             ข้อมูลโปรไฟล์
           </h1>
         </div>
-        <div className="grid grid-cols-2 text-start text-xs md:text-2xl">
+        <div className="grid grid-cols-2 gap-3 mt-3 text-start text-xs md:text-2xl">
           <div className="w-full">
             <p className="mb-3">
               ชื่อ - นามสกุล : {data.firstname} {data.lastname}
@@ -35,12 +36,7 @@ export default function UserProfile({ data }: { data: Users }) {
             <p className="mb-3">ชื่อผู้ใช้งาน : {data.username}</p>
             <p className="mb-3">
               รหัสผ่าน :
-              <button
-                className="ms-3 h-10 items-center rounded-md bg-yellow-400 px-4 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900"
-                type="button"
-              >
-                แก้ไขรหัสผ่าน
-              </button>
+              <EditPassword id={data.id} />
             </p>
           </div>
           <div className="w-full border-l-2 border-gray-800 ps-4 ">
