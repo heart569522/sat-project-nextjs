@@ -91,14 +91,21 @@ export default function NavLinks({ userData }: { userData: Users }) {
     ],
   };
 
-  // Get the allowed paths based on the user's role or use default for other roles
-  const allowedPathsForRole = allowedPaths[
-    userData?.role as keyof typeof allowedPaths
-  ] || ['/', '/activity-history', '/test'];
+  const isUserVerified = userData?.is_verify;
 
-  // Filter links based on allowed paths
+  const allowedPathsForUnverifiedUser = ['/activity-history', '/test'];
+  const defaultPaths = ['/', '/activity-history', '/test'];
+
+  const userRole = userData?.role;
+
+  const allowedPathsForRole = userRole
+    ? isUserVerified
+      ? allowedPaths[userRole as keyof typeof allowedPaths]
+      : allowedPathsForUnverifiedUser
+    : defaultPaths;
+
   const filteredLinks = links.filter((link) =>
-    allowedPathsForRole.some((allowedPath) =>
+    allowedPathsForRole.some((allowedPath: string) =>
       allowedPath === '/'
         ? link.href === '/'
         : link.href.startsWith(allowedPath),
@@ -159,14 +166,21 @@ export function NavLinksMobile({
     ],
   };
 
-  // Get the allowed paths based on the user's role or use default for other roles
-  const allowedPathsForRole = allowedPaths[
-    userData?.role as keyof typeof allowedPaths
-  ] || ['/', '/activity-history', '/test'];
+  const isUserVerified = userData?.is_verify;
 
-  // Filter links based on allowed paths
+  const allowedPathsForUnverifiedUser = ['/activity-history', '/test'];
+  const defaultPaths = ['/', '/activity-history', '/test'];
+
+  const userRole = userData?.role;
+
+  const allowedPathsForRole = userRole
+    ? isUserVerified
+      ? allowedPaths[userRole as keyof typeof allowedPaths]
+      : allowedPathsForUnverifiedUser
+    : defaultPaths;
+
   const filteredLinks = links.filter((link) =>
-    allowedPathsForRole.some((allowedPath) =>
+    allowedPathsForRole.some((allowedPath: string) =>
       allowedPath === '/'
         ? link.href === '/'
         : link.href.startsWith(allowedPath),
@@ -206,7 +220,7 @@ export function NavLinksMobile({
       })}
 
       {userData && (
-        <div className="mt-8 flex items-center gap-1 justify-end px-2 py-0">
+        <div className="mt-8 flex items-center justify-end gap-1 px-2 py-0">
           <div
             onClick={() => {
               closeMobileNav();

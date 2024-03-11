@@ -12,6 +12,7 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnProtectedPage = [
+        '/welcome',
         '/project-proposal',
         '/activity-record',
         '/management',
@@ -31,7 +32,7 @@ export const authConfig = {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
-        return Response.redirect(new URL('/project-proposal', nextUrl));
+        return Response.redirect(new URL('/welcome', nextUrl));
       }
       return true;
     },
