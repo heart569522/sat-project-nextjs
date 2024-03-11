@@ -2,14 +2,13 @@ import { pool } from '@/app/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { unstable_noStore as noStore } from 'next/cache';
 
-const ITEMS_PER_PAGE = 5;
 const searchColumns = [
   'project_code',
   'project_name',
   'students',
   'project_hour',
   'project_year',
-  'created_at'
+  'created_at',
 ];
 
 export async function GET(req: NextRequest) {
@@ -17,6 +16,10 @@ export async function GET(req: NextRequest) {
   try {
     const page = req.nextUrl.searchParams.get('page');
     const search = req.nextUrl.searchParams.get('search');
+    const userId = req.nextUrl.searchParams.get('userId');
+    const isAdminFetch = req.nextUrl.searchParams.get('isWithoutDraft');
+
+    const ITEMS_PER_PAGE = isAdminFetch ? 10 : 5;
 
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
@@ -29,6 +32,14 @@ export async function GET(req: NextRequest) {
           return `CAST(student_attendance_pn10.${column} AS TEXT) ILIKE '%${search}%'`;
         })
         .join(' OR ')})`;
+
+      if (userId) {
+        searchConditions += ` AND student_attendance_pn10.created_by = '${userId}'`;
+      }
+    } else {
+      if (userId) {
+        searchConditions += ` AND student_attendance_pn10.created_by = '${userId}'`;
+      }
     }
 
     const sqlQuery = `

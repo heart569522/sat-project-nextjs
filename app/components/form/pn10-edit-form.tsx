@@ -282,7 +282,7 @@ export default function PN10EditForm({
         setDetailModal('แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรมสำเร็จ');
         setButtonLink(
           isAdminManage
-            ? `/management/pn01/document/${editData?.id}`
+            ? `/management/pn10/document/${editData?.id}`
             : `/activity-record/document/${editData?.id}`,
         );
         setButtonText('ไปยังเอกสารเอกสาร พน.10');
@@ -398,6 +398,7 @@ export default function PN10EditForm({
                   placeholder=""
                   error={Boolean(validationError.projectHour)}
                   helperText={validationError.projectHour}
+                  disabled={!isAdminManage}
                 />
                 <p className="text-lg">ชั่วโมง</p>
               </div>
