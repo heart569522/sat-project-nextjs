@@ -19,7 +19,7 @@ export interface PN01 {
   operationPlanKPI?: string;
   projectKPI?: string;
   projectStatus?: string;
-  studentRows?: ResponsibleRow[];
+  responsibleRows?: ResponsibleRow[];
   OIVTRows?: OIVTRow[];
   expectedResultRows?: ExpectedResultRow[];
   operationDurationRows?: OperationDurationRow[];

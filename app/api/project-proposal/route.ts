@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
     const date = datetime.date;
     const time = datetime.time;
 
-    const response = await pool.query(`
+    const response = await pool.query(
+      `
         INSERT INTO project_proposal_pn01 (
             project_code, 
             date, 
@@ -145,51 +146,96 @@ export async function POST(req: NextRequest) {
             created_by
         )
         VALUES (
-            '${projectCode}', 
-            '${date}', 
-            '${time}', 
-            '${faculty}',
-            '${project_name}', 
-            '${project_year}', 
-            '${project_head}', 
-            '${project_head_phone}',
-            '${responsible_rows}', 
-            '${strategic_issue}', 
-            (SELECT name FROM strategic_issue_list WHERE id = '${strategic_issue}'), 
-            '${objective}', 
-            (SELECT name FROM objective_list WHERE id = '${objective}'),
-            '${university_strategic}',
-            (SELECT name FROM university_strategic_list WHERE id = '${university_strategic}'),
-            '${strategic_plan_kpi}', 
-            (SELECT name FROM strategic_plan_kpi_list WHERE id = '${strategic_plan_kpi}'),
-            '${operational_plan_kpi}',
-            (SELECT name FROM operational_plan_kpi_list WHERE id = '${operational_plan_kpi}'),
-            '${project_kpi}', 
-            (SELECT name FROM project_kpi_list WHERE id = '${project_kpi}'),
-            '${project_status}', 
-            (SELECT name FROM project_status_list WHERE id = '${project_status}'),
-            '${project_types}',
-            '${university_identity}', 
-            '${principle_reason}',
-            '${OIVT_rows}', 
-            '${expected_result_rows}',
-            '${operation_duration_rows}', 
-            '${project_location}', 
-            '${project_datetime}',
-            '${project_schedule_rows}', 
-            '${lecturer}', 
-            '${target_total}', 
-            '${target_rows}',
-            '${improvement}', 
-            '${budget_income_total}', 
-            '${budget_income_rows}', 
-            '${budget_expense_total}', 
-            '${budget_expense_rows}',
-            (SELECT id FROM pn01_status WHERE name = '${PN01Status[1]}'),
-            (SELECT id FROM users WHERE id = '${userId}')
+            $1, -- projectCode
+            $2, -- date
+            $3, -- time
+            $4, -- faculty
+            $5, -- project_name
+            $6, -- project_year
+            $7, -- project_head
+            $8, -- project_head_phone
+            $9, -- responsible_rows
+            $10, -- strategic_issue
+            (SELECT name FROM strategic_issue_list WHERE id = $11), -- strategic_issue_name
+            $12, -- objective
+            (SELECT name FROM objective_list WHERE id = $13), -- objective_name
+            $14, -- university_strategic
+            (SELECT name FROM university_strategic_list WHERE id = $15), -- university_strategic_name
+            $16, -- strategic_plan_kpi
+            (SELECT name FROM strategic_plan_kpi_list WHERE id = $17), -- strategic_plan_kpi_name
+            $18, -- operational_plan_kpi
+            (SELECT name FROM operational_plan_kpi_list WHERE id = $19), -- operational_plan_kpi_name
+            $20, -- project_kpi
+            (SELECT name FROM project_kpi_list WHERE id = $21), -- project_kpi_name
+            $22, -- project_status
+            (SELECT name FROM project_status_list WHERE id = $23), -- project_status_name
+            $24, -- project_types
+            $25, -- university_identity
+            $26, -- principle_reason
+            $27, -- OIVT_rows
+            $28, -- expected_result_rows
+            $29, -- operation_duration_rows
+            $30, -- project_location
+            $31, -- project_datetime
+            $32, -- project_schedule_rows
+            $33, -- lecturer
+            $34, -- target_total
+            $35, -- target_rows
+            $36, -- improvement
+            $37, -- budget_income_total
+            $38, -- budget_income_rows
+            $39, -- budget_expense_total
+            $40, -- budget_expense_rows
+            $41, -- status_id
+            (SELECT id FROM users WHERE id = $42) -- user_id
         )
         RETURNING id;
-    `);
+      `,
+      [
+        projectCode,
+        date,
+        time,
+        faculty,
+        project_name,
+        project_year,
+        project_head,
+        project_head_phone,
+        responsible_rows,
+        strategic_issue,
+        strategic_issue,
+        objective,
+        objective,
+        university_strategic,
+        university_strategic,
+        strategic_plan_kpi,
+        strategic_plan_kpi,
+        operational_plan_kpi,
+        operational_plan_kpi,
+        project_kpi,
+        project_kpi,
+        project_status,
+        project_status,
+        project_types,
+        university_identity,
+        principle_reason,
+        OIVT_rows,
+        expected_result_rows,
+        operation_duration_rows,
+        project_location,
+        project_datetime,
+        project_schedule_rows,
+        lecturer,
+        target_total,
+        target_rows,
+        improvement,
+        budget_income_total,
+        budget_income_rows,
+        budget_expense_total,
+        budget_expense_rows,
+        '1',
+        userId,
+      ],
+    );
 
     return NextResponse.json(
       {

@@ -6,13 +6,14 @@ import {
   DocumentDuplicateIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
+import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { useRouter } from 'next/router';
 import React from 'react';
 // import { ButtonLogoutMoblie } from '../buttons/button-logout';
 import { Users } from '@/app/model/user';
@@ -21,7 +22,6 @@ import { logout } from '@/app/lib/actions';
 // Map of links to display in the side navigation.
 // Depending on the size of the application, this would be stored in a database.
 const links = [
-  // { name: 'Home', href: '/dashboard', icon: HomeIcon },
   // {
   //   name: 'Invoices',
   //   href: '/invoices',
@@ -43,6 +43,7 @@ const links = [
     href: '/activity-history',
     icon: FindInPageOutlinedIcon,
   },
+  { name: 'แดชบอร์ด', href: '/dashboard', icon: SpaceDashboardOutlinedIcon },
   {
     name: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม (พน.01)',
     href: '/management/pn01',
@@ -61,31 +62,24 @@ const links = [
   {
     name: 'จัดการข้อมูลผู้ใช้งานระบบ',
     href: '/management/users',
-    icon: FindInPageOutlinedIcon,
+    icon: ManageAccountsOutlinedIcon,
   },
   {
     name: 'เข้าสู่ระบบ/สมัครสมาชิก',
     href: '/',
     icon: LoginOutlinedIcon,
   },
-  { name: 'test', href: '/test', icon: DocumentDuplicateIcon },
 ];
 
 export default function NavLinks({ userData }: { userData: Users }) {
   const pathname = usePathname();
 
   const allowedPaths = {
-    teacher: [
-      '/project-proposal',
-      '/activity-record',
-      '/activity-history',
-      '/test',
-    ],
+    teacher: ['/project-proposal', '/activity-record', '/activity-history'],
     admin: [
       '/project-proposal',
       '/activity-record',
       '/activity-history',
-      '/test',
       '/management',
       '/dashboard',
     ],
@@ -150,17 +144,11 @@ export function NavLinksMobile({
   const pathname = usePathname();
 
   const allowedPaths = {
-    teacher: [
-      '/project-proposal',
-      '/activity-record',
-      '/activity-history',
-      '/test',
-    ],
+    teacher: ['/project-proposal', '/activity-record', '/activity-history'],
     admin: [
       '/project-proposal',
       '/activity-record',
       '/activity-history',
-      '/test',
       '/management',
       '/dashboard',
     ],

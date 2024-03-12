@@ -17,7 +17,13 @@ export default async function SideNav() {
     <div className="z-10 flex w-full flex-col md:fixed md:h-screen md:w-80 md:px-2 md:py-4">
       <Link
         className="hidden h-16 items-end justify-start bg-blue-600 p-4 md:mb-2 md:flex md:h-40 md:rounded-md"
-        href="/"
+        href={
+          userData?.is_verify && userData?.role === 'admin'
+            ? '/dashboard'
+            : userData?.is_verify && userData?.role === 'teacher'
+            ? '/project-proposal'
+            : '/'
+        }
       >
         <div className="w-full text-white">
           <BannerLogo />

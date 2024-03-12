@@ -53,6 +53,18 @@ export async function getUserLoginData(data: string) {
   return res.json();
 }
 
+export async function getCountData(apiPath: string) {
+  noStore();
+  const res = await fetch(`${process.env.API_URL}/api/${apiPath}`);
+  return res.json();
+}
+
+export async function getLastRequestData(apiPath: string) {
+  noStore();
+  const res = await fetch(`${process.env.API_URL}/api/${apiPath}`);
+  return res.json();
+}
+
 export async function getAllData(apiPath: string) {
   const res = await fetch(`${process.env.API_URL}/api/${apiPath}`);
 
@@ -367,4 +379,3 @@ export async function forgotPassword(password: string, id: string) {
 
   return response;
 }
-

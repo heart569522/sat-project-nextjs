@@ -1463,7 +1463,7 @@ export default function PN01Form({
       operationPlanKPI: selectedValues.operationPlanKPI,
       projectKPI: selectedValues.projectKPI,
       projectStatus: selectedValues.projectStatus,
-      studentRows: responsibleRows,
+      responsibleRows: responsibleRows,
       OIVTRows: OIVTRows,
       expectedResultRows: expectedResultRows,
       operationDurationRows: operationDurationRows,
