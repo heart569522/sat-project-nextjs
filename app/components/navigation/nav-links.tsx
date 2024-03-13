@@ -233,7 +233,7 @@ export function NavLinksMobile({
 
 export function ProfileButton({ name }: { name: string | undefined }) {
   const pathname = usePathname();
-  const isActive = pathname === '/profile';
+  const isActive = pathname.startsWith('/profile');
 
   return (
     <Link
@@ -253,7 +253,7 @@ export function ProfileButton({ name }: { name: string | undefined }) {
 
 export function ProfileButtonMobile({ name }: { name: string | undefined }) {
   const pathname = usePathname();
-  const isActive = pathname === '/profile';
+  const isActive = pathname.startsWith('/profile');
 
   return (
     <Link

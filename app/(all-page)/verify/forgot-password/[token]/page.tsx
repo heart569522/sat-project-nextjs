@@ -176,12 +176,18 @@ export default function Verify({ params }: { params: { token: string } }) {
           setFormLoading(false);
           setIsSuccess(true);
           setIsFailed(false);
+        } else {
+          setFormLoading(false);
+          setIsSuccess(false);
+          setIsFailed(true);
         }
       } catch (error) {
         setFormLoading(false);
         setIsSuccess(false);
         setIsFailed(true);
       }
+    } else {
+      setFormLoading(false);
     }
   };
 
@@ -229,7 +235,9 @@ export default function Verify({ params }: { params: { token: string } }) {
                       <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
                       <p className="text-2xl">สำเร็จ</p>
                     </div>
-                    <p className="text-lg mb-4">แก้ไขรหัสผ่านสำเร็จ, กลับไปหน้าเข้าสู่ระบบ</p>
+                    <p className="mb-4 text-lg">
+                      แก้ไขรหัสผ่านสำเร็จ, กลับไปหน้าเข้าสู่ระบบ
+                    </p>
                     <Link
                       href={`/`}
                       className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700"
