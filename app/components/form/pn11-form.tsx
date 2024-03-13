@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { OverlayLoading } from '../loading-screen';
-import { uuidv7 } from "uuidv7";
+import { uuidv7 } from 'uuidv7';
 
 export default function PN11Form({
   editData,
@@ -353,11 +353,7 @@ export default function PN11Form({
     return uuidv7();
   };
 
-  const storeToken = async (
-    id: string,
-    email: string,
-    token: string,
-  ) => {
+  const storeToken = async (id: string, email: string, token: string) => {
     const formDataToken = {
       email: email,
       token: token,
@@ -728,7 +724,9 @@ export default function PN11Form({
           if (action === 'submit') {
             handleSubmit();
           } else if (action === 'cancel') {
-            router.push('/activity-history/', { scroll: false });
+            router.push(isEditing ? '/management/pn11' : '/activity-history/', {
+              scroll: false,
+            });
           }
         }}
       />

@@ -5,6 +5,7 @@ import {
   EyeIcon,
 } from '@heroicons/react/24/outline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import Link from 'next/link';
 import { deleteInvoice } from '@/app/lib/actions';
 import { deleteData } from '@/app/lib/api-service';
@@ -51,6 +52,18 @@ export function CreateInvoice() {
     >
       <span className="hidden md:block">เพิ่มผู้ใช้งานระบบ</span>{' '}
       <PlusIcon className="h-5 md:ml-4" />
+    </Link>
+  );
+}
+
+export function CreateUser() {
+  return (
+    <Link
+      href="/management/users/create"
+      className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-base font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+    >
+      <span className="hidden md:block">เพิ่มผู้ใช้</span>{' '}
+      <PersonAddAltOutlinedIcon className="h-5 md:ml-4" />
     </Link>
   );
 }

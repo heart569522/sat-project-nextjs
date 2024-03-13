@@ -1,13 +1,23 @@
 'use client';
-import { checkExist, getAllData, updateData } from '@/app/lib/api-service';
+import {
+  checkExist,
+  createData,
+  getAllData,
+  updateData,
+} from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
 import {
   FormControl,
   FormHelperText,
+  IconButton,
+  InputAdornment,
   MenuItem,
+  OutlinedInput,
   Select,
   Switch,
   TextField,
@@ -21,10 +31,12 @@ import Link from 'next/link';
 
 export default function UserForm({
   editData,
+  isCreating,
   isEditing,
   isAdminTable,
 }: {
-  editData: any;
+  editData?: any;
+  isCreating?: boolean;
   isEditing?: boolean;
   isAdminTable?: boolean;
 }) {
@@ -39,6 +51,8 @@ export default function UserForm({
   const [buttonText, setButtonText] = useState('');
   const [nextTab, setNextTab] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const [formInput, setFormInput] = useState({
     firstname: isEditing ? editData.firstname : '',
     lastname: isEditing ? editData.lastname : '',
@@ -47,6 +61,7 @@ export default function UserForm({
     faculty: isEditing ? editData.faculty_id : '',
     major: isEditing ? editData.major_id : '',
     username: isEditing ? editData.username : '',
+    password: '',
     verify: isEditing ? editData.is_verify : false,
     role: isEditing ? editData.role : '',
   });
@@ -56,6 +71,10 @@ export default function UserForm({
 
   const [faculties, setFaculties] = useState<Faculties[]>([]);
   const [majors, setMajors] = useState<Majors[]>([]);
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const getFaculties = async () => {
     try {
@@ -177,7 +196,10 @@ export default function UserForm({
     console.log('--validateForm--');
 
     let isValid = true;
-    const excludedFields = ['verify'];
+    const excludedFields = [
+      'verify',
+      isAdminTable || isEditing ? 'password' : '',
+    ];
 
     // Validate formInput
     for (const key in formInput) {
@@ -227,18 +249,22 @@ export default function UserForm({
             editData.id,
           );
         } else {
-          
+          response = await createData('users', formData);
         }
 
         if (response && (response.status === 201 || response.status === 200)) {
           setLoading(false);
           setModalSuccess(true);
           setTitleModal(
-            isAdminTable
+            isAdminTable && !isCreating
               ? 'แก้ไขข้อมูลผู้ใช้สำเร็จ'
+              : isCreating
+              ? 'เพิ่มผู้ใช้สำเร็จ'
               : 'แก้ไขข้อมูลโปรไฟล์สำเร็จ',
           );
-          setButtonLink(isAdminTable ? '/management/users' : '/profile');
+          setButtonLink(
+            isAdminTable || isCreating ? '/management/users' : '/profile',
+          );
           setButtonText('ตกลง');
           setNextTab(true);
           setOpenResponseModal(true);
@@ -266,14 +292,21 @@ export default function UserForm({
       username: formInput.username.toLowerCase(),
     };
 
-    const finalFormData =
+    const specificFields =
       isAdminTable && isEditing
+        ? { role: formInput.role, is_verify: formInput.verify }
+        : isCreating
         ? {
-            ...commonFields,
+            password: formInput.password,
             role: formInput.role,
             is_verify: formInput.verify,
           }
-        : commonFields;
+        : {};
+
+    const finalFormData = {
+      ...commonFields,
+      ...specificFields,
+    };
 
     return finalFormData;
   };
@@ -521,11 +554,57 @@ export default function UserForm({
                     helperText={validationError.username}
                     placeholder="ตัวอักษรภาษาอังกฤษ(พิมพ์เล็ก) หรือตัวเลขจำนวน 6 ตัวขึ้นไป"
                     autoComplete="off"
-                    disabled={!isAdminTable}
+                    disabled={!isAdminTable && !isCreating}
                   />
                 </div>
               </div>
-              {isAdminTable && (
+              {isCreating && (
+                <div className="mt-2 grid grid-cols-1 gap-2">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <label
+                        className="my-3 text-base font-medium text-gray-900"
+                        htmlFor="password"
+                      >
+                        รหัสผ่าน / Password
+                      </label>
+                    </div>
+                    <FormControl variant="outlined">
+                      <OutlinedInput
+                        className="w-full"
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        value={formInput.password}
+                        onChange={handleInputChange}
+                        error={Boolean(validationError.password)}
+                        placeholder=""
+                        autoComplete="off"
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleShowPassword}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOffOutlinedIcon className="h-5 w-5 text-gray-600" />
+                              ) : (
+                                <VisibilityOutlinedIcon className="h-5 w-5 text-gray-600" />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                      <FormHelperText className="text-red-600">
+                        {validationError.password}
+                      </FormHelperText>
+                    </FormControl>
+                  </div>
+                </div>
+              )}
+
+              {(isAdminTable || isCreating) && (
                 <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
                   <div className="flex flex-col">
                     <label
@@ -546,11 +625,11 @@ export default function UserForm({
                         value={formInput.role}
                         onChange={handleRoleChange}
                       >
-                        <MenuItem value="admin" divider={true}>
-                          เจ้าหน้าที่
-                        </MenuItem>
                         <MenuItem value="teacher" divider={true}>
                           อาจารย์
+                        </MenuItem>
+                        <MenuItem value="admin" divider={true}>
+                          เจ้าหน้าที่
                         </MenuItem>
                       </Select>
                       <FormHelperText>{validationError.role}</FormHelperText>
@@ -594,7 +673,7 @@ export default function UserForm({
               type="submit"
               disabled={!isFormEdited}
             >
-              ยืนยันการแก้ไขข้อมูล
+              {isCreating ? 'ตกลง' : 'ยืนยันการแก้ไขข้อมูล'}
             </button>
           </div>
         </form>

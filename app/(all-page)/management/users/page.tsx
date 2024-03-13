@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { fetchPages, getUserLoginData } from '@/app/lib/api-service';
 import UsersTable from '@/app/components/tables/users-table';
 import { auth } from '@/auth';
+import { CreateInvoice, CreateUser } from '@/app/components/buttons/buttons';
 
 export const metadata: Metadata = {
   title: 'จัดการข้อมูลผู้ใช้งานระบบ',
@@ -32,7 +33,7 @@ export default async function Page({
         <h1 className={`text-2xl`}>รายการผู้ใช้งานระบบ</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        {/* <CreateInvoice /> */}
+        <CreateUser />
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
       <UsersTable query={query} currentPage={currentPage} userId={userData.id}/>

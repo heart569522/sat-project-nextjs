@@ -7,6 +7,7 @@ export async function PATCH(
 ) {
   try {
     const { token } = context.params;
+    console.log("🚀 ~ token:", token)
 
     const response = await pool.query(
       `
@@ -27,6 +28,7 @@ export async function PATCH(
       { status: 200 },
     );
   } catch (error) {
+    console.log("🚀 ~ error:", error)
     return NextResponse.json(
       { message: `Server error, please try again later` },
       { status: 500 },

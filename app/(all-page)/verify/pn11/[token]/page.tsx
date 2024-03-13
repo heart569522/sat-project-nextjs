@@ -29,6 +29,7 @@ export default function Verify({ params }: { params: { token: string } }) {
       const response = await verifyData(
         'activity-transcript/update-verify',
         token,
+        true
       );
 
       if (response && response.status === 200) {
