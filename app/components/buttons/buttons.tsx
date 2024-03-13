@@ -156,21 +156,25 @@ export function EditProfile({ id }: { id: string | undefined }) {
   );
 }
 
-export function ForgotPassword(){
+export function ForgotPassword() {
   return (
-    <Link href={`/forgot-password`}
-      className="flex cursor-pointer text-lg justify-center text-gray-600 underline">
+    <Link
+      href={`/forgot-password`}
+      className="flex cursor-pointer justify-center text-lg text-gray-600 underline"
+    >
       ลืมรหัสผ่าน
     </Link>
   );
 }
 
-export function EditPassword({ id }: { id: string | undefined }){
+export function EditPassword({ id }: { id: string | undefined }) {
   return (
-    <Link href={`/profile/checkPasswds`}
+    <Link
+      href={`/profile/change-password/${id}/edit`}
       className="ms-3 items-center rounded-md bg-yellow-400 px-4 py-2 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900"
-      type="button">
-      แก้ไขรหัสผ่าน
+      type="button"
+    >
+      เปลี่ยนรหัสผ่าน
     </Link>
   );
 }

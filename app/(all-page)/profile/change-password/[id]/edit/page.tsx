@@ -1,15 +1,12 @@
-import { getDataById } from '@/app/lib/api-service';
-import ProfileEditForm from '@/app/components/form/user-edit-form';
 import Breadcrumbs from '@/app/components/breadcrumbs';
+import ChangePasswordForm from '@/app/components/form/change-password-form';
 
-export default async function EditProfile({
+export default async function ChangePassword({
   params,
 }: {
   params: { id: string };
 }) {
-  //get User data
-  const id = params.id;
-  const data = await getDataById('profile', id);
+  const userId = params.id;
 
   return (
     <>
@@ -22,16 +19,16 @@ export default async function EditProfile({
               active: false,
             },
             {
-              label: 'แก้ไขข้อมูลโปรไฟล์',
+              label: 'เปลี่ยนรหัสผ่าน',
               href: '',
               active: true,
             },
           ]}
         />
       </div>
-      <div className="flex text-xl md:text-2xl">แก้ไขข้อมูลโปรไฟล์</div>
+      <div className="flex text-xl md:text-2xl">เปลี่ยนรหัสผ่าน</div>
       <div className="mt-4">
-        <ProfileEditForm editData={data} isEditing={true} />
+        <ChangePasswordForm userId={userId}/>
       </div>
     </>
   );

@@ -7,6 +7,7 @@ export async function GET() {
         SELECT id, firstname, lastname, phone, created_at FROM activity_transcript_pn11 
         WHERE is_delete = false
         AND is_verify = true
+        AND status_id <> 5
         ORDER BY created_at DESC
         LIMIT 5;
     `);

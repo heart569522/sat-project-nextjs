@@ -16,8 +16,15 @@ import { Users } from '@/app/model/user';
 
 import { OverlayLoading } from '@/app/components/loading-screen';
 import ModalResponse from '../modal/modal-response';
+import Link from 'next/link';
 
-export default function ProfileEditForm({editData ,isEditing} : {editData:any ,isEditing?:boolean}) {
+export default function ProfileEditForm({
+  editData,
+  isEditing,
+}: {
+  editData: any;
+  isEditing?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
 
   const [openResponseModal, setOpenResponseModal] = useState(false);
@@ -30,15 +37,14 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
   const [nextTab, setNextTab] = useState(false);
 
   const [formInput, setFormInput] = useState({
-    firstname:isEditing ? editData.firstname : '',
-    lastname:isEditing ? editData.lastname : '',
-    email:isEditing ?  editData.email  : '',
-    phone:isEditing ?  editData.phone  : '',
-    faculty:isEditing ?  editData.faculty_id  : '',
-    major:isEditing ?  editData.major_id  : '',
-    username:isEditing ?  editData.username  : '',
+    firstname: isEditing ? editData.firstname : '',
+    lastname: isEditing ? editData.lastname : '',
+    email: isEditing ? editData.email : '',
+    phone: isEditing ? editData.phone : '',
+    faculty: isEditing ? editData.faculty_id : '',
+    major: isEditing ? editData.major_id : '',
+    username: isEditing ? editData.username : '',
   });
-  
 
   const [existEmail, setExistEmail] = useState(null);
   const [existUsername, setExistUsername] = useState(null);
@@ -68,8 +74,7 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
     console.log('fetch list fac/major');
 
     const fetchData = async () => {
-      await getFaculties();
-      await getMajors();
+      await Promise.all([getFaculties(), getMajors()]);
     };
 
     fetchData();
@@ -143,35 +148,69 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
     setIsFormEdited(true);
   };
 
+  const validateForm = () => {
+    console.log('--validateForm--');
 
+    let isValid = true;
 
+    // Validate formInput
+    for (const key in formInput) {
+      if (Object.prototype.hasOwnProperty.call(formInput, key)) {
+        const value = formInput[key as keyof typeof formInput];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          isValid = false;
 
+          setValidationError((prevErrors) => ({
+            ...prevErrors,
+            [key]:
+              key == 'faculty' || key == 'major'
+                ? 'โปรดเลือกข้อมูล'
+                : `โปรดกรอกข้อมูล`,
+          }));
+
+          console.error(`${key} is required.`);
+        }
+      }
+    }
+
+    return isValid;
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
     resetResponseModal();
-    
-    const formData = setFinalFormData();
-    console.log(formData);
-    try {
-      let response: any;
-      response = await updateData('profile/update-profile' ,formData , editData.id);
 
-      if (response && (response.status === 201 || response.status === 200)) {
-        setLoading(false);
-        setModalSuccess(true);
-        setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
-        setButtonLink(`/profile`);
-        setButtonText('ตกลง');
-        setNextTab(true);
-        setOpenResponseModal(true);
-      } else {
+    const isFormValid = validateForm();
+
+    if (isFormValid) {
+      const formData = setFinalFormData();
+
+      try {
+        let response: any;
+
+        response = await updateData(
+          'profile/update-profile',
+          formData,
+          editData.id,
+        );
+
+        if (response && (response.status === 201 || response.status === 200)) {
+          setLoading(false);
+          setModalSuccess(true);
+          setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
+          setButtonLink(`/profile`);
+          setButtonText('ตกลง');
+          setNextTab(true);
+          setOpenResponseModal(true);
+        } else {
+          handleSubmissionError();
+        }
+      } catch (error) {
         handleSubmissionError();
       }
-    } catch (error) {
-      handleSubmissionError();
+    } else {
+      setLoading(false)
     }
-
   };
 
   const setFinalFormData = () => {
@@ -185,7 +224,6 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
       faculty_id: Number(formInput.faculty),
       major_id: Number(formInput.major),
       username: formInput.username.toLowerCase(),
-
     };
 
     return finalFormData;
@@ -214,59 +252,61 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
 
   return (
     <React.Fragment>
-      <form action={handleSubmit} className="space-y-3">
-        <div className="flex-1 rounded-lg px-6 pb-4 pt-8">
-          <div className="w-full">
-            <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="firstname"
-                >
-                  ชื่อจริง / First Name
-                </label>
-                <TextField
-                  className="w-full"
-                  id="firstname"
-                  type="text"
-                  name="firstname"
-                  value={formInput.firstname}
-                  onChange={handleInputChange}
-                  error={Boolean(validationError.firstname)}
-                  helperText={validationError.firstname}
-                  placeholder=""
-                  autoComplete="off"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="lastname"
-                >
-                  นามสกุล / Last Name
-                </label>
-                <TextField
-                  className="w-full"
-                  id="lastname"
-                  type="text"
-                  name="lastname"
-                  value={formInput.lastname}
-                  onChange={handleInputChange}
-                  error={Boolean(validationError.lastname)}
-                  helperText={validationError.lastname}
-                  placeholder=""
-                  autoComplete="off"
-                />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
+      <OverlayLoading showLoading={loading} />
+      <div className="height-forgot-password rounded-md border border-gray-200 p-4 pb-8">
+        <form action={handleSubmit} className="space-y-3">
+          <div className="flex-1 rounded-lg px-6 pb-4">
+            <div className="w-full">
+              <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
+                <div className="flex flex-col">
                   <label
                     className="my-3 text-base font-medium text-gray-900"
-                    htmlFor="email"
+                    htmlFor="firstname"
                   >
-                    อีเมล / Email
+                    ชื่อจริง / First Name
                   </label>
-                  <div className="flex gap-1">
+                  <TextField
+                    className="w-full"
+                    id="firstname"
+                    type="text"
+                    name="firstname"
+                    value={formInput.firstname}
+                    onChange={handleInputChange}
+                    error={Boolean(validationError.firstname)}
+                    helperText={validationError.firstname}
+                    placeholder=""
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className="my-3 text-base font-medium text-gray-900"
+                    htmlFor="lastname"
+                  >
+                    นามสกุล / Last Name
+                  </label>
+                  <TextField
+                    className="w-full"
+                    id="lastname"
+                    type="text"
+                    name="lastname"
+                    value={formInput.lastname}
+                    onChange={handleInputChange}
+                    error={Boolean(validationError.lastname)}
+                    helperText={validationError.lastname}
+                    placeholder=""
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label
+                      className="my-3 text-base font-medium text-gray-900"
+                      htmlFor="email"
+                    >
+                      อีเมล / Email
+                    </label>
+                    {/* <div className="flex gap-1">
                     {existEmail && (
                       <>
                         <HighlightOffOutlinedIcon className="text-red-500" />
@@ -283,181 +323,183 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
                         </p>
                       </>
                     )}
+                  </div> */}
                   </div>
+                  <TextField
+                    className="w-full"
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={formInput.email}
+                    onChange={handleInputChange}
+                    // onBlur={handleCheckEmailExist}
+                    error={Boolean(validationError.email)}
+                    helperText={validationError.email}
+                    placeholder=""
+                    autoComplete="off"
+                  />
                 </div>
-                <TextField
-                  className="w-full"
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={formInput.email}
-                  onChange={handleInputChange}
-                  onBlur={handleCheckEmailExist}
-                  error={Boolean(validationError.email)}
-                  helperText={validationError.email}
-                  placeholder=""
-                  autoComplete="off"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="phone"
-                >
-                  เบอร์โทรศัพท์ / Phone
-                </label>
-                <TextField
-                  className="w-full"
-                  id="phone"
-                  type="text"
-                  name="phone"
-                  value={formInput.phone}
-                  onChange={handleInputChange}
-                  error={Boolean(validationError.phone)}
-                  helperText={validationError.phone}
-                  placeholder=""
-                  autoComplete="off"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="my-3 text-base font-medium text-gray-900"
-                  htmlFor="faculty"
-                >
-                  คณะ - วิทยาลัย / Faculty
-                </label>
-                <FormControl
-                  className="w-full appearance-none rounded border leading-tight text-gray-900"
-                  error={Boolean(validationError.faculty)}
-                  size="small"
-                >
-                  <Select
-                    className="bg-white"
-                    name="faculty"
-                    id="faculty"
-                    value={formInput.faculty}
-                    onChange={handleFacultyChange}
-                  >
-                    {faculties.map((faculty) => (
-                      <MenuItem
-                        key={faculty.id}
-                        value={faculty.id}
-                        divider={true}
-                      >
-                        {faculty.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <FormHelperText>{validationError.faculty}</FormHelperText>
-                </FormControl>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className={`my-3 text-base font-medium ${
-                    formInput.faculty ? 'text-gray-900' : 'text-gray-400'
-                  }`}
-                  htmlFor="major"
-                >
-                  สาขาวิชา / Major
-                </label>
-                <FormControl
-                  className="w-full appearance-none rounded border leading-tight text-gray-900"
-                  error={Boolean(validationError.major)}
-                  size="small"
-                >
-                  <Select
-                    className="bg-white"
-                    name="major"
-                    id="major"
-                    value={formInput.major}
-                    onChange={handleMajorChange}
-                    disabled={!formInput.faculty}
-                  >
-                    {majors
-                      .filter(
-                        (major) =>
-                          major.faculty_id === Number(formInput.faculty),
-                      )
-                      .map((filteredMajor) => (
-                        <MenuItem
-                          key={filteredMajor.id}
-                          value={filteredMajor.id}
-                          divider={true}
-                        >
-                          {filteredMajor.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                  <FormHelperText>{validationError.major}</FormHelperText>
-                </FormControl>
-              </div>
-            </div>
-            <div className="mt-2 grid grid-cols-1 gap-2">
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col">
                   <label
                     className="my-3 text-base font-medium text-gray-900"
-                    htmlFor="username"
+                    htmlFor="phone"
                   >
-                    ชื่อผู้ใช้ / Username
+                    เบอร์โทรศัพท์ / Phone
                   </label>
-                  <div className="flex gap-1">
-                    {existUsername && (
-                      <>
-                        <HighlightOffOutlinedIcon className="text-red-500" />
-                        <p className="font-semibold text-red-500">
-                          ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว
-                        </p>
-                      </>
-                    )}
-                    {!existUsername && existUsername != null && (
-                      <>
-                        <TaskAltOutlinedIcon className="text-green-500" />
-                        <p className="font-semibold text-green-500">
-                          สามารถใช้งานได้
-                        </p>
-                      </>
-                    )}
-                  </div>
+                  <TextField
+                    className="w-full"
+                    id="phone"
+                    type="text"
+                    name="phone"
+                    value={formInput.phone}
+                    onChange={handleInputChange}
+                    error={Boolean(validationError.phone)}
+                    helperText={validationError.phone}
+                    placeholder=""
+                    autoComplete="off"
+                  />
                 </div>
-                <TextField
-                  className="w-full"
-                  id="username"
-                  type="text"
-                  name="username"
-                  value={formInput.username}
-                  onChange={handleInputChange}
-                  onBlur={handleCheckUsernameExist}
-                  error={Boolean(validationError.username)}
-                  helperText={validationError.username}
-                  placeholder="ตัวอักษรภาษาอังกฤษ(พิมพ์เล็ก) หรือตัวเลขจำนวน 6 ตัวขึ้นไป"
-                  autoComplete="off"
-                  disabled
-                />
+                <div className="flex flex-col">
+                  <label
+                    className="my-3 text-base font-medium text-gray-900"
+                    htmlFor="faculty"
+                  >
+                    คณะ - วิทยาลัย / Faculty
+                  </label>
+                  <FormControl
+                    className="w-full appearance-none rounded border leading-tight text-gray-900"
+                    error={Boolean(validationError.faculty)}
+                    size="small"
+                  >
+                    <Select
+                      className="bg-white"
+                      name="faculty"
+                      id="faculty"
+                      value={formInput.faculty}
+                      onChange={handleFacultyChange}
+                    >
+                      {faculties.map((faculty) => (
+                        <MenuItem
+                          key={faculty.id}
+                          value={faculty.id}
+                          divider={true}
+                        >
+                          {faculty.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <FormHelperText>{validationError.faculty}</FormHelperText>
+                  </FormControl>
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    className={`my-3 text-base font-medium ${
+                      formInput.faculty ? 'text-gray-900' : 'text-gray-400'
+                    }`}
+                    htmlFor="major"
+                  >
+                    สาขาวิชา / Major
+                  </label>
+                  <FormControl
+                    className="w-full appearance-none rounded border leading-tight text-gray-900"
+                    error={Boolean(validationError.major)}
+                    size="small"
+                  >
+                    <Select
+                      className="bg-white"
+                      name="major"
+                      id="major"
+                      value={formInput.major}
+                      onChange={handleMajorChange}
+                      disabled={!formInput.faculty}
+                    >
+                      {majors
+                        .filter(
+                          (major) =>
+                            major.faculty_id === Number(formInput.faculty),
+                        )
+                        .map((filteredMajor) => (
+                          <MenuItem
+                            key={filteredMajor.id}
+                            value={filteredMajor.id}
+                            divider={true}
+                          >
+                            {filteredMajor.name}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText>{validationError.major}</FormHelperText>
+                  </FormControl>
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-1 gap-2">
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <label
+                      className="my-3 text-base font-medium text-gray-900"
+                      htmlFor="username"
+                    >
+                      ชื่อผู้ใช้ / Username
+                    </label>
+                    <div className="flex gap-1">
+                      {existUsername && (
+                        <>
+                          <HighlightOffOutlinedIcon className="text-red-500" />
+                          <p className="font-semibold text-red-500">
+                            ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว
+                          </p>
+                        </>
+                      )}
+                      {!existUsername && existUsername != null && (
+                        <>
+                          <TaskAltOutlinedIcon className="text-green-500" />
+                          <p className="font-semibold text-green-500">
+                            สามารถใช้งานได้
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <TextField
+                    className="w-full"
+                    id="username"
+                    type="text"
+                    name="username"
+                    value={formInput.username}
+                    onChange={handleInputChange}
+                    onBlur={handleCheckUsernameExist}
+                    error={Boolean(validationError.username)}
+                    helperText={validationError.username}
+                    placeholder="ตัวอักษรภาษาอังกฤษ(พิมพ์เล็ก) หรือตัวเลขจำนวน 6 ตัวขึ้นไป"
+                    autoComplete="off"
+                    disabled
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="mb-2 mt-6 flex justify-center gap-2">
-          <button 
-          className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
-          >
-            ยกเลิก
-          </button>
-          
-          <button
-            className={
-            !isFormEdited
-            ? 'flex h-10 items-center rounded-md bg-gray-300 px-4 text-base font-medium text-gray-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
-            : 'flex h-10 items-center rounded-md bg-blue-500  px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
-            }
-            type="submit"
-            disabled={!isFormEdited}
-          >
-            ยืนยันการแก้ไขข้อมูล
-          </button>
-        </div>
-      </form>
+          <div className="mb-2 mt-6 flex justify-center gap-2">
+            <Link
+              href={'/profile'}
+              className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
+            >
+              ยกเลิก
+            </Link>
+
+            <button
+              className={
+                !isFormEdited
+                  ? 'flex h-10 items-center rounded-md bg-gray-300 px-4 text-base font-medium text-gray-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+                  : 'flex h-10 items-center rounded-md bg-blue-500  px-4 text-base font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+              }
+              type="submit"
+              disabled={!isFormEdited}
+            >
+              ยืนยันการแก้ไขข้อมูล
+            </button>
+          </div>
+        </form>
+      </div>
 
       <ModalResponse
         openModal={openResponseModal}
@@ -470,7 +512,6 @@ export default function ProfileEditForm({editData ,isEditing} : {editData:any ,i
         buttonText={buttonText}
         isNextTab={nextTab}
       />
-      <OverlayLoading showLoading={loading} />
     </React.Fragment>
   );
 }
