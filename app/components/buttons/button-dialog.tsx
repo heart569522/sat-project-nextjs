@@ -24,6 +24,7 @@ export function ButtonDialog({
   onSuccess,
   isPN01Draft,
   formData,
+  disabled,
 }: {
   id: string;
   apiPath: string;
@@ -33,6 +34,7 @@ export function ButtonDialog({
   onSuccess?: any;
   isPN01Draft?: boolean;
   formData?: any;
+  disabled?: boolean;
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -124,8 +126,8 @@ export function ButtonDialog({
             email: formData.email,
             name: formData.name,
             title: formEmailInput.title,
-            detail: formEmailInput.detail
-          }
+            detail: formEmailInput.detail,
+          };
           handleDialogClose();
           response = await sendEmail(apiPath, formDataEmail);
         } else {
@@ -179,7 +181,12 @@ export function ButtonDialog({
     <React.Fragment>
       <button
         onClick={handleDialogOpen}
-        className="rounded-md border p-2 hover:bg-gray-100"
+        className={`rounded-md border p-2 ${
+          disabled
+            ? 'cursor-not-allowed bg-gray-100 text-gray-500'
+            : 'hover:bg-gray-100'
+        }`}
+        disabled={disabled}
       >
         <span className="sr-only">{action}</span>
         {action == 'delete' && <TrashIcon className="w-5" />}
@@ -209,7 +216,7 @@ export function ButtonDialog({
                 <div className="py-2">
                   <label
                     htmlFor="title"
-                    className={`mb-2 underline block text-base font-medium ${
+                    className={`mb-2 block text-base font-medium underline ${
                       validationError.title ? 'text-red-600' : 'text-gray-900'
                     }`}
                   >
@@ -229,7 +236,7 @@ export function ButtonDialog({
                 <div className="py-2">
                   <label
                     htmlFor="detail"
-                    className={`mb-2 underline block text-base font-medium ${
+                    className={`mb-2 block text-base font-medium underline ${
                       validationError.detail ? 'text-red-600' : 'text-gray-900'
                     }`}
                   >

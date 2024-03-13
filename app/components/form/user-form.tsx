@@ -9,21 +9,24 @@ import {
   FormHelperText,
   MenuItem,
   Select,
+  Switch,
   TextField,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Users } from '@/app/model/user';
 
 import { OverlayLoading } from '@/app/components/loading-screen';
-import ModalResponse from '../modal/modal-response';
+import ModalResponse from '@/app/components/modal/modal-response';
 import Link from 'next/link';
 
-export default function ProfileEditForm({
+export default function UserForm({
   editData,
   isEditing,
+  isAdminTable,
 }: {
   editData: any;
   isEditing?: boolean;
+  isAdminTable?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +47,8 @@ export default function ProfileEditForm({
     faculty: isEditing ? editData.faculty_id : '',
     major: isEditing ? editData.major_id : '',
     username: isEditing ? editData.username : '',
+    verify: isEditing ? editData.is_verify : false,
+    role: isEditing ? editData.role : '',
   });
 
   const [existEmail, setExistEmail] = useState(null);
@@ -148,14 +153,38 @@ export default function ProfileEditForm({
     setIsFormEdited(true);
   };
 
+  const handleRoleChange = (event: { target: { value: any } }) => {
+    const roleValue = event.target.value;
+    setFormInput((prevInput) => ({
+      ...prevInput,
+      role: roleValue,
+    }));
+    setValidationError((prevError) => ({ ...prevError, role: '' }));
+
+    setIsFormEdited(true);
+  };
+
+  const handleToggle = async () => {
+    setFormInput((prevInput) => ({
+      ...prevInput,
+      verify: !prevInput.verify,
+    }));
+
+    setIsFormEdited(true);
+  };
+
   const validateForm = () => {
     console.log('--validateForm--');
 
     let isValid = true;
+    const excludedFields = ['verify'];
 
     // Validate formInput
     for (const key in formInput) {
       if (Object.prototype.hasOwnProperty.call(formInput, key)) {
+        if (excludedFields.includes(key)) {
+          continue;
+        }
         const value = formInput[key as keyof typeof formInput];
         if (!value || (typeof value === 'string' && value.trim() === '')) {
           isValid = false;
@@ -184,21 +213,32 @@ export default function ProfileEditForm({
 
     if (isFormValid) {
       const formData = setFinalFormData();
+      console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
       try {
         let response: any;
 
-        response = await updateData(
-          'profile/update-profile',
-          formData,
-          editData.id,
-        );
+        if (isAdminTable && isEditing) {
+          response = await updateData('users', formData, editData.id);
+        } else if (isEditing) {
+          response = await updateData(
+            'profile/update-profile',
+            formData,
+            editData.id,
+          );
+        } else {
+          
+        }
 
         if (response && (response.status === 201 || response.status === 200)) {
           setLoading(false);
           setModalSuccess(true);
-          setTitleModal('แก้ไขข้อมูลโปรไฟล์สำเร็จ');
-          setButtonLink(`/profile`);
+          setTitleModal(
+            isAdminTable
+              ? 'แก้ไขข้อมูลผู้ใช้สำเร็จ'
+              : 'แก้ไขข้อมูลโปรไฟล์สำเร็จ',
+          );
+          setButtonLink(isAdminTable ? '/management/users' : '/profile');
           setButtonText('ตกลง');
           setNextTab(true);
           setOpenResponseModal(true);
@@ -209,14 +249,14 @@ export default function ProfileEditForm({
         handleSubmissionError();
       }
     } else {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   const setFinalFormData = () => {
     console.log('--set form--');
 
-    const finalFormData: Users = {
+    const commonFields = {
       firstname: formInput.firstname,
       lastname: formInput.lastname,
       phone: formInput.phone,
@@ -225,6 +265,15 @@ export default function ProfileEditForm({
       major_id: Number(formInput.major),
       username: formInput.username.toLowerCase(),
     };
+
+    const finalFormData =
+      isAdminTable && isEditing
+        ? {
+            ...commonFields,
+            role: formInput.role,
+            is_verify: formInput.verify,
+          }
+        : commonFields;
 
     return finalFormData;
   };
@@ -467,20 +516,70 @@ export default function ProfileEditForm({
                     name="username"
                     value={formInput.username}
                     onChange={handleInputChange}
-                    onBlur={handleCheckUsernameExist}
+                    // onBlur={handleCheckUsernameExist}
                     error={Boolean(validationError.username)}
                     helperText={validationError.username}
                     placeholder="ตัวอักษรภาษาอังกฤษ(พิมพ์เล็ก) หรือตัวเลขจำนวน 6 ตัวขึ้นไป"
                     autoComplete="off"
-                    disabled
+                    disabled={!isAdminTable}
                   />
                 </div>
               </div>
+              {isAdminTable && (
+                <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
+                  <div className="flex flex-col">
+                    <label
+                      className="my-3 text-base font-medium text-gray-900"
+                      htmlFor="role"
+                    >
+                      ตำแหน่ง / Role
+                    </label>
+                    <FormControl
+                      className="w-full appearance-none rounded border leading-tight text-gray-900"
+                      error={Boolean(validationError.role)}
+                      size="small"
+                    >
+                      <Select
+                        className="bg-white"
+                        name="role"
+                        id="role"
+                        value={formInput.role}
+                        onChange={handleRoleChange}
+                      >
+                        <MenuItem value="admin" divider={true}>
+                          เจ้าหน้าที่
+                        </MenuItem>
+                        <MenuItem value="teacher" divider={true}>
+                          อาจารย์
+                        </MenuItem>
+                      </Select>
+                      <FormHelperText>{validationError.role}</FormHelperText>
+                    </FormControl>
+                  </div>
+                  <div className="flex w-full flex-col border-b border-gray-400 hover:border-gray-900">
+                    <label
+                      className="my-3 text-base font-medium text-gray-900"
+                      htmlFor="verify"
+                    >
+                      ยันยืนบัญชี / Verify
+                    </label>
+                    <div className="ml-4 flex items-center justify-start gap-2">
+                      <p className="text-base">ไม่ยืนยัน</p>
+                      <Switch
+                        checked={formInput.verify}
+                        onClick={handleToggle}
+                        color="success"
+                      />
+                      <p className="text-base">ยืนยันแล้ว</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="mb-2 mt-6 flex justify-center gap-2">
             <Link
-              href={'/profile'}
+              href={isAdminTable ? '/management/users' : '/profile'}
               className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >
               ยกเลิก

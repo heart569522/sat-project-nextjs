@@ -11,7 +11,7 @@ import { Alert, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { OverlayLoading } from '@/app/components/loading-screen';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv7 } from "uuidv7";
 
 export default function ForgetPassForm() {
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,7 @@ export default function ForgetPassForm() {
   };
 
   const generateUniqueToken = () => {
-    return uuidv4();
+    return uuidv7();
   };
 
   const storeToken = async (email: string, token: string) => {

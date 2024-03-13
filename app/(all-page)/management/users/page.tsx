@@ -1,8 +1,9 @@
 import Pagination from '@/app/components/pagination';
 import SearchAuto from '@/app/components/search-box/search-auto';
 import { Metadata } from 'next';
-import { fetchPages } from '@/app/lib/api-service';
+import { fetchPages, getUserLoginData } from '@/app/lib/api-service';
 import UsersTable from '@/app/components/tables/users-table';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'จัดการข้อมูลผู้ใช้งานระบบ',
@@ -16,6 +17,10 @@ export default async function Page({
     page?: string;
   };
 }) {
+  const authResult = (await auth()) as any;
+  const { id } = authResult?.user || null;
+  const userData = await getUserLoginData(id);
+
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
@@ -30,7 +35,7 @@ export default async function Page({
         {/* <CreateInvoice /> */}
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
-      <UsersTable query={query} currentPage={currentPage} />
+      <UsersTable query={query} currentPage={currentPage} userId={userData.id}/>
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>

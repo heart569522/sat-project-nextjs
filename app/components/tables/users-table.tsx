@@ -38,9 +38,11 @@ interface ToggleCanEditState {
 export default function UsersTable({
   query,
   currentPage,
+  userId,
 }: {
   query?: string;
   currentPage?: number;
+  userId?: string;
 }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,26 +211,19 @@ export default function UsersTable({
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
-                        <DetailButton
-                          id={row.id}
-                          path="activity-transcript/document"
-                        />
                         <EditButton
                           id={row.id}
-                          path="activity-transcript"
-                          disabled={!row.is_edit && !row.is_draft}
+                          path={'management/users'}
+                          disabled={row.id === userId}
                         />
                         <ButtonDialog
                           id={row.id}
                           apiPath="users"
                           action="delete"
-                          title="ลบโครงการ/กิจกรรม"
-                          detail={`${
-                            row.is_draft
-                              ? 'คุณยืนยันที่จะลบรายการแบบร่างนี้ ?'
-                              : `คุณยืนยันที่จะลบรายการโครงการ/กิจกรรม "${row.project_name}" ?`
-                          }`}
+                          title={`ลบผู้ใช้`}
+                          detail={`คุณยืนยันที่จะลบบัญชีผู้ใช้ : ${row.firstname} ${row.lastname} ?`}
                           onSuccess={fetchData}
+                          disabled={row.id === userId}
                         />
                       </div>
                     </div>
@@ -334,13 +329,10 @@ export default function UsersTable({
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
                             <div className="flex justify-center gap-2">
-                              {/* <DetailButton
-                                id={row.id}
-                                path={'management/pn11/document'}
-                              /> */}
                               <EditButton
                                 id={row.id}
-                                path={'management/pn11'}
+                                path={'management/users'}
+                                disabled={row.id === userId}
                               />
                               <ButtonDialog
                                 id={row.id}
@@ -349,6 +341,7 @@ export default function UsersTable({
                                 title={`ลบผู้ใช้`}
                                 detail={`คุณยืนยันที่จะลบบัญชีผู้ใช้ : ${row.firstname} ${row.lastname} ?`}
                                 onSuccess={fetchData}
+                                disabled={row.id === userId}
                               />
                             </div>
                           </td>
