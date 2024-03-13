@@ -26,7 +26,7 @@ export default async function Page({
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`text-2xl`}>
+        <h1 className={`text-xl md:text-2xl`}>
           จัดการคำร้องขอเสนอโครงการ / กิจกรรม พน.01
         </h1>
       </div>

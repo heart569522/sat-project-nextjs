@@ -11,6 +11,7 @@ import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -65,6 +66,11 @@ const links = [
     icon: ManageAccountsOutlinedIcon,
   },
   {
+    name: 'ตั้งค่า',
+    href: '/setting',
+    icon: SettingsOutlinedIcon,
+  },
+  {
     name: 'เข้าสู่ระบบ/สมัครสมาชิก',
     href: '/',
     icon: LoginOutlinedIcon,
@@ -82,6 +88,7 @@ export default function NavLinks({ userData }: { userData: Users }) {
       '/activity-history',
       '/management',
       '/dashboard',
+      '/setting'
     ],
   };
 
@@ -151,6 +158,7 @@ export function NavLinksMobile({
       '/activity-history',
       '/management',
       '/dashboard',
+      '/setting'
     ],
   };
 

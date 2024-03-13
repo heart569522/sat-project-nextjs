@@ -7,7 +7,7 @@ import { auth } from '@/auth';
 import PN11Form from '@/app/components/form/pn11-form';
 
 export const metadata: Metadata = {
-  title: 'แก้ไขการโครงการ/กิจกรรม (พน.01)',
+  title: 'แก้ไขคำร้องขอระเบียนกิจกรรม (พน.11)',
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
