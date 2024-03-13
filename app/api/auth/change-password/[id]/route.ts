@@ -8,7 +8,6 @@ export async function PATCH(
 ) {
   const client = await pool.connect();
   const { id } = context.params;
-  const password = req.nextUrl.searchParams.get('password');
 
   try {
     await client.query('BEGIN');
