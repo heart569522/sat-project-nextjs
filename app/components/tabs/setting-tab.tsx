@@ -3,10 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { EditButton } from '../buttons/buttons';
-import { PencilIcon } from '@heroicons/react/24/outline';
-
-const title = ['Applied', 'Phone Screening', 'Interview', 'Offer', 'Hired'];
+import PN01SelectMenu from './pn01-select-menu';
+import FacultyMajorForm from '../form/faculty-major-form';
 
 export default function SettingTab() {
   const router = useRouter();
@@ -71,21 +69,16 @@ export default function SettingTab() {
       </div>
       <div className="mt-4">
         {activeTab === 'pn01-select' && (
-          <div className="grid grid-cols-3 gap-2 max-md:grid-cols-2">
-            <div className="flex h-16 w-full items-center justify-between rounded-md border bg-gray-50 p-4 hover:border-sky-100">
-              <p className="text-lg font-semibold">ประเด็นยุทธศาสตร์</p>
-              <div className={`rounded-md border p-2 hover:bg-gray-100`}>
-                <Link href={'/setting/pn01-select/strategic-issue'}>
-                  <PencilIcon className="w-5" />
-                </Link>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <PN01SelectMenu />
           </div>
         )}
         {activeTab === 'facuty-major' && (
-          <div className="grid grid-cols-4 gap-2 max-md:grid-cols-2">
-            faasfa
-          </div>
+          
+            <FacultyMajorForm
+              pageTitle={'แก้ไขคณะ/วิทยาลัย — สาขา'}
+            />
+          
         )}
       </div>
     </>

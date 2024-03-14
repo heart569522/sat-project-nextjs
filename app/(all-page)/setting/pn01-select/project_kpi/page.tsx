@@ -3,14 +3,14 @@ import PN01SelectForm from '@/app/components/form/pn01-select-form';
 import { getAllData } from '@/app/lib/api-service';
 import { Metadata } from 'next';
 
-const TITLE = 'แก้ไขประเด็นยุทธศาสตร์';
+const TITLE = 'แก้ไขตัวชี้วัดโครงการ';
 
 export const metadata: Metadata = {
   title: TITLE,
 };
 
-export default async function StrategicIssue() {
-  const data = await getAllData('pn01-select-list/strategic_issue_list');
+export default async function ProjectKPI() {
+  const data = await getAllData('pn01-select-list/project_kpi_list');
 
   return (
     <main>

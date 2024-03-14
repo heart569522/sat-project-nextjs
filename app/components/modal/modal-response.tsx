@@ -27,7 +27,8 @@ export default function ModalResponse({
   buttonText,
   isCloseButton,
   haveNextPage,
-  isNextTab
+  isNextTab,
+  isReloadPage,
 }: {
   openModal: boolean;
   onCloseModal?: () => void;
@@ -40,6 +41,7 @@ export default function ModalResponse({
   isCloseButton?: boolean;
   haveNextPage?: boolean;
   isNextTab?: boolean;
+  isReloadPage?: boolean;
 }) {
   const router = useRouter();
 
@@ -47,7 +49,7 @@ export default function ModalResponse({
     if (haveNextPage) {
       router.replace(buttonLink as string);
     } else if (isNextTab) {
-      window.location.href = (buttonLink as string)
+      window.location.href = buttonLink as string;
     } else {
       router.push(buttonLink as string);
     }

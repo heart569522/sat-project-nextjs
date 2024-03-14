@@ -272,6 +272,28 @@ export async function updateData(
   }
 }
 
+export async function updateAllData(
+  apiPath: string,
+  formData: any,
+) {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/api/${apiPath}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return response;
+  } catch (error) {
+    console.error('Error while sending data:', error);
+    throw error;
+  }
+}
+
 export async function deleteData(
   apiPath: string,
   id: string,

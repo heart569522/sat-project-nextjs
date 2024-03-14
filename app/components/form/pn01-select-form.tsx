@@ -4,6 +4,7 @@ import { Button } from '@/app/components/buttons/button';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
+import { updateAllData, updateData } from '@/app/lib/api-service';
 import { pn01SelectList } from '@/app/model/pn01-select-list';
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { TextField, Tooltip, IconButton } from '@mui/material';
@@ -19,7 +20,15 @@ interface ValidationErrors {
   [key: string]: ValidationError[];
 }
 
-export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
+interface PN01SelectFormProps {
+  data: pn01SelectList[];
+  pageTitle: string;
+}
+
+export default function PN01SelectForm({
+  data,
+  pageTitle,
+}: PN01SelectFormProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -36,16 +45,13 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
   const [buttonText, setButtonText] = useState('');
 
   const [dataRows, setDataRows] = useState(data);
-  console.log("🚀 ~ PN01SelectForm ~ dataRows:", dataRows)
 
   const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
     console.log('handleOpenModal');
 
     if (isCancel) {
       setTitleModal('ยกเลิกการแก้ไข');
-      setDetailModal(
-        'คุณยืนยันที่จะยกเลิกการแก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม',
-      );
+      setDetailModal(`คุณยืนยันที่จะยกเลิกการ${pageTitle}`);
       setHandleAction('cancel');
       setOpenQuestionModal(true);
     }
@@ -55,7 +61,7 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
 
       if (isFormValid) {
         setTitleModal('แก้ไขข้อมูล');
-        setDetailModal('คุณยืนยันที่แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม');
+        setDetailModal(`คุณยืนยันที่จะ${pageTitle}`);
         setHandleAction('submit');
         setOpenQuestionModal(true);
       }
@@ -96,7 +102,7 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
   };
 
   const deleteRow = (id: number) => {
-    setDataRows((prevRows: pn01SelectList[]) => {
+    setDataRows((prevRows) => {
       const updatedRows = prevRows.filter((row) => row.id !== id);
 
       const updatedRowsWithSequentialIds = updatedRows.map((row, index) => ({
@@ -189,11 +195,7 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
 
     // Validate Table arrays
     const dataFields = ['name'];
-    const isDataValid = validateArray(
-      dataRows as pn01SelectList[],
-      dataFields,
-      'data',
-    );
+    const isDataValid = validateArray(dataRows, dataFields, 'data');
 
     isValid = isDataValid && /* Add other validations here */ isValid;
 
@@ -212,42 +214,26 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
     setLoading(true);
     resetResponseModal();
 
-    console.log('handleSubmit');
+    try {
+      const response = await updateAllData(
+        'pn01-select-list/strategic_issue_list',
+        dataRows,
+      );
 
-    const formData = setFinalFormData();
-    console.log('formData: ', formData);
-
-    // try {
-    //   const response = await updateData(
-    //     'attendance',
-    //     formData,
-    //     editData?.id as string,
-    //   );
-
-    //   if (response && (response.status === 201 || response.status === 200)) {
-    //     setLoading(false);
-    //     setModalSuccess(true);
-    //     setTitleModal('สำเร็จ');
-    //     setDetailModal('แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรมสำเร็จ');
-    //     setButtonLink(`/management/pn10/document/`);
-    //     setButtonText('ไปยังเอกสารเอกสาร พน.10');
-    //     setOpenResponseModal(true);
-    //   } else {
-    //     handleSubmissionError();
-    //   }
-    // } catch (error) {
-    //   handleSubmissionError();
-    // }
-  };
-
-  const setFinalFormData = () => {
-    console.log('--set form--');
-
-    const finalFormData = {
-      name: dataRows,
-    };
-
-    return finalFormData;
+      if (response && (response.status === 201 || response.status === 200)) {
+        setLoading(false);
+        setModalSuccess(true);
+        setTitleModal('สำเร็จ');
+        setDetailModal(`${pageTitle}สำเร็จ`);
+        setButtonLink(`/setting#pn01-select`);
+        setButtonText('ตกลง');
+        setOpenResponseModal(true);
+      } else {
+        handleSubmissionError();
+      }
+    } catch (error) {
+      handleSubmissionError();
+    }
   };
 
   return (
@@ -271,7 +257,7 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
                       ลำดับ
                     </th>
                     <th scope="col" className="px-6 py-3">
-                      รหัสนักศึกษา
+                      รายการ
                     </th>
                     <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
                       เพิ่ม/ลบแถว
@@ -360,7 +346,7 @@ export default function PN01SelectForm({ data }: { data: pn01SelectList[] }) {
             if (action === 'submit') {
               handleSubmit();
             } else if (action === 'cancel') {
-              router.push('/activity-record', { scroll: false });
+              router.push('/setting#pn01-select', { scroll: false });
             }
           }}
         />
