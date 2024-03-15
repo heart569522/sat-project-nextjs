@@ -27,9 +27,16 @@ interface ValidationErrors {
 
 interface FacultyMajorFormProps {
   pageTitle?: string;
+  data?: Faculties;
+  isEditing?: boolean;
 }
 
-export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
+export default function FacultyMajorForm({
+  pageTitle,
+  data,
+  isEditing,
+}: FacultyMajorFormProps) {
+  // console.log('🚀 ~ data:', data);
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -41,29 +48,40 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
   const [handleAction, setHandleAction] = useState('');
   const [modalSuccess, setModalSuccess] = useState(false);
   const [modalError, setModalError] = useState(false);
-  const [modalNextTab, setModalNextTab] = useState(false);
-//   const [modalNextTab, setModalNextTab] = useState(false);
+  const [modalNextPage, setModalNextPage] = useState(true);
   const [buttonLink, setButtonLink] = useState('');
   const [buttonText, setButtonText] = useState('');
 
-  const [facultyData, setFacultyData] = useState<Faculties[]>();
-  console.log('🚀 ~ FacultyMajorForm ~ facultyData:', facultyData);
-  const [majorData, setMajorData] = useState<Majors[]>();
-  const [filterMajorData, setFilterMajorData] = useState<Majors[]>();
+  const initialMajorState = isEditing
+    ? []
+    : [
+        {
+          id: 1,
+          name: '',
+          created_at: '',
+          updated_at: '',
+          faculty_id: 0,
+        },
+      ];
 
-  const [activeFacultyId, setActiveFacultyId] = useState<number | null>(null);
+  const [formInput, setFormInput] = useState({
+    facultyName: isEditing ? data?.name : '',
+  });
+  const [majorRows, setMajorRows] = useState<Majors[]>(initialMajorState);
+  console.log('🚀 ~ majorRows:', majorRows);
 
   useEffect(() => {
-    getFacultyMajorData();
+    getMajorData(data?.id as number);
   }, []);
 
-  const getFacultyMajorData = async () => {
+  const getMajorData = async (facultyId: number) => {
     try {
-      const faculty = await getAllData('faculties');
       const major = await getAllData('majors');
+      const filteredMajors = major.filter(
+        (row: { faculty_id: number }) => row.faculty_id === facultyId,
+      );
 
-      setFacultyData(faculty);
-      setMajorData(major);
+      setMajorRows(filteredMajors);
     } catch (error) {
       console.error(error);
     }
@@ -112,90 +130,39 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
   const [validationArrayError, setValidationArrayError] =
     useState<ValidationErrors>({});
 
-  const addFacultyRow = () => {
-    const newFacultyId = facultyData ? facultyData.length + 1 : 1;
+  const handleInputChange = (event: {
+    target: { name: string; value: string | null };
+  }) => {
+    const { name, value } = event.target;
 
-    setFacultyData((prevRows: Faculties[] | undefined) => [
-      ...(prevRows || []),
-      {
-        id: newFacultyId,
-        name: '',
-        created_at: '',
-        updated_at: '',
-      },
-    ]);
+    setFormInput((prevTypes) => ({
+      ...prevTypes,
+      [name]: value,
+    }));
 
-    // addMajorRow(newFacultyId);
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
   };
 
-  const addMajorRow = (facultyId: number) => {
-    setFilterMajorData((prevRows: Majors[] | undefined) => [
+  const addMajorRow = () => {
+    setMajorRows((prevRows) => [
       ...(prevRows || []),
       {
         id: prevRows ? prevRows.length + 1 : 1,
         name: '',
         created_at: '',
         updated_at: '',
-        faculty_id: facultyId,
+        faculty_id: data?.id as number,
       },
     ]);
   };
 
-  const deleteFacultyRow = (id: number) => {
-    setFacultyData((prevFacultyRows) => {
-      const updatedFacultyRows = prevFacultyRows?.filter(
-        (row: { id: number }) => row.id !== id,
-      );
-
-      const updatedMajorData = majorData?.filter(
-        (major: { faculty_id: number }) => major.faculty_id !== id,
-      );
-
-      setMajorData(updatedMajorData);
-
-      const updatedRowsWithSequentialIds = updatedFacultyRows?.map(
-        (row: any, index: number) => ({
-          ...row,
-          id: index + 1,
-        }),
-      );
-
-      setValidationArrayError((prevErrors) => {
-        const updatedErrors = { ...prevErrors };
-
-        Object.keys(updatedErrors).forEach((key) => {
-          if (
-            key.startsWith(`faculty_`) &&
-            updatedErrors[key].some((error) => error.id === id)
-          ) {
-            updatedErrors[key] = updatedErrors[key].filter(
-              (error) => error.id !== id,
-            );
-
-            if (updatedErrors[key].length === 0) {
-              delete updatedErrors[key];
-            }
-          }
-        });
-
-        return updatedErrors;
-      });
-
-      return updatedRowsWithSequentialIds;
-    });
-  };
-
   const deleteMajorRow = (id: number) => {
-    setFilterMajorData((prevRows) => {
+    setMajorRows((prevRows) => {
       const updatedRows = prevRows?.filter(
         (row: { id: number }) => row.id !== id,
-      );
-
-      const updatedRowsWithSequentialIds = updatedRows?.map(
-        (row: any, index: number) => ({
-          ...row,
-          id: index + 1,
-        }),
       );
 
       setValidationArrayError((prevErrors) => {
@@ -219,50 +186,12 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
         return updatedErrors;
       });
 
-      return updatedRowsWithSequentialIds;
-    });
-  };
-
-  const showMajorRow = (facultyId?: number) => {
-    let selectedFacultyId = facultyId;
-
-    if (!selectedFacultyId && majorData && majorData.length > 0) {
-      selectedFacultyId = majorData[0].faculty_id;
-    }
-
-    const filteredMajorData = majorData?.filter(
-      (major) => major.faculty_id === selectedFacultyId,
-    );
-
-    setFilterMajorData(filteredMajorData);
-
-    return selectedFacultyId;
-  };
-
-  useEffect(() => {
-    const selectedFacultyId = showMajorRow();
-    setActiveFacultyId(selectedFacultyId as number);
-  }, [majorData]);
-
-  const handleFacultyChange = (id: number, field: string, value: string) => {
-    setFacultyData(
-      (prevRows) =>
-        prevRows?.map((row: Faculties) =>
-          row.id === id ? { ...row, [field]: value } : row,
-        ),
-    );
-
-    setValidationArrayError((prevErrors) => {
-      const key = `faculty_${field}`;
-      const specificErrors = prevErrors[key] || [];
-      const updatedErrors = specificErrors.filter((error) => error.id !== id);
-      const restErrors = { ...prevErrors, [key]: updatedErrors };
-      return restErrors;
+      return updatedRows;
     });
   };
 
   const handleMajorChange = (id: number, field: string, value: string) => {
-    setFilterMajorData(
+    setMajorRows(
       (prevRows) =>
         prevRows?.map((row: Majors) =>
           row.id === id ? { ...row, [field]: value } : row,
@@ -317,24 +246,32 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
   const validateForm = () => {
     let isValid = true;
 
+    // Validate formInput
+    for (const key in formInput) {
+      if (Object.prototype.hasOwnProperty.call(formInput, key)) {
+        const value = formInput[key as keyof typeof formInput];
+        if (!value || (typeof value === 'string' && value.trim() === '')) {
+          isValid = false;
+
+          setValidationError((prevErrors) => ({
+            ...prevErrors,
+            [key]: `โปรดกรอกข้อมูล`,
+          }));
+
+          console.error(`${key} is required.`);
+        }
+      }
+    }
+
     // Validate Table arrays
     const dataFields = ['name'];
-    const isFacultyValid = validateArray(
-      facultyData as Faculties[],
-      dataFields,
-      'faculty',
-    );
-
     const isMajorValid = validateArray(
-      filterMajorData as Majors[],
+      majorRows as Majors[],
       dataFields,
       'major',
     );
 
-    isValid =
-      isFacultyValid &&
-      isMajorValid &&
-      /* Add other validations here */ isValid;
+    isValid = isMajorValid && /* Add other validations here */ isValid;
 
     return isValid;
   };
@@ -344,7 +281,6 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
     setModalError(true);
     setTitleModal('ผิดพลาด');
     setDetailModal('โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง');
-    setModalNextTab(false);
     setOpenResponseModal(true);
   };
 
@@ -356,16 +292,20 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
     console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
     try {
-      const response = await updateAllData('faculties/faculty-major', formData);
+      const response = await updateData(
+        'faculties/faculty-major',
+        formData,
+        data?.id as number,
+        true
+      );
 
       if (response && (response.status === 201 || response.status === 200)) {
         setLoading(false);
         setModalSuccess(true);
         setTitleModal('สำเร็จ');
         setDetailModal(`${pageTitle}สำเร็จ`);
-        setButtonLink(`/setting`);
+        setButtonLink(`/setting#faculty-major`);
         setButtonText('ตกลง');
-        setModalNextTab(true);
         setOpenResponseModal(true);
       } else {
         handleSubmissionError();
@@ -379,8 +319,8 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
     console.log('--set form--');
 
     const finalFormData = {
-      facultyData: facultyData,
-      majorData: filterMajorData,
+      facultyName: formInput.facultyName,
+      majorData: majorRows,
     };
 
     return finalFormData;
@@ -388,250 +328,154 @@ export default function FacultyMajorForm({ pageTitle }: FacultyMajorFormProps) {
 
   return (
     <>
-      <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
-        <form className="py-2">
-          <div className="grid grid-cols-2 items-start gap-4 max-md:grid-cols-1">
-            <div className={`mb-6 grid gap-3 md:grid-cols-1`}>
+      <form className="py-2">
+        <div className="rounded-md border-2 border-gray-100 p-4 md:p-6">
+          <div className={`mb-6 grid grid-cols-1 gap-6`}>
+            <div>
               <label
-                htmlFor="projectName"
-                className={`block text-center text-lg font-medium ${
-                  validationError.data ? 'text-red-600' : 'text-gray-900'
+                htmlFor="projectYear"
+                className={`mb-2 block text-lg font-medium ${
+                  validationError.facultyName ? 'text-red-600' : 'text-gray-900'
                 }`}
               >
-                รายการคณะ/วิทยาลัย
+                คณะ/วิทยาลัย
               </label>
-              <div className="relative overflow-x-auto">
-                <table className="w-full rounded border text-left text-sm text-gray-500">
-                  <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                    <tr>
-                      <th scope="col" className="w-[5%] bg-gray-300 px-6 py-3">
-                        ลำดับ
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        รายการ
-                      </th>
-                      <th scope="col" className="w-[25%] bg-gray-300 px-6 py-3">
-                        เพิ่ม/ลบแถว
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {facultyData?.map((row, i) => (
-                      <tr className="border-b bg-white" key={i}>
-                        <th
-                          scope="row"
-                          className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
-                        >
-                          {i + 1}
-                        </th>
-                        <td className="px-6 py-4">
-                          <div className={`grid grid-cols-1 gap-6`}>
-                            <TextField
-                              type="text"
-                              name="name"
-                              className="flex w-full"
-                              placeholder=""
-                              value={row.name}
-                              onChange={(e) =>
-                                handleFacultyChange(
-                                  row.id,
-                                  'name',
-                                  e.target.value,
-                                )
-                              }
-                              error={Boolean(
-                                validationArrayError['faculty_name']?.some(
-                                  (item) => item.id === row.id,
-                                ),
-                              )}
-                              helperText={
-                                validationArrayError['faculty_name']?.find(
-                                  (item) => item.id === row.id,
-                                )?.error || ''
-                              }
-                            />
-                          </div>
-                        </td>
-                        <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                          <Tooltip title="เพิ่มแถว">
-                            <IconButton
-                              aria-label="add_row"
-                              size="small"
-                              onClick={addFacultyRow}
-                            >
-                              <PlusCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                          {facultyData.length > 1 && (
-                            <Tooltip title="ลบแถว">
-                              <IconButton
-                                aria-label="delete_row"
-                                size="small"
-                                onClick={() => deleteFacultyRow(row.id)}
-                              >
-                                <XCircleIcon className="h-9 w-9" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          <Tooltip title="ดูสาขา">
-                            <IconButton
-                              aria-label="see_major"
-                              size="small"
-                              onClick={() => {
-                                const selectedFacultyId = showMajorRow(row.id);
-                                setActiveFacultyId(selectedFacultyId as number);
-                              }}
-                              className={`${
-                                activeFacultyId === row.id
-                                  ? 'bg-blue-300 text-white hover:bg-blue-400'
-                                  : ''
-                              }`}
-                            >
-                              <ChevronDoubleRightIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className={`mb-6 grid gap-3 md:grid-cols-1`}>
-              <label
-                htmlFor="projectName"
-                className={`block text-center text-lg font-medium ${
-                  validationError.data ? 'text-red-600' : 'text-gray-900'
-                }`}
-              >
-                รายการสาขา
-              </label>
-              <div className="relative overflow-x-auto">
-                <table className="w-full rounded border text-left text-sm text-gray-500">
-                  <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
-                    <tr>
-                      <th scope="col" className="w-[5%] bg-gray-300 px-6 py-3">
-                        ลำดับ
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        รายการ
-                      </th>
-                      <th scope="col" className="w-[20%] bg-gray-300 px-6 py-3">
-                        เพิ่ม/ลบแถว
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filterMajorData?.map((row, i) => (
-                      <tr className="border-b bg-white" key={i}>
-                        <th
-                          scope="row"
-                          className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
-                        >
-                          {i + 1}
-                        </th>
-                        <td className="px-6 py-4">
-                          <div className={`grid grid-cols-1 gap-6`}>
-                            <TextField
-                              type="text"
-                              name="name"
-                              className="flex w-full"
-                              placeholder=""
-                              value={row.name}
-                              onChange={(e) =>
-                                handleMajorChange(
-                                  row.id,
-                                  'name',
-                                  e.target.value,
-                                )
-                              }
-                              error={Boolean(
-                                validationArrayError['major_name']?.some(
-                                  (item) => item.id === row.id,
-                                ),
-                              )}
-                              helperText={
-                                validationArrayError['major_name']?.find(
-                                  (item) => item.id === row.id,
-                                )?.error || ''
-                              }
-                            />
-                          </div>
-                        </td>
-                        <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                          <Tooltip title="เพิ่มแถว">
-                            <IconButton
-                              aria-label="add_row"
-                              size="small"
-                              onClick={() => addMajorRow(row.faculty_id)}
-                            >
-                              <PlusCircleIcon className="h-9 w-9" />
-                            </IconButton>
-                          </Tooltip>
-                          {filterMajorData.length > 1 && (
-                            <Tooltip title="ลบแถว">
-                              <IconButton
-                                aria-label="delete_row"
-                                size="small"
-                                onClick={() => deleteMajorRow(row.id)}
-                              >
-                                <XCircleIcon className="h-9 w-9" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <TextField
+                type="text"
+                name="facultyName"
+                className="flex w-full"
+                value={formInput.facultyName}
+                onChange={handleInputChange}
+                placeholder=""
+                error={Boolean(validationError.facultyName)}
+                helperText={validationError.facultyName}
+              />
             </div>
           </div>
-        </form>
-
-        <div className="grid grid-cols-1">
-          <div className="mt-6 flex justify-end gap-4">
-            <button
-              onClick={() => handleOpenModal(true, false)}
-              className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+          <div className={`mb-6 grid gap-3 md:grid-cols-1`}>
+            <label
+              className={`block text-lg font-medium ${
+                validationError.data ? 'text-red-600' : 'text-gray-900'
+              }`}
             >
-              ยกเลิก
-            </button>
-            <Button onClick={() => handleOpenModal(false, true)}>
-              {'ตกลง'}
-            </Button>
+              รายการสาขาทั้งหมด
+            </label>
+            <div className="relative overflow-x-auto">
+              <table className="w-full rounded border text-left text-sm text-gray-500">
+                <thead className="bg-gray-200 text-center text-base uppercase text-gray-700">
+                  <tr>
+                    <th scope="col" className="w-[10%] bg-gray-300 px-6 py-3">
+                      ลำดับ
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      รายการ
+                    </th>
+                    <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
+                      เพิ่ม/ลบแถว
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {majorRows?.map((row, i) => (
+                    <tr className="border-b bg-white" key={i}>
+                      <th
+                        scope="row"
+                        className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
+                      >
+                        {i + 1}
+                      </th>
+                      <td className="px-6 py-4">
+                        <div className={`grid grid-cols-1 gap-6`}>
+                          <TextField
+                            type="text"
+                            name="name"
+                            className="flex w-full"
+                            placeholder=""
+                            value={row.name}
+                            onChange={(e) =>
+                              handleMajorChange(row.id, 'name', e.target.value)
+                            }
+                            error={Boolean(
+                              validationArrayError['major_name']?.some(
+                                (item) => item.id === row.id,
+                              ),
+                            )}
+                            helperText={
+                              validationArrayError['major_name']?.find(
+                                (item) => item.id === row.id,
+                              )?.error || ''
+                            }
+                          />
+                        </div>
+                      </td>
+                      <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                        <Tooltip title="เพิ่มแถว">
+                          <IconButton
+                            aria-label="add_row"
+                            size="small"
+                            onClick={addMajorRow}
+                          >
+                            <PlusCircleIcon className="h-9 w-9" />
+                          </IconButton>
+                        </Tooltip>
+                        {majorRows.length > 1 && (
+                          <Tooltip title="ลบแถว">
+                            <IconButton
+                              aria-label="delete_row"
+                              size="small"
+                              onClick={() => deleteMajorRow(row.id)}
+                            >
+                              <XCircleIcon className="h-9 w-9" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
+      </form>
+      <div className="mt-6 flex justify-end gap-4">
+        <button
+          onClick={() => handleOpenModal(true, false)}
+          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        >
+          ยกเลิก
+        </button>
+        <Button onClick={() => handleOpenModal(false, true)}>{'ตกลง'}</Button>
+
+        <ModalQuestion
+          openModal={openQuestionModal}
+          onCloseModal={handleCloseModal}
+          title={titleModal}
+          detail={detailModal}
+          okAction={handleAction}
+          onOk={(action) => {
+            if (action === 'submit') {
+              handleSubmit();
+            } else if (action === 'cancel') {
+              router.push('/setting#faculty-major', { scroll: false });
+            }
+          }}
+        />
+
+        <ModalResponse
+          openModal={openResponseModal}
+          onCloseModal={handleCloseModal}
+          title={titleModal}
+          detail={detailModal}
+          isSuccess={modalSuccess}
+          isError={modalError}
+          buttonLink={buttonLink}
+          buttonText={buttonText}
+          haveNextPage={modalNextPage}
+        />
+
+        <OverlayLoading showLoading={loading} />
       </div>
-      <ModalQuestion
-        openModal={openQuestionModal}
-        onCloseModal={handleCloseModal}
-        title={titleModal}
-        detail={detailModal}
-        okAction={handleAction}
-        onOk={(action) => {
-          if (action === 'submit') {
-            handleSubmit();
-          } else if (action === 'cancel') {
-            router.push('/setting#pn01-select', { scroll: false });
-          }
-        }}
-      />
-
-      <ModalResponse
-        openModal={openResponseModal}
-        onCloseModal={handleCloseModal}
-        title={titleModal}
-        detail={detailModal}
-        isSuccess={modalSuccess}
-        isError={modalError}
-        buttonLink={buttonLink}
-        buttonText={buttonText}
-        isNextTab={modalNextTab}
-        // isReloadPage={modalReloadPage}
-      />
-
-      <OverlayLoading showLoading={loading} />
     </>
   );
 }

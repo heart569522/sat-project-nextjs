@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PN01SelectMenu from './pn01-select-menu';
-import FacultyMajorForm from '../form/faculty-major-form';
+import FacultyMenu from './faculty-menu';
 
 export default function SettingTab() {
   const router = useRouter();
@@ -53,14 +53,14 @@ export default function SettingTab() {
           </li>
           <li className="me-2">
             <Link
-              href="/#facuty-major"
+              href="/#faculty-major"
               className={`inline-block rounded-t-lg border-b-2 p-4 
                 ${
-                  activeTab === 'facuty-major'
+                  activeTab === 'faculty-major'
                     ? 'border-blue-600 p-4 font-semibold text-blue-600'
                     : 'hover:border-gray-300 hover:text-gray-600'
                 }`}
-              onClick={() => handleTabChange('facuty-major')}
+              onClick={() => handleTabChange('faculty-major')}
             >
               คณะ/วิทยาลัย — สาขา
             </Link>
@@ -73,12 +73,13 @@ export default function SettingTab() {
             <PN01SelectMenu />
           </div>
         )}
-        {activeTab === 'facuty-major' && (
-          
-            <FacultyMajorForm
-              pageTitle={'แก้ไขคณะ/วิทยาลัย — สาขา'}
-            />
-          
+        {activeTab === 'faculty-major' && (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <FacultyMenu />
+          </div>
+          // <FacultyMajorForm
+          //   pageTitle={'แก้ไขคณะ/วิทยาลัย — สาขา'}
+          // />
         )}
       </div>
     </>

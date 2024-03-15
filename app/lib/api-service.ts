@@ -248,7 +248,7 @@ export async function createDraft(apiPath: string, formData: any) {
 export async function updateData(
   apiPath: string,
   formData: any,
-  id: string,
+  id: string | number,
   isPatchMethod?: boolean,
 ) {
   try {

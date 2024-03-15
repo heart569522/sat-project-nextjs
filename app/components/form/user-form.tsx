@@ -658,7 +658,7 @@ export default function UserForm({
           </div>
           <div className="mb-2 mt-6 flex justify-center gap-2">
             <Link
-              href={isAdminTable ? '/management/users' : '/profile'}
+              href={isAdminTable || isCreating ? '/management/users' : '/profile'}
               className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >
               ยกเลิก

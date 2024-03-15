@@ -26,18 +26,24 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   noStore();
+  const client = await pool.connect();
+
   try {
+    await client.query('BEGIN');
+    await client.query('ALTER TABLE users DROP CONSTRAINT users_major_id_fkey');
+    await client.query('ALTER TABLE majors DROP CONSTRAINT majors_faculty_id_fkey');
+
     const formData = await req.json();
     const { facultyData, majorData } = formData;
 
     const insertFacultyQuery = `
-      INSERT INTO faculties (id, name)
-      VALUES ($1, $2)
+      INSERT INTO faculties (name)
+      VALUES ($1)
     `;
 
     const insertMajorQuery = `
-      INSERT INTO majors (id, name, faculty_id)
-      VALUES ($1, $2, $3)
+      INSERT INTO majors (name, faculty_id)
+      VALUES ($1, $2)
     `;
 
     const deleteFacultyQuery = `
@@ -48,53 +54,66 @@ export async function POST(req: NextRequest) {
       DELETE FROM majors WHERE id = $1
     `;
 
-    for (const faculty of facultyData) {
-      const existingFaculty = await pool.query(
-        'SELECT * FROM faculties WHERE id = $1',
-        [faculty.id],
+    const existingFaculty = await client.query('SELECT * FROM faculties');
+    const existingMajor = await client.query('SELECT * FROM majors');
+
+    for (const row of existingFaculty.rows) {
+      const { id: existingId } = row;
+
+      const matchingRow = facultyData.find(
+        ({ id }: { id: number }) => id === existingId,
       );
 
-      if (existingFaculty.rows.length === 0) {
-        await pool.query(insertFacultyQuery, [faculty.id, faculty.name]);
+      if (!matchingRow) {
+        await client.query(deleteFacultyQuery, [existingId]);
       }
     }
 
-    for (const major of majorData) {
-      const existingMajor = await pool.query(
-        'SELECT * FROM majors WHERE id = $1',
-        [major.id],
+    for (const { id, name } of facultyData) {
+      const existingRow = await client.query(
+        'SELECT * FROM faculties WHERE id = $1',
+        [id],
       );
-
-      if (existingMajor.rows.length === 0) {
-        await pool.query(insertMajorQuery, [
-          major.id,
-          major.name,
-          major.faculty_id,
+      if (existingRow.rows.length === 0) {
+        await client.query(insertFacultyQuery, [ name]);
+      } else {
+        await client.query('UPDATE faculties SET name = $1 WHERE id = $2', [
+          name,
+          id,
         ]);
       }
     }
 
-    // Delete faculties not in the new data
-    const existingFacultyIds = facultyData.map((faculty: { id: any; }) => faculty.id);
-    const allExistingFacultyIds = await pool.query('SELECT id FROM faculties');
-    const facultyIdsToDelete = allExistingFacultyIds.rows
-      .map((faculty) => faculty.id)
-      .filter((id) => !existingFacultyIds.includes(id));
+    for (const row of existingMajor.rows) {
+      const { id: existingId } = row;
 
-    for (const id of facultyIdsToDelete) {
-      await pool.query(deleteFacultyQuery, [id]);
+      const matchingRow = majorData.find(
+        ({ id }: { id: number }) => id === existingId,
+      );
+
+      if (!matchingRow) {
+        await client.query(deleteMajorQuery, [existingId]);
+      }
     }
 
-    // Delete majors not in the new data
-    const existingMajorIds = majorData.map((major: { id: any; }) => major.id);
-    const allExistingMajorIds = await pool.query('SELECT id FROM majors');
-    const majorIdsToDelete = allExistingMajorIds.rows
-      .map((major) => major.id)
-      .filter((id) => !existingMajorIds.includes(id));
-
-    for (const id of majorIdsToDelete) {
-      await pool.query(deleteMajorQuery, [id]);
+    for (const { id, name, faculty_id } of majorData) {
+      const existingRow = await client.query(
+        'SELECT * FROM majors WHERE id = $1',
+        [id],
+      );
+      if (existingRow.rows.length === 0) {
+        await client.query(insertMajorQuery, [name, faculty_id]);
+      } else {
+        await client.query(
+          'UPDATE majors SET name = $1, faculty_id = $2 WHERE id = $3',
+          [name, faculty_id, id],
+        );
+      }
     }
+
+    await client.query('ALTER TABLE users ADD CONSTRAINT users_major_id_fkey FOREIGN KEY (major_id) REFERENCES majors(id)');
+    await client.query('ALTER TABLE majors ADD CONSTRAINT majors_faculty_id_fkey FOREIGN KEY (faculty_id) REFERENCES faculties(id)');
+    await client.query('COMMIT');
 
     return NextResponse.json(
       {
@@ -103,6 +122,7 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
+    await client.query('ROLLBACK');
     console.log('🚀 ~ POST ~ error:', error);
     return NextResponse.json(
       {

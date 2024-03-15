@@ -10,7 +10,7 @@ export async function GET(
 
   try {
     const res = await pool.query<Majors>(
-      `SELECT * FROM majors WHERE id = $1`,
+      `SELECT * FROM majors WHERE is_delete = false AND id = $1`,
       [id],
     );
 

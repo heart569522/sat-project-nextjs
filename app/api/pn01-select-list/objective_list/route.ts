@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     `;
 
     const deleteQuery = `
-      DELETE FROM objective_list WHERE id = $1
+      DELETE FROM objective_list WHERE id = $1 
     `;
 
     const existingRows = await pool.query('SELECT * FROM objective_list');

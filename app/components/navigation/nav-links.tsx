@@ -12,6 +12,7 @@ import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -48,17 +49,17 @@ const links = [
   {
     name: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม (พน.01)',
     href: '/management/pn01',
-    icon: FindInPageOutlinedIcon,
+    icon: DocumentDuplicateIcon,
   },
   {
     name: 'จัดการข้อมูลบันทึกการเข้าร่วมโครงการกิจกรรม (พน.10)',
     href: '/management/pn10',
-    icon: FindInPageOutlinedIcon,
+    icon: ContactPageOutlinedIcon,
   },
   {
     name: 'จัดการคำร้องขอระเบียนกิจกรรม (พน.11)',
     href: '/management/pn11',
-    icon: FindInPageOutlinedIcon,
+    icon: HistoryEduOutlinedIcon,
   },
   {
     name: 'จัดการข้อมูลผู้ใช้งานระบบ',

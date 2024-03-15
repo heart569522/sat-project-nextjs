@@ -1,17 +1,22 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import FacultyMajorForm from '@/app/components/form/faculty-major-form';
 import PN01SelectForm from '@/app/components/form/pn01-select-form';
-import { getAllData } from '@/app/lib/api-service';
+import { getDataById } from '@/app/lib/api-service';
 import { Metadata } from 'next';
 
-const TITLE = 'แก้ไขคณะ/วิทยาลัย — สาขา';
+const TITLE = 'แก้ไขคณะ/วิทยาลัย - สาขา';
 
 export const metadata: Metadata = {
   title: TITLE,
 };
 
-export default async function FacultyMajor() {
-  const data = await getAllData('faculties/faculty-major');
+export default async function FacultyMajor({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const id = params.id;
+  const data = await getDataById('faculties', id);
 
   return (
     <main>
@@ -20,7 +25,7 @@ export default async function FacultyMajor() {
           breadcrumbs={[
             {
               label: 'ตั้งค่า',
-              href: '/setting#facuty-major',
+              href: '/setting#faculty-major',
               active: false,
             },
             {
@@ -33,7 +38,7 @@ export default async function FacultyMajor() {
         <div className="flex text-xl md:text-2xl">{TITLE}</div>
       </div>
       <div className="mt-4 w-full">
-        {/* <FacultyMajorForm data={data} pageTitle={TITLE}/> */}
+        <FacultyMajorForm data={data[0]} pageTitle={TITLE} isEditing={true}/>
       </div>
     </main>
   );

@@ -10,7 +10,7 @@ export async function GET(
 
   try {
     const res = await pool.query<Faculties>(
-      `SELECT * FROM faculties WHERE id = $1`,
+      `SELECT * FROM faculties WHERE is_delete = false AND id = $1`,
       [id],
     );
 

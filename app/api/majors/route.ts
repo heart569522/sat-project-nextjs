@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET() {
   try {
     const res = await pool.query(
-      `SELECT * FROM majors ORDER BY id`,
+      `SELECT * FROM majors WHERE is_delete = false ORDER BY id`,
     );
 
     return NextResponse.json(res.rows, { status: 200 });
