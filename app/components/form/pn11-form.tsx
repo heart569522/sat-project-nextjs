@@ -404,6 +404,7 @@ export default function PN11Form({
                 ชื่อจริง
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="firstname"
                 className="flex w-full"
@@ -424,6 +425,7 @@ export default function PN11Form({
                 นามสกุล
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="lastname"
                 className="flex w-full"
@@ -444,6 +446,7 @@ export default function PN11Form({
                 รหัสประจำตัวนักศึกษา
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="studentId"
                 className="flex w-full"
@@ -464,6 +467,7 @@ export default function PN11Form({
                 หมายเลขโทรศัพท์
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="phone"
                 className="flex w-full"
@@ -548,6 +552,7 @@ export default function PN11Form({
                 Email (สำหรับส่งการแจ้งเตือนเพื่อรับเอกสาร)
               </label>
               <TextField
+                size="small"
                 type="email"
                 name="email"
                 className="flex w-full"
@@ -637,6 +642,7 @@ export default function PN11Form({
                     ชื่อ-นามสกุล (ผู้รับ)
                   </label>
                   <TextField
+                    size="small"
                     type="text"
                     name="recipientName"
                     className="flex w-full"
@@ -659,6 +665,7 @@ export default function PN11Form({
                     ที่อยู่ในการจัดส่ง (ผู้รับ)
                   </label>
                   <TextField
+                    size="small"
                     type="text"
                     name="recipientAddress"
                     className="flex w-full"
@@ -688,6 +695,7 @@ export default function PN11Form({
                     หมายเลขโทรศัพท์ (ผู้รับ)
                   </label>
                   <TextField
+                    size="small"
                     type="text"
                     name="recipientPhone"
                     className="flex w-full"

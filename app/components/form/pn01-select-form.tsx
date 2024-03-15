@@ -276,6 +276,7 @@ export default function PN01SelectForm({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="name"
                             className="flex w-full"

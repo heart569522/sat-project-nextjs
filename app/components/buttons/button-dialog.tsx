@@ -231,6 +231,7 @@ export function ButtonDialog({
                     placeholder=""
                     error={Boolean(validationError.title)}
                     helperText={validationError.title}
+                    size="small"
                   />
                 </div>
                 <div className="py-2">

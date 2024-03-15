@@ -50,7 +50,9 @@ export default function PN10EditForm({
 
     if (isCancel) {
       setTitleModal('ยกเลิกการแก้ไข');
-      setDetailModal('คุณยืนยันที่จะยกเลิกการแก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม');
+      setDetailModal(
+        'คุณยืนยันที่จะยกเลิกการแก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม',
+      );
       setHandleAction('cancel');
       setOpenQuestionModal(true);
     }
@@ -60,9 +62,7 @@ export default function PN10EditForm({
 
       if (isFormValid) {
         setTitleModal('แก้ไขข้อมูล');
-        setDetailModal(
-          'คุณยืนยันที่แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม',
-        );
+        setDetailModal('คุณยืนยันที่แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม');
         setHandleAction('submit');
         setOpenQuestionModal(true);
       }
@@ -273,7 +273,11 @@ export default function PN10EditForm({
     console.log('formData: ', formData);
 
     try {
-      const response = await updateData('attendance', formData, editData?.id as string);
+      const response = await updateData(
+        'attendance',
+        formData,
+        editData?.id as string,
+      );
 
       if (response && (response.status === 201 || response.status === 200)) {
         setLoading(false);
@@ -324,6 +328,7 @@ export default function PN10EditForm({
                 รหัสโครงการ
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="projectCode"
                 className="flex w-full"
@@ -345,6 +350,7 @@ export default function PN10EditForm({
                 โครงการ/กิจกรรม
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="projectName"
                 className="flex w-full"
@@ -368,6 +374,7 @@ export default function PN10EditForm({
                 ปีการศึกษา
               </label>
               <TextField
+                size="small"
                 type="number"
                 name="projectYear"
                 className="flex w-full"
@@ -390,6 +397,7 @@ export default function PN10EditForm({
               </label>
               <div className="flex items-center gap-3">
                 <TextField
+                  size="small"
                   type="text"
                   name="projectHour"
                   className="flex w-full"
@@ -446,6 +454,7 @@ export default function PN10EditForm({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="Std"
                             className="flex w-full"
@@ -470,6 +479,7 @@ export default function PN10EditForm({
                       <td className="bg-gray-50 px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="Name"
                             className="flex w-full"
@@ -498,6 +508,7 @@ export default function PN10EditForm({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="remark"
                             className="flex w-full"

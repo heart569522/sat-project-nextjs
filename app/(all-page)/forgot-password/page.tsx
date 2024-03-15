@@ -191,6 +191,7 @@ export default function ForgetPassForm() {
                 error={Boolean(validationError.email)}
                 placeholder=""
                 autoComplete="off"
+                size="small"
               />
               {!avaliableEmail && (
                 <div className="w-full py-2">

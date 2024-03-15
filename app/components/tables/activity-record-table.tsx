@@ -97,7 +97,7 @@ export default function ActivityRecordTable({
       if (response && (response.status === 201 || response.status === 200)) {
         setHour('');
         setIsEditHour(false);
-        setEditingRowId(''); 
+        setEditingRowId('');
         fetchData();
       }
     } catch (error) {
@@ -285,6 +285,7 @@ export default function ActivityRecordTable({
                                 {isEditHour && editingRowId === row.id ? (
                                   <>
                                     <TextField
+                                      size="small"
                                       className="w-full"
                                       value={hour}
                                       onChange={(e) => setHour(e.target.value)}

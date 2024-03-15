@@ -477,6 +477,7 @@ export default function ProjectProposalTable({
                                     </div>
                                     <div className="mt-2 flex justify-between gap-2">
                                       <TextField
+                                        size="small"
                                         className="w-full"
                                         value={remark}
                                         onChange={(e) =>

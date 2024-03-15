@@ -446,6 +446,7 @@ export default function FacultyMajorFormOld({ pageTitle }: FacultyMajorFormProps
                               className="flex w-full"
                               placeholder=""
                               value={row.name}
+                              size="small"
                               onChange={(e) =>
                                 handleFacultyChange(
                                   row.id,
@@ -552,6 +553,7 @@ export default function FacultyMajorFormOld({ pageTitle }: FacultyMajorFormProps
                               className="flex w-full"
                               placeholder=""
                               value={row.name}
+                              size="small"
                               onChange={(e) =>
                                 handleMajorChange(
                                   row.id,

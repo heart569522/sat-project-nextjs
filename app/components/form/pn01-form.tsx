@@ -1496,6 +1496,7 @@ export default function PN01Form({
                 1.ชื่อคณะ/วิทยาลัย/หน่วยงาน *
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="faculty"
                 className="flex w-full"
@@ -1516,6 +1517,7 @@ export default function PN01Form({
                 2.ชื่อโครงการ *
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="projectName"
                 className="flex w-full"
@@ -1536,6 +1538,7 @@ export default function PN01Form({
                 ปีการศึกษา (พ.ศ.) *
               </label>
               <TextField
+                size="small"
                 type="number"
                 name="projectYear"
                 className="flex w-full"
@@ -1558,6 +1561,7 @@ export default function PN01Form({
                 3.ผู้ดำเนินการ/ผู้รับผิดชอบโครงการ *
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="projectHead"
                 className="flex w-full"
@@ -1580,6 +1584,7 @@ export default function PN01Form({
                 หมายเลขโทรศัพท์ *
               </label>
               <TextField
+                size="small"
                 type="text"
                 name="projectHeadPhone"
                 className="flex w-full"
@@ -1626,6 +1631,7 @@ export default function PN01Form({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-2 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="firstname"
                             className="flex w-full"
@@ -1650,6 +1656,7 @@ export default function PN01Form({
                             }
                           />
                           <TextField
+                            size="small"
                             type="text"
                             name="lastname"
                             className="flex w-full"
@@ -1678,6 +1685,7 @@ export default function PN01Form({
                       <td className="bg-gray-50 px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="position"
                             className="flex w-full"
@@ -1706,6 +1714,7 @@ export default function PN01Form({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             name="work"
                             className="flex w-full "
@@ -2587,6 +2596,7 @@ export default function PN01Form({
           <div className="mb-6">
             <div className="grid gap-6 md:grid-cols-1">
               <TextField
+                size="small"
                 name="principleReason"
                 multiline
                 rows={5}
@@ -2638,6 +2648,7 @@ export default function PN01Form({
                         <td className="bg-gray-50 px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               type="text"
                               name="objective"
                               className="flex w-full"
@@ -2666,6 +2677,7 @@ export default function PN01Form({
                         <td className="px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               type="text"
                               name="indicator"
                               className="flex w-full"
@@ -2694,6 +2706,7 @@ export default function PN01Form({
                         <td className="bg-gray-50 px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               type="text"
                               name="value"
                               className="flex w-full"
@@ -2722,6 +2735,7 @@ export default function PN01Form({
                         <td className="px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               type="text"
                               name="tool"
                               className="flex w-full"
@@ -2788,6 +2802,7 @@ export default function PN01Form({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             id="expected_result"
                             className="flex w-full"
@@ -2855,6 +2870,7 @@ export default function PN01Form({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             type="text"
                             id="operation_duration"
                             className="flex w-full"
@@ -2929,6 +2945,7 @@ export default function PN01Form({
                   11.1 สถานที่จัดโครงการ *
                 </label>
                 <TextField
+                  size="small"
                   type="text"
                   name="projectLocation"
                   className="flex w-full"
@@ -2953,6 +2970,7 @@ export default function PN01Form({
                   </p>
                 </label>
                 <TextField
+                  size="small"
                   type="text"
                   name="projectDatetime"
                   className="flex w-full"
@@ -3009,6 +3027,7 @@ export default function PN01Form({
                                 <td className="px-6 py-4">
                                   <div className={`grid grid-cols-1 gap-6`}>
                                     <TextField
+                                      size="small"
                                       type="text"
                                       name="date"
                                       className="flex w-full"
@@ -3027,6 +3046,7 @@ export default function PN01Form({
                                 <td className="bg-gray-50 px-6 py-4">
                                   <div className={`grid grid-cols-1 gap-6`}>
                                     <TextField
+                                      size="small"
                                       type="text"
                                       name="time"
                                       className="flex w-full"
@@ -3045,6 +3065,7 @@ export default function PN01Form({
                                 <td className="px-6 py-4">
                                   <div className={`grid grid-cols-1 gap-6`}>
                                     <TextField
+                                      size="small"
                                       type="text"
                                       name="detail"
                                       className="flex w-full"
@@ -3113,6 +3134,7 @@ export default function PN01Form({
           <div className="mb-6">
             <div className="mb-3 grid grid-cols-1 gap-6">
               <TextField
+                size="small"
                 type="text"
                 name="lecturer"
                 className="flex w-full"
@@ -3149,6 +3171,7 @@ export default function PN01Form({
                       <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             hiddenLabel
                             type="text"
                             id="detail"
@@ -3178,6 +3201,7 @@ export default function PN01Form({
                       <td className="px-6 py-4">
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
+                            size="small"
                             hiddenLabel
                             type="number"
                             name="count"
@@ -3254,6 +3278,7 @@ export default function PN01Form({
           <div className="mb-6">
             <div>
               <TextField
+                size="small"
                 name="improvement"
                 rows={5}
                 multiline
@@ -3316,6 +3341,7 @@ export default function PN01Form({
                         <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               hiddenLabel
                               type="text"
                               name="detail"
@@ -3346,7 +3372,7 @@ export default function PN01Form({
                         <td className="px-6 py-4">
                           <div className={`grid grid-cols-1 gap-0`}>
                             <OutlinedInput
-                              // hiddenLabel
+                              size="small"
                               type="number"
                               name="amount"
                               endAdornment={
@@ -3381,6 +3407,7 @@ export default function PN01Form({
                         <td className="bg-gray-50 px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               hiddenLabel
                               type="text"
                               name="source"
@@ -3487,6 +3514,7 @@ export default function PN01Form({
                         <td className="w-[10%] bg-gray-50 px-6 py-4 text-center text-base">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               hiddenLabel
                               type="text"
                               name="detail"
@@ -3517,7 +3545,7 @@ export default function PN01Form({
                         <td className="px-6 py-4">
                           <div className={`grid grid-cols-1 gap-0`}>
                             <OutlinedInput
-                              // hiddenLabel
+                              size="small"
                               type="number"
                               name="amount"
                               endAdornment={
@@ -3552,6 +3580,7 @@ export default function PN01Form({
                         <td className="bg-gray-50 px-6 py-4">
                           <div className={`grid grid-cols-1 gap-6`}>
                             <TextField
+                              size="small"
                               hiddenLabel
                               type="text"
                               name="note"

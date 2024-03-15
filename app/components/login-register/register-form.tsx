@@ -315,6 +315,7 @@ export default function RegisterForm() {
                   ชื่อจริง / First Name
                 </label>
                 <TextField
+                  size="small"
                   className="w-full"
                   id="firstname"
                   type="text"
@@ -335,6 +336,7 @@ export default function RegisterForm() {
                   นามสกุล / Last Name
                 </label>
                 <TextField
+                  size="small"
                   className="w-full"
                   id="lastname"
                   type="text"
@@ -375,6 +377,7 @@ export default function RegisterForm() {
                   </div>
                 </div>
                 <TextField
+                  size="small"
                   className="w-full"
                   id="email"
                   type="email"
@@ -396,6 +399,7 @@ export default function RegisterForm() {
                   เบอร์โทรศัพท์ / Phone
                 </label>
                 <TextField
+                  size="small"
                   className="w-full"
                   id="phone"
                   type="text"
@@ -510,6 +514,7 @@ export default function RegisterForm() {
                   </div>
                 </div>
                 <TextField
+                  size="small"
                   className="w-full"
                   id="username"
                   type="text"
@@ -541,6 +546,7 @@ export default function RegisterForm() {
                     error={Boolean(validationError.password)}
                     placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
                     autoComplete="off"
+                    size='small'
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -580,6 +586,7 @@ export default function RegisterForm() {
                     error={Boolean(validationError.confirmPassword)}
                     placeholder=""
                     autoComplete="off"
+                    size='small'
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton

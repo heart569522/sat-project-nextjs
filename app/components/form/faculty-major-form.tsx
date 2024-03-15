@@ -349,6 +349,7 @@ export default function FacultyMajorForm({
                 placeholder=""
                 error={Boolean(validationError.facultyName)}
                 helperText={validationError.facultyName}
+                size="small"
               />
             </div>
           </div>
@@ -392,6 +393,7 @@ export default function FacultyMajorForm({
                             className="flex w-full"
                             placeholder=""
                             value={row.name}
+                            size="small"
                             onChange={(e) =>
                               handleMajorChange(row.id, 'name', e.target.value)
                             }

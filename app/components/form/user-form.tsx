@@ -348,6 +348,7 @@ export default function UserForm({
                     ชื่อจริง / First Name
                   </label>
                   <TextField
+                    size="small"
                     className="w-full"
                     id="firstname"
                     type="text"
@@ -368,6 +369,7 @@ export default function UserForm({
                     นามสกุล / Last Name
                   </label>
                   <TextField
+                    size="small"
                     className="w-full"
                     id="lastname"
                     type="text"
@@ -408,6 +410,7 @@ export default function UserForm({
                   </div> */}
                   </div>
                   <TextField
+                    size="small"
                     className="w-full"
                     id="email"
                     type="email"
@@ -429,6 +432,7 @@ export default function UserForm({
                     เบอร์โทรศัพท์ / Phone
                   </label>
                   <TextField
+                    size="small"
                     className="w-full"
                     id="phone"
                     type="text"
@@ -543,6 +547,7 @@ export default function UserForm({
                     </div>
                   </div>
                   <TextField
+                    size="small"
                     className="w-full"
                     id="username"
                     type="text"
@@ -580,6 +585,7 @@ export default function UserForm({
                         error={Boolean(validationError.password)}
                         placeholder=""
                         autoComplete="off"
+                        size='small'
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
@@ -658,7 +664,9 @@ export default function UserForm({
           </div>
           <div className="mb-2 mt-6 flex justify-center gap-2">
             <Link
-              href={isAdminTable || isCreating ? '/management/users' : '/profile'}
+              href={
+                isAdminTable || isCreating ? '/management/users' : '/profile'
+              }
               className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >
               ยกเลิก
