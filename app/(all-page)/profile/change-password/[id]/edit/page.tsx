@@ -1,5 +1,10 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import ChangePasswordForm from '@/app/components/form/change-password-form';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'เปลี่ยนรหัสผ่าน',
+};
 
 export default async function ChangePassword({
   params,

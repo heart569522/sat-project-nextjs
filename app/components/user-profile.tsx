@@ -1,10 +1,13 @@
-'use client';
 import React from 'react';
 import { Users } from '@/app/model/user';
 import { EditProfile } from '@/app/components/buttons/buttons';
 import Link from 'next/link';
-import {EditPassword} from '@/app/components/buttons/buttons';
-export default function UserProfile({ data }: { data: Users }) {
+import { EditPassword } from '@/app/components/buttons/buttons';
+import { LockClosedIcon, PaperClipIcon } from '@heroicons/react/24/outline';
+import LockPersonOutlinedIcon from '@mui/icons-material/LockPersonOutlined';
+import SettingsAccessibilityOutlinedIcon from '@mui/icons-material/SettingsAccessibilityOutlined';
+
+export default async function UserProfile({ data }: { data: Users }) {
   const CheckRole = () => {
     if (data.role === 'admin') {
       return 'ผู้ดูแลระบบ';
@@ -17,72 +20,121 @@ export default function UserProfile({ data }: { data: Users }) {
 
   return (
     <div className="">
-      <div className="w-full rounded-md border p-5 shadow-sm">
-        <div className="w-full rounded-md bg-blue-500 p-3 py-4">
-          <h1 className="text-md text-center font-bold text-zinc-50 md:text-2xl">
-            ข้อมูลโปรไฟล์
-          </h1>
-        </div>
-        <div className="grid grid-cols-2 gap-3 mt-3 text-start text-xs md:text-2xl">
-          <div className="w-full">
-            <p className="mb-3">
-              ชื่อ - นามสกุล : {data.firstname} {data.lastname}
-            </p>
-            <p className="mb-3">
-              ตำแหน่ง : <CheckRole />
-            </p>
-            <p className="mb-3">คณะ : {data.faculty_name}</p>
-            <p className="mb-3">สาขา : {data.major_name}</p>
-            <p className="mb-3">ชื่อผู้ใช้งาน : {data.username}</p>
-            <p className="mb-3">
-              รหัสผ่าน :
-              <EditPassword id={data.id} />
-            </p>
+      <div className="mt-10 border-t border-gray-200">
+        <dl className="divide-y divide-gray-200">
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              ชื่อผู้ใช้
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.username}
+            </dd>
           </div>
-          <div className="w-full border-l-2 border-gray-800 ps-4 ">
-            <p className="mb-3">อีเมล : {data.email}</p>
-            <p className="mb-3">เบอร์โทรศัพท์ : {data.phone}</p>
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              ชื่อ - นามสกุล
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.firstname} {data.lastname}
+            </dd>
           </div>
-        </div>
-        <div className="mb-2 mt-6 flex flex-col gap-5">
-          <EditProfile id={data.id} />
-        </div>
-        {/* <div className="flex flex-col gap-y-6">
-          <h2 className="text-4xl font-bold tracking-wide">
-            คุณ{data.firstname}&nbsp;{data.lastname}
-          </h2>
-          <div className="flex gap-x-2">
-            <p className="text-2xl font-semibold">ตำแหน่ง :</p>
-            <p className="text-2xl">
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              ตำแหน่ง
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               <CheckRole />
-            </p>
+            </dd>
           </div>
-          {data.faculty_name && (
-            <div className="flex gap-x-2">
-              <p className="text-2xl font-semibold">คณะ/วิทยาลัย :</p>
-              <p className="text-2xl">{data.faculty_name}</p>
-            </div>
-          )}
-          {data.major_name && (
-            <div className="flex gap-x-2">
-              <p className="text-2xl font-semibold">สาขา :</p>
-              <p className="text-2xl">{data.major_name}</p>
-            </div>
-          )}
-          <div className="flex gap-x-2">
-            <p className="text-2xl font-semibold">เบอร์โทรศัพท์ :</p>
-            <p className="text-2xl">{data.phone}</p>
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              คณะ/วิทยาลัย
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.faculty_name}
+            </dd>
           </div>
-          <div className="flex gap-x-2">
-            <p className="text-2xl font-semibold">อีเมล :</p>
-            <p className="text-2xl">{data.email}</p>
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              สาขา
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.major_name}
+            </dd>
           </div>
-          <div className="flex gap-x-2">
-            <p className="text-2xl font-semibold">ชื่อผู้ใช้ :</p>
-            <p className="text-2xl">{data.username}</p>
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              Email
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.email}
+            </dd>
           </div>
-        </div> */}
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              เบอร์โทรศัพท์
+            </dt>
+            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {data.phone}
+            </dd>
+          </div>
+          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt className="text-lg font-medium leading-6 text-gray-900">
+              จัดการ
+            </dt>
+            <dd className="mt-4 text-lg text-gray-900 sm:col-span-2 sm:mt-0">
+              <ul
+                role="list"
+                className="divide-y divide-gray-200 rounded-md border border-gray-200"
+              >
+                <li className="flex items-center justify-between py-4 pl-4 pr-5 text-lg leading-6 hover:bg-gray-50">
+                  <div className="flex w-0 flex-1 items-center">
+                    <LockPersonOutlinedIcon
+                      className="h-6 w-6 flex-shrink-0 text-gray-400"
+                      aria-hidden="true"
+                    />
+                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                      <span className="truncate font-medium">
+                        แก้ไขรหัสผ่าน
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-4 flex-shrink-0">
+                    <Link
+                      href={`/profile/change-password/${data.id}/edit`}
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      แก้ไข
+                    </Link>
+                  </div>
+                </li>
+                <li className="flex items-center justify-between py-4 pl-4 pr-5 text-lg leading-6 hover:bg-gray-50">
+                  <div className="flex w-0 flex-1 items-center">
+                    <SettingsAccessibilityOutlinedIcon
+                      className="h-6 w-6 flex-shrink-0 text-gray-400"
+                      aria-hidden="true"
+                    />
+                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                      <span className="truncate font-medium">
+                        แก้ไขข้อมูลโปรไฟล์
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-4 flex-shrink-0">
+                    <Link
+                      href={`/profile/${data.id}/edit`}
+                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      แก้ไข
+                    </Link>
+                  </div>
+                </li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
       </div>
     </div>
+    // </div>
   );
 }

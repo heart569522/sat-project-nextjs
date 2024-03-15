@@ -3,7 +3,7 @@ import UserForm from '@/app/components/form/user-form';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'แก้ไขการโครงการ/กิจกรรม (พน.01)',
+  title: 'เพิ่มผู้ใช้',
 };
 
 export default async function Page() {

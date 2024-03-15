@@ -1,7 +1,12 @@
 import UserProfile from '@/app/components/user-profile';
 import { getDataById, getUserLoginData } from '@/app/lib/api-service';
 import { auth } from '@/auth';
+import { Metadata } from 'next';
 import React from 'react'
+
+export const metadata: Metadata = {
+  title: 'ข้อมูลโปรไฟล์',
+};
 
 export default async function Profile() {
   

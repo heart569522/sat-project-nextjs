@@ -1,4 +1,9 @@
 import SettingTab from '@/app/components/tabs/setting-tab';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ตั้งค่า',
+};
 
 export default async function Page() {
   return (

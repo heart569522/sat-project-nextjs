@@ -8,7 +8,7 @@ import PN11Form from '@/app/components/form/pn11-form';
 import UserForm from '@/app/components/form/user-form';
 
 export const metadata: Metadata = {
-  title: 'แก้ไขการโครงการ/กิจกรรม (พน.01)',
+  title: 'แก้ไขข้อมูลผู้ใช้',
 };
 
 export default async function Page({ params }: { params: { id: string } }) {

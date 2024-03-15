@@ -1,6 +1,11 @@
 import { getDataById } from '@/app/lib/api-service';
 import UserForm from '@/app/components/form/user-form';
 import Breadcrumbs from '@/app/components/breadcrumbs';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'แก้ไขข้อมูลโปรไฟล์',
+};
 
 export default async function EditProfile({
   params,
