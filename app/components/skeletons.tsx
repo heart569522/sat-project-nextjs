@@ -5,6 +5,16 @@ import React from 'react';
 const shimmer =
   'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
 
+export function SettingSkeleton() {
+  return (
+    <div
+      className={`${shimmer} relative overflow-hidden rounded-md bg-gray-100 shadow-sm`}
+    >
+      <div className={`flex h-20 w-full animate-pulse`}></div>
+    </div>
+  );
+}
+
 export function CardSkeleton() {
   return (
     <div

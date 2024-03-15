@@ -64,10 +64,16 @@ export default function ModalResponse({
       <Box sx={{ ...style, width: 450 }}>
         <div className="flex items-center justify-center pt-6">
           {isSuccess && (
-            <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
+            <CheckCircleOutlinedIcon
+              sx={{ width: '3.5rem', height: '3.5rem' }}
+              className="text-green-500"
+            />
           )}
           {isError && (
-            <ErrorOutlineOutlinedIcon className="h-14 w-14 text-red-500" />
+            <ErrorOutlineOutlinedIcon
+              sx={{ width: '3.5rem', height: '3.5rem' }}
+              className="text-red-500 h-"
+            />
           )}
         </div>
 

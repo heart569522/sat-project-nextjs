@@ -5,14 +5,31 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PN01SelectMenu from './pn01-select-menu';
 import FacultyMenu from './faculty-menu';
+import { Faculties } from '@/app/model/faculties-majors';
+import { getAllData } from '@/app/lib/api-service';
 
 export default function SettingTab() {
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState('pn01-select');
+  const [facultyData, setFacultyData] = useState<Faculties[]>();
 
   const handleTabChange = (tabName: string) => {
     setActiveTab(tabName);
+  };
+
+  useEffect(() => {
+    getFacultyMajorData();
+  }, []);
+
+  const getFacultyMajorData = async () => {
+    try {
+      const faculty = await getAllData('faculties');
+
+      setFacultyData(faculty);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -75,11 +92,8 @@ export default function SettingTab() {
         )}
         {activeTab === 'faculty-major' && (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            <FacultyMenu />
+            <FacultyMenu facultyLength={facultyData?.length as number}/>
           </div>
-          // <FacultyMajorForm
-          //   pageTitle={'แก้ไขคณะ/วิทยาลัย — สาขา'}
-          // />
         )}
       </div>
     </>
