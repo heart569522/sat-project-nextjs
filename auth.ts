@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { pool } from '@/app/lib/db';
 import { z } from 'zod';
 import { authConfig } from '@/auth.config';
-import { Session } from 'next-auth/types';
+// import { Session } from 'next-auth/types';
 
 async function login(username: string) {
   try {
@@ -44,13 +44,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user } : {token: any, user: any}) {
       if (!token.sub) return token;
 
       if (user) token.role = user.role;
       return token;
     },
-    async session({ session, token }: { session: Session; token: any }) {
+    async session({ session, token }: { session: any, token: any }) {
       if (token.sub && session.user) {
         session.user.id = token.sub
         session.user.role = token.role
