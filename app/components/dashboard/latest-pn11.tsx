@@ -14,7 +14,7 @@ export default async function LatestPN11() {
       <h2 className={`${notoThai.className} mb-4 text-xl md:text-2xl`}>
         คำร้องขอระเบียนกิจกรรมล่าสุด
       </h2>
-      <div className="flex grow flex-col justify-between rounded-xl bg-gray-100 p-4">
+      <div className="flex grow flex-col justify-between rounded-xl bg-blue-50 p-4">
         <div className="">
           {latestPN11.map((row: any, i: any) => (
             <Link
@@ -38,7 +38,7 @@ export default async function LatestPN11() {
                 </div>
               </div>
               <p
-                className={`${notoThai.className} truncate text-sm font-medium md:text-base`}
+                className={`${notoThai.className} truncate text-sm font-medium`}
               >
                 {/* {`${row.date} ${row.time}`} */}
                 {convertISOStringToDateTimeText(row.created_at)}
@@ -46,10 +46,10 @@ export default async function LatestPN11() {
             </Link>
           ))}
         </div>
-        <div className="flex items-center pb-2 pt-6">
+        {/* <div className="flex items-center pb-2 pt-6">
           <ArrowPathIcon className="h-5 w-5 text-gray-500" />
           <h3 className="ml-2 text-sm text-gray-500 ">Updated just now</h3>
-        </div>
+        </div> */}
       </div>
     </div>
   );
