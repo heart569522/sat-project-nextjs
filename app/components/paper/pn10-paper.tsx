@@ -25,7 +25,7 @@ const DotsPlaceholder = ({
       ))}
       {text && (
         <span
-          className={`absolute ${positionClasses[position]} lef left -translate-x-1/2 transform whitespace-nowrap pb-3`}
+          className={`absolute ${positionClasses[position]} left -translate-x-1/2 transform whitespace-nowrap pb-3`}
         >
           {text}
         </span>

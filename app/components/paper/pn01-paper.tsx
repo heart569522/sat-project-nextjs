@@ -34,6 +34,11 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
     return newPageHeightDiv;
   };
 
+  const shouldRenderTable = data.project_responsible?.some((row) => {
+    const fullName = `${row.firstname} ${row.lastname}`.trim();
+    return fullName !== '';
+  });
+
   useEffect(() => {
     const checkPageBreak = () => {
       if (paperRef.current) {
@@ -124,7 +129,7 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
             </article>
             <article id="part" className="part">
               <div className="flex gap-x-3 py-2 text-sm">
-                <label className={`font-semibold`}>
+                <label className={`font-semibold whitespace-nowrap`}>
                   1.&nbsp;&nbsp;&nbsp;ชื่อคณะ/วิทยาลัย/หน่วยงาน:
                 </label>
                 <p>{data.faculty}</p>
@@ -132,7 +137,7 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
             </article>
             <article id="part" className="part">
               <div className="flex gap-x-3 py-2 text-sm">
-                <label className={`font-semibold`}>
+                <label className={`font-semibold whitespace-nowrap`}>
                   2.&nbsp;&nbsp;&nbsp;ชื่อโครงการ:
                 </label>
                 <p>{data.project_name}</p>
@@ -149,44 +154,46 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
                 <label className="font-semibold">หมายเลขโทรศัพท์:</label>
                 <p>{data.project_head_phone}</p>
               </div>
-              <div className="flex justify-center py-1">
-                <table className="w-[95%]">
-                  <thead>
-                    <tr className="text-center text-sm">
-                      <td className="table-p w-[10%] border border-black">
-                        ลำดับที่
-                      </td>
-                      <td className="table-p w-[40%] border border-black">
-                        ชื่อ – สกุล
-                      </td>
-                      <td className="table-p w-[25%] border border-black">
-                        ตำแหน่งในโครงการ
-                      </td>
-                      <td className="table-p w-[25%] border border-black">
-                        ภาระงาน (ภารกิจ/สัปดาห์)
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.project_responsible?.map((row) => (
-                      <tr className="text-sm" key={row.id}>
-                        <td className="table-p border border-black text-center">
-                          {row.id}
+              {shouldRenderTable && (
+                <div className="flex justify-center py-1">
+                  <table className="w-[95%]">
+                    <thead>
+                      <tr className="text-center text-sm">
+                        <td className="table-p w-[10%] border border-black">
+                          ลำดับที่
                         </td>
-                        <td className="table-p border border-black">
-                          {row.firstname}&nbsp;{row.lastname}
+                        <td className="table-p w-[40%] border border-black">
+                          ชื่อ – สกุล
                         </td>
-                        <td className="table-p border border-black">
-                          {row.position}
+                        <td className="table-p w-[25%] border border-black">
+                          ตำแหน่งในโครงการ
                         </td>
-                        <td className="table-p border border-black text-center">
-                          {row.work}
+                        <td className="table-p w-[25%] border border-black">
+                          ภาระงาน (ภารกิจ/สัปดาห์)
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {data.project_responsible?.map((row) => (
+                        <tr className="text-sm" key={row.id}>
+                          <td className="table-p border border-black text-center">
+                            {row.id}
+                          </td>
+                          <td className="table-p border border-black">
+                            {row.firstname}&nbsp;{row.lastname}
+                          </td>
+                          <td className="table-p border border-black">
+                            {row.position}
+                          </td>
+                          <td className="table-p border border-black text-center">
+                            {row.work}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </article>
             <article id="part" className="part">
               <div className="flex gap-x-3 py-2 text-sm">

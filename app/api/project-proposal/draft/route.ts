@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
     const faculty = formData.faculty;
     const project_name = formData.projectName;
     const project_head = formData.projectHead;
+    const project_code = formData.projectYear;
     const project_head_phone = formData.projectHeadPhone;
     const principle_reason = formData.principleReason;
     const project_location = formData.projectLocation;
@@ -80,7 +81,8 @@ export async function POST(req: NextRequest) {
         INSERT INTO project_proposal_pn01 (
           faculty, 
           project_name, 
-          project_head, 
+          project_head,
+          project_year,
           project_head_phone,
           project_responsible, 
           strategic_issue_id, 
@@ -142,14 +144,16 @@ export async function POST(req: NextRequest) {
           $28, 
           $29, 
           $30,
-          (SELECT id FROM pn01_status WHERE name = $31),
-          (SELECT id FROM users WHERE id = $32)
+          $31,
+          $32,
+          (SELECT id FROM users WHERE id = $33)
         )
       `,
       [
         faculty || null,
         project_name || null,
         project_head || null,
+        project_code || null,
         project_head_phone || null,
         responsible_rows,
         strategic_issue || null,
@@ -177,7 +181,7 @@ export async function POST(req: NextRequest) {
         budget_expense_total || null,
         budget_expense_rows,
         is_draft,
-        PN01Status[0],
+        '0',
         userId,
       ],
     );

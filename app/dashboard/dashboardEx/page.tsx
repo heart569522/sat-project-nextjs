@@ -4,7 +4,7 @@ import LatestInvoices from '@/app/components/dashboard/latest-invoices';
 import { Suspense } from 'react';
 import {
   RevenueChartSkeleton,
-  LatestInvoicesSkeleton,
+  LatestDataSkeleton,
   CardsSkeleton,
 } from '@/app/components/skeletons';
 
@@ -21,7 +21,7 @@ export default async function Page() {
         <Suspense fallback={<RevenueChartSkeleton />}>
           <RevenueChart />
         </Suspense>
-        <Suspense fallback={<LatestInvoicesSkeleton />}>
+        <Suspense fallback={<LatestDataSkeleton />}>
           <LatestInvoices />
         </Suspense>
       </div>

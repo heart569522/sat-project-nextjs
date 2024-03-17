@@ -1274,13 +1274,13 @@ export default function PN01Form({
     }
 
     // Validate Table arrays
-    const responsibleFields = ['firstname', 'lastname'];
-    const isResponsibleValid = validateArray(
-      responsibleRows,
-      responsibleFields,
-      'responsible',
-    );
-    console.log('isResponsibleValid : ', isResponsibleValid);
+    // const responsibleFields = ['firstname', 'lastname'];
+    // const isResponsibleValid = validateArray(
+    //   responsibleRows,
+    //   responsibleFields,
+    //   'responsible',
+    // );
+    // console.log('isResponsibleValid : ', isResponsibleValid);
 
     const OIVTFields = ['objective', 'indicator', 'value', 'tool'];
     const isOIVTValid = validateArray(OIVTRows, OIVTFields, 'OIVT');
@@ -1325,7 +1325,7 @@ export default function PN01Form({
     );
 
     isValid =
-      isResponsibleValid &&
+      // isResponsibleValid &&
       isOIVTValid &&
       isExpectedResultValid &&
       isOperationDurationValid &&
@@ -1606,7 +1606,7 @@ export default function PN01Form({
                       ลำดับที่
                     </th>
                     <th scope="col" className="px-6 py-3">
-                      ชื่อ - สกุล *
+                      ชื่อ - สกุล
                     </th>
                     <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
                       ตำแหน่งโครงการ

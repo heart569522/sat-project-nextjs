@@ -36,7 +36,11 @@ export default async function EditProfile({
       </div>
       <div className="flex text-xl md:text-2xl">แก้ไขข้อมูลโปรไฟล์</div>
       <div className="mt-4">
-        <UserForm editData={data} isEditing={true} />
+        <UserForm
+          editData={data}
+          isEditing={true}
+          isAdminEditing={data.role === 'admin'}
+        />
       </div>
     </>
   );

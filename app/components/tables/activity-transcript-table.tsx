@@ -218,6 +218,7 @@ export default function ActivityTranscriptTable({
                                     <StatusBadge
                                       docType={'pn01'}
                                       statusId={item.id}
+                                      statusName={item.name}
                                     />
                                   </MenuItem>
                                 ))}
@@ -363,6 +364,7 @@ export default function ActivityTranscriptTable({
                                       <StatusBadge
                                         docType={'pn11'}
                                         statusId={item.id}
+                                        statusName={item.name}
                                       />
                                     </MenuItem>
                                   ))}

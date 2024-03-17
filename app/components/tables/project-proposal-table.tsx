@@ -46,7 +46,9 @@ export default function ProjectProposalTable({
 }) {
   // console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
+  console.log("🚀 ~ data:", data)
   const [pn01StatusData, setPN01StatusData] = useState([]);
+  console.log("🚀 ~ pn01StatusData:", pn01StatusData)
   const [loading, setLoading] = useState(true);
   const [showRemark, setShowRemark] = useState<string | null>(null);
 
@@ -236,6 +238,7 @@ export default function ProjectProposalTable({
                                       <StatusBadge
                                         docType={'pn01'}
                                         statusId={item.id}
+                                        statusName={item.name}
                                       />
                                     </MenuItem>
                                   ))}
@@ -245,6 +248,7 @@ export default function ProjectProposalTable({
                             <StatusBadge
                               docType={'pn01'}
                               statusId={row.status_id}
+                              statusName={row.status_name}
                             />
                           )}
                         </div>
@@ -377,6 +381,7 @@ export default function ProjectProposalTable({
                                         <StatusBadge
                                           docType={'pn01'}
                                           statusId={item.id}
+                                          statusName={item.name}
                                         />
                                       </MenuItem>
                                     ))}
@@ -386,6 +391,7 @@ export default function ProjectProposalTable({
                               <StatusBadge
                                 docType={'pn01'}
                                 statusId={row.status_id}
+                                statusName={row.status_name}
                               />
                             )}
                           </td>

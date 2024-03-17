@@ -257,7 +257,7 @@ export async function PUT(
         budget_expense_total = '${budget_expense_total}',
         budget_expense = '${budget_expense_rows}',
         is_draft = false,
-        status_id = (SELECT id FROM pn01_status WHERE name = '${PN01Status[1]}')
+        status_id = '1'
       WHERE id = '${id}';
     `,
     );

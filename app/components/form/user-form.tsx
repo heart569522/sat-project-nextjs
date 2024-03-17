@@ -33,11 +33,13 @@ export default function UserForm({
   editData,
   isCreating,
   isEditing,
+  isAdminEditing,
   isAdminTable,
 }: {
   editData?: any;
   isCreating?: boolean;
   isEditing?: boolean;
+  isAdminEditing?: boolean;
   isAdminTable?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
@@ -585,7 +587,7 @@ export default function UserForm({
                         error={Boolean(validationError.password)}
                         placeholder=""
                         autoComplete="off"
-                        size='small'
+                        size="small"
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
@@ -610,7 +612,7 @@ export default function UserForm({
                 </div>
               )}
 
-              {(isAdminTable || isCreating) && (
+              {(isAdminTable || isCreating || isAdminEditing) && (
                 <div className="grid grid-cols-2 gap-2 max-lg:grid-cols-1">
                   <div className="flex flex-col">
                     <label
@@ -665,7 +667,11 @@ export default function UserForm({
           <div className="mb-2 mt-6 flex justify-center gap-2">
             <Link
               href={
-                isAdminTable || isCreating ? '/management/users' : '/profile'
+                isAdminTable || isCreating
+                  ? '/management/users'
+                  : isAdminEditing
+                  ? '/profile'
+                  : '/profile'
               }
               className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >

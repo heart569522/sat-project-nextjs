@@ -4,11 +4,12 @@ import React from 'react';
 
 interface Props {
   statusId: number;
+  statusName: string;
   docType?: any;
 }
 
 export default function StatusBadge(props: Props) {
-  const { statusId, docType } = props;
+  const { statusId, docType, statusName } = props;
 
   const badgeColor = () => {
     let color;
@@ -42,12 +43,10 @@ export default function StatusBadge(props: Props) {
 
   return (
     <div>
-      <span className={`${badgeColor()} rounded border px-2 py-1 text-sm font-medium whitespace-nowrap`}>
-        {docType == 'pn01'
-          ? PN01Status[statusId]
-          : docType == 'pn11'
-          ? PN11Status[statusId]
-          : '-'}
+      <span
+        className={`${badgeColor()} whitespace-nowrap rounded border px-2 py-1 text-sm font-medium`}
+      >
+        {docType === 'pn01' || docType === 'pn11' ? statusName : '-'}
       </span>
     </div>
   );

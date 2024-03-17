@@ -1,16 +1,13 @@
 import React from 'react';
 import { Users } from '@/app/model/user';
-import { EditProfile } from '@/app/components/buttons/buttons';
 import Link from 'next/link';
-import { EditPassword } from '@/app/components/buttons/buttons';
-import { LockClosedIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 import LockPersonOutlinedIcon from '@mui/icons-material/LockPersonOutlined';
 import SettingsAccessibilityOutlinedIcon from '@mui/icons-material/SettingsAccessibilityOutlined';
 
 export default async function UserProfile({ data }: { data: Users }) {
   const CheckRole = () => {
     if (data.role === 'admin') {
-      return 'ผู้ดูแลระบบ';
+      return 'เจ้าหน้าที่';
     } else if (data.role === 'teacher') {
       return 'อาจารย์';
     } else {
@@ -38,14 +35,16 @@ export default async function UserProfile({ data }: { data: Users }) {
               {data.firstname} {data.lastname}
             </dd>
           </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-lg font-medium leading-6 text-gray-900">
-              ตำแหน่ง
-            </dt>
-            <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              <CheckRole />
-            </dd>
-          </div>
+          {data.role === 'admin' && (
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-lg font-medium leading-6 text-gray-900">
+                ตำแหน่ง
+              </dt>
+              <dd className="mt-1 text-lg font-semibold leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <CheckRole />
+              </dd>
+            </div>
+          )}
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-lg font-medium leading-6 text-gray-900">
               คณะ/วิทยาลัย

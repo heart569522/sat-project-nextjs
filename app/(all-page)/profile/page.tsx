@@ -18,7 +18,7 @@ export default async function Profile() {
     <div className="">
       <div className="flex text-xl md:text-2xl">ข้อมูลโปรไฟล์</div>
       <div className="mt-4">
-        <UserProfile data={userData}/>
+        <UserProfile data={userData} />
       </div>
     </div>
   )
