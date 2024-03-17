@@ -4,7 +4,7 @@ import { Button } from '@/app/components/buttons/button';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
-import { getAllData, updateAllData, updateData } from '@/app/lib/api-service';
+import { createData, getAllData, updateAllData, updateData } from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import { pn01SelectList } from '@/app/model/pn01-select-list';
 import {
@@ -52,26 +52,28 @@ export default function FacultyMajorForm({
   const [buttonLink, setButtonLink] = useState('');
   const [buttonText, setButtonText] = useState('');
 
-  const initialMajorState = isEditing
-    ? []
-    : [
-        {
-          id: 1,
-          name: '',
-          created_at: '',
-          updated_at: '',
-          faculty_id: 0,
-        },
-      ];
+  const initialMajorState = [
+    {
+      id: 1,
+      name: '',
+      created_at: '',
+      updated_at: '',
+      faculty_id: 0,
+    },
+  ];
 
   const [formInput, setFormInput] = useState({
     facultyName: isEditing ? data?.name : '',
   });
-  const [majorRows, setMajorRows] = useState<Majors[]>(initialMajorState);
+  const [majorRows, setMajorRows] = useState<Majors[]>(
+    isEditing ? [] : initialMajorState,
+  );
   console.log('🚀 ~ majorRows:', majorRows);
 
   useEffect(() => {
-    getMajorData(data?.id as number);
+    if (isEditing) {
+      getMajorData(data?.id as number);
+    }
   }, []);
 
   const getMajorData = async (facultyId: number) => {
@@ -91,7 +93,7 @@ export default function FacultyMajorForm({
     console.log('handleOpenModal');
 
     if (isCancel) {
-      setTitleModal('ยกเลิกการแก้ไข');
+      setTitleModal(isEditing ? 'ยกเลิกการแก้ไข' : 'ยกเลิก');
       setDetailModal(`คุณยืนยันที่จะยกเลิกการ${pageTitle}`);
       setHandleAction('cancel');
       setOpenQuestionModal(true);
@@ -101,7 +103,7 @@ export default function FacultyMajorForm({
       const isFormValid = validateForm();
 
       if (isFormValid) {
-        setTitleModal('แก้ไขข้อมูล');
+        setTitleModal(isEditing ? 'แก้ไขข้อมูล' : 'เพิ่มข้อมูล');
         setDetailModal(`คุณยืนยันที่จะ${pageTitle}`);
         setHandleAction('submit');
         setOpenQuestionModal(true);
@@ -191,11 +193,10 @@ export default function FacultyMajorForm({
   };
 
   const handleMajorChange = (id: number, field: string, value: string) => {
-    setMajorRows(
-      (prevRows) =>
-        prevRows?.map((row: Majors) =>
-          row.id === id ? { ...row, [field]: value } : row,
-        ),
+    setMajorRows((prevRows) =>
+      prevRows?.map((row: Majors) =>
+        row.id === id ? { ...row, [field]: value } : row,
+      ),
     );
 
     setValidationArrayError((prevErrors) => {
@@ -292,12 +293,21 @@ export default function FacultyMajorForm({
     console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
     try {
-      const response = await updateData(
-        'faculties/faculty-major',
-        formData,
-        data?.id as number,
-        true
-      );
+      let response : any;
+      
+      if (isEditing) {
+        response = await updateData(
+          'faculties/faculty-major',
+          formData,
+          data?.id as number,
+          true,
+        );
+      } else {
+        response = await createData(
+          'faculties/faculty-major',
+          formData,
+        );
+      }
 
       if (response && (response.status === 201 || response.status === 200)) {
         setLoading(false);
@@ -359,7 +369,7 @@ export default function FacultyMajorForm({
                 validationError.data ? 'text-red-600' : 'text-gray-900'
               }`}
             >
-              รายการสาขาทั้งหมด
+              รายการสาขา
             </label>
             <div className="relative overflow-x-auto">
               <table className="w-full rounded border text-left text-sm text-gray-500">
@@ -369,7 +379,7 @@ export default function FacultyMajorForm({
                       ลำดับ
                     </th>
                     <th scope="col" className="px-6 py-3">
-                      รายการ
+                      สาขา
                     </th>
                     <th scope="col" className="w-[15%] bg-gray-300 px-6 py-3">
                       เพิ่ม/ลบแถว

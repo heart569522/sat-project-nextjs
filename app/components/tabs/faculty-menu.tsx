@@ -6,6 +6,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { SettingSkeleton } from '../skeletons';
+import { ButtonDialog } from '../buttons/button-dialog';
 
 export default function FacultyMenu({
   facultyLength,
@@ -48,12 +49,23 @@ export default function FacultyMenu({
               <p className="text-lg font-semibold text-gray-800">
                 {menuItem.name}
               </p>
-              <div
-                className={`rounded-md border bg-gray-100 p-2 hover:bg-gray-200`}
-              >
-                <Link href={`setting/faculty-major/${menuItem.id}/edit`}>
-                  <PencilIcon className="w-5" />
-                </Link>
+              <div className="flex gap-1">
+                <div
+                  className={`rounded-md border bg-white p-2 hover:bg-gray-200`}
+                >
+                  <Link href={`setting/faculty-major/${menuItem.id}/edit`}>
+                    <PencilIcon className="w-5" />
+                  </Link>
+                </div>
+                <ButtonDialog
+                  id={menuItem.id}
+                  apiPath="faculties/faculty-major/delete"
+                  action="delete"
+                  title={`ลบคณะ/วิทยาลัย : ${menuItem.name}`}
+                  detail={`ระบบจะลบข้อมูลสาขาที่อยู่ภายในคณะ/วิทยาลัยนี้ออกทั้งหมด`}
+                  onSuccess={getFacultyMajorData}
+                  className="bg-white hover:bg-gray-200"
+                />
               </div>
             </div>
           ))}

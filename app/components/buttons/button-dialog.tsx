@@ -14,8 +14,10 @@ import React, { useState } from 'react';
 import { notoThai } from '@/app/components/fonts';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import ModalResponse from '@/app/components/modal/modal-response';
+import clsx from 'clsx';
 
 export function ButtonDialog({
+  className,
   id,
   apiPath,
   action,
@@ -26,7 +28,8 @@ export function ButtonDialog({
   formData,
   disabled,
 }: {
-  id: string;
+  className?: string,
+  id: string | number;
   apiPath: string;
   action: string;
   title: string;
@@ -181,11 +184,13 @@ export function ButtonDialog({
     <React.Fragment>
       <button
         onClick={handleDialogOpen}
-        className={`rounded-md border p-2 ${
+        className={clsx(
+          'rounded-md border p-2',
           disabled
             ? 'cursor-not-allowed bg-gray-100 text-gray-500'
-            : 'hover:bg-gray-100'
-        }`}
+            : 'hover:bg-gray-100',
+          className
+        )}
         disabled={disabled}
       >
         <span className="sr-only">{action}</span>

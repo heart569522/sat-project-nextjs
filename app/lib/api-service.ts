@@ -296,7 +296,7 @@ export async function updateAllData(
 
 export async function deleteData(
   apiPath: string,
-  id: string,
+  id: string | number,
   isDeleteMethod?: boolean,
 ) {
   try {
