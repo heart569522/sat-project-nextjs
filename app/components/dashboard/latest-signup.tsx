@@ -13,7 +13,7 @@ export default async function LatestSignUp() {
 
   return (
     <div className="flex w-full flex-col md:col-span-4">
-      <h2 className={`${notoThai.className} mb-4 text-xl md:text-2xl`}>
+      <h2 className={`${notoThai.className} mb-4 text-lg lg:text-xl xl:text-2xl font-semibold`}>
         รายการสมัครสมาชิกล่าสุด
       </h2>
       <div className="flex grow flex-col justify-between rounded-xl bg-blue-50 p-4">

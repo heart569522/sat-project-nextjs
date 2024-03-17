@@ -9,6 +9,11 @@ import {
 import LatestPN01 from '@/app/components/dashboard/latest-pn01';
 import LatestPN11 from '@/app/components/dashboard/latest-pn11';
 import LatestSignUp from '@/app/components/dashboard/latest-signup';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'แดชบอร์ด',
+};
 
 export default async function Page() {
   return (
@@ -19,7 +24,7 @@ export default async function Page() {
           <CardWrapper />
         </Suspense>
       </div>
-      <div className="mt-6 grid gap-3 grid-cols-1 lg:grid-cols-8 xl:grid-cols-12">
+      <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-8 xl:grid-cols-12">
         {/* <Suspense fallback={<RevenueChartSkeleton />}>
           <RevenueChart />
         </Suspense> */}

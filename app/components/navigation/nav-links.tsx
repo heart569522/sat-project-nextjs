@@ -89,14 +89,14 @@ export default function NavLinks({ userData }: { userData: Users }) {
       '/activity-history',
       '/management',
       '/dashboard',
-      '/setting'
+      '/setting',
     ],
   };
 
   const isUserVerified = userData?.is_verify;
 
-  const allowedPathsForUnverifiedUser = ['/activity-history', '/test'];
-  const defaultPaths = ['/', '/activity-history', '/test'];
+  const allowedPathsForUnverifiedUser = ['/activity-history'];
+  const defaultPaths = ['/', '/activity-history'];
 
   const userRole = userData?.role;
 
@@ -116,28 +116,132 @@ export default function NavLinks({ userData }: { userData: Users }) {
 
   return (
     <>
-      {filteredLinks.map((link, index) => {
-        const LinkIcon = link.icon;
-        const isActive =
-          pathname.startsWith(link.href) &&
-          (link.href === '/' ? pathname === '/' : true);
+      {userRole === 'admin' ? (
+        <>
+          {/* Display title for 'ทั่วไป' group */}
+          {filteredLinks.some((link) =>
+            [
+              '/project-proposal',
+              '/activity-record',
+              '/activity-history',
+            ].includes(link.href),
+          ) && (
+            <div className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white">
+              ทั่วไป
+            </div>
+          )}
 
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={clsx(
-              'hidden h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium transition hover:bg-sky-100 hover:text-blue-600 md:flex md:flex-none md:justify-start md:p-2 md:px-3',
-              {
-                'bg-sky-100 text-blue-600': isActive,
-              },
-            )}
-          >
-            <LinkIcon className="w-6" />
-            <p className="hidden md:block">{link.name}</p>
-          </Link>
-        );
-      })}
+          {/* Display links for 'ทั่วไป' group */}
+          {filteredLinks.map((link, index) => {
+            const LinkIcon = link.icon;
+            const isActive =
+              pathname.startsWith(link.href) &&
+              (link.href === '/' ? pathname === '/' : true);
+
+            if (
+              [
+                '/project-proposal',
+                '/activity-record',
+                '/activity-history',
+              ].includes(link.href)
+            ) {
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={clsx(
+                    'hidden h-[45px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium transition hover:bg-sky-100 hover:text-blue-600 md:flex md:flex-none md:justify-start md:p-2 md:px-3',
+                    {
+                      'bg-sky-100 text-blue-600': isActive,
+                    },
+                  )}
+                >
+                  <LinkIcon className="w-6" />
+                  <p className="hidden md:block">{link.name}</p>
+                </Link>
+              );
+            }
+            return null;
+          })}
+
+          {/* Display title for 'เจ้าหน้าที่' group */}
+          {filteredLinks.some((link) =>
+            [
+              '/management/pn01',
+              '/management/pn10',
+              '/management/pn11',
+              '/management/users',
+              '/dashboard',
+              '/setting',
+            ].includes(link.href),
+          ) && (
+            <div className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white">
+              เจ้าหน้าที่
+            </div>
+          )}
+
+          {/* Display links for 'เจ้าหน้าที่' group */}
+          {filteredLinks.map((link, index) => {
+            const LinkIcon = link.icon;
+            const isActive =
+              pathname.startsWith(link.href) &&
+              (link.href === '/' ? pathname === '/' : true);
+
+            if (
+              [
+                '/management/pn01',
+                '/management/pn10',
+                '/management/pn11',
+                '/management/users',
+                '/dashboard',
+                '/setting',
+              ].includes(link.href)
+            ) {
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={clsx(
+                    'hidden h-[45px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium transition hover:bg-sky-100 hover:text-blue-600 md:flex md:flex-none md:justify-start md:p-2 md:px-3',
+                    {
+                      'bg-sky-100 text-blue-600': isActive,
+                    },
+                  )}
+                >
+                  <LinkIcon className="w-6" />
+                  <p className="hidden md:block">{link.name}</p>
+                </Link>
+              );
+            }
+            return null;
+          })}
+        </>
+      ) : (
+        <>
+          {filteredLinks.map((link, index) => {
+            const LinkIcon = link.icon;
+            const isActive =
+              pathname.startsWith(link.href) &&
+              (link.href === '/' ? pathname === '/' : true);
+
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={clsx(
+                  'hidden h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium transition hover:bg-sky-100 hover:text-blue-600 md:flex md:flex-none md:justify-start md:p-2 md:px-3',
+                  {
+                    'bg-sky-100 text-blue-600': isActive,
+                  },
+                )}
+              >
+                <LinkIcon className="w-6" />
+                <p className="hidden md:block">{link.name}</p>
+              </Link>
+            );
+          })}
+        </>
+      )}
     </>
   );
 }
@@ -159,7 +263,7 @@ export function NavLinksMobile({
       '/activity-history',
       '/management',
       '/dashboard',
-      '/setting'
+      '/setting',
     ],
   };
 
