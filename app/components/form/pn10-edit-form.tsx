@@ -164,11 +164,10 @@ export default function PN10EditForm({
   };
 
   const handleStudentChange = (id: number, field: string, value: string) => {
-    setStudentRows(
-      (prevRows) =>
-        prevRows?.map((row) =>
-          row.id === id ? { ...row, [field]: value } : row,
-        ),
+    setStudentRows((prevRows) =>
+      prevRows?.map((row) =>
+        row.id === id ? { ...row, [field]: value } : row,
+      ),
     );
 
     setValidationArrayError((prevErrors) => {

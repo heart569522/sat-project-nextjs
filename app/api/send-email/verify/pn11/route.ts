@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const htmlEmail = ConvertReactToEmail({
       EmailComponent: VerifyEmail,
       recipientName: `${firstname} ${lastname}`,
-      verifyLink: verifyLink
+      verifyLink: verifyLink,
     });
 
     const transporter = nodemailer.createTransport({

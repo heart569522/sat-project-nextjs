@@ -9,7 +9,7 @@ export default async function Welcome() {
 
   return (
     <div className="flex h-modal w-full items-center justify-center">
-      <CheckUserVerifyCard userData={userData}/>
+      <CheckUserVerifyCard userData={userData} />
     </div>
   );
 }

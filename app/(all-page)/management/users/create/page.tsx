@@ -27,7 +27,7 @@ export default async function Page() {
         <div className="flex text-xl md:text-2xl">เพิ่มผู้ใช้</div>
       </div>
       <div className="mt-4 w-full">
-        <UserForm isCreating={true}/>
+        <UserForm isCreating={true} />
       </div>
     </main>
   );

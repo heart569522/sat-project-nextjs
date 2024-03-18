@@ -608,6 +608,22 @@ export default function PN01Form({
       ...prevErrors,
       [name]: '',
     }));
+
+    // if (name === 'strategicIssue') {
+    //   const filteredObjectives = objectiveList.filter(
+    //     (objective) => objective.strategic_issue_id === value,
+    //   );
+    //   console.log("🚀 ~ handleSelectChange ~ filteredObjectives:", filteredObjectives)
+    //   setObjectiveList(filteredObjectives);
+    // }
+
+    // if (name === 'objective') {
+    //   const filteredUniversityStrategics = universityStrategicList.filter(
+    //     (universityStrategic) => universityStrategic.objective_id === value,
+    //   );
+    //   console.log("🚀 ~ handleSelectChange ~ filteredUniversityStrategics:", filteredUniversityStrategics)
+    //   setUniversityStrategicList(filteredUniversityStrategics);
+    // }
   };
 
   const addResponsibleRow = () => {
@@ -1427,8 +1443,8 @@ export default function PN01Form({
           (isEditing || isDrafting) && !isAdminManage
             ? `/project-proposal/document/${editData.id}`
             : isAdminManage
-            ? `/management/pn01/document/${editData.id}`
-            : `/project-proposal/document/${response.data.id}`,
+              ? `/management/pn01/document/${editData.id}`
+              : `/project-proposal/document/${response.data.id}`,
         );
         setButtonText('ไปยังเอกสารเอกสาร พน.01');
         setOpenResponseModal(true);
@@ -1585,7 +1601,7 @@ export default function PN01Form({
               </label>
               <TextField
                 size="small"
-                type="text"
+                type="number"
                 name="projectHeadPhone"
                 className="flex w-full"
                 value={formInput.projectHeadPhone}
@@ -1822,12 +1838,23 @@ export default function PN01Form({
                   name="objective"
                   value={selectedValues.objective}
                   onChange={handleSelectChange}
+                  disabled={!selectedValues.strategicIssue}
                 >
-                  {objectiveList.map((list) => (
-                    <MenuItem divider={true} key={list.id} value={list.id}>
-                      {list.name}
-                    </MenuItem>
-                  ))}
+                  {objectiveList
+                    .filter(
+                      (ojective) =>
+                        ojective.strategic_issue_id ===
+                        Number(selectedValues.strategicIssue),
+                    )
+                    .map((filteredObjective) => (
+                      <MenuItem
+                        key={filteredObjective.id}
+                        value={filteredObjective.id}
+                        divider={true}
+                      >
+                        {filteredObjective.name}
+                      </MenuItem>
+                    ))}
                 </Select>
                 <FormHelperText>
                   {validationSelectError.objective}
@@ -1853,12 +1880,28 @@ export default function PN01Form({
                   name="universityStrategic"
                   value={selectedValues.universityStrategic}
                   onChange={handleSelectChange}
+                  disabled={!selectedValues.objective}
                 >
-                  {universityStrategicList.map((list) => (
+                  {/* {universityStrategicList.map((list) => (
                     <MenuItem divider={true} key={list.id} value={list.id}>
                       {list.name}
                     </MenuItem>
-                  ))}
+                  ))} */}
+                  {universityStrategicList
+                    .filter(
+                      (universityStrategic) =>
+                        universityStrategic.objective_id ===
+                        Number(selectedValues.objective),
+                    )
+                    .map((filteredUniversityStrategic) => (
+                      <MenuItem
+                        key={filteredUniversityStrategic.id}
+                        value={filteredUniversityStrategic.id}
+                        divider={true}
+                      >
+                        {filteredUniversityStrategic.name}
+                      </MenuItem>
+                    ))}
                 </Select>
                 <FormHelperText>
                   {validationSelectError.universityStrategic}

@@ -1,9 +1,5 @@
 import * as React from 'react';
 
 export default async function Page() {
-  return (
-    <div>
-      asdasd
-    </div>
-  );
+  return <div>asdasd</div>;
 }

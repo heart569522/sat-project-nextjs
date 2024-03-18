@@ -7,7 +7,10 @@ import PN01SelectMenu from './pn01-select-menu';
 import FacultyMenu from './faculty-menu';
 import { Faculties } from '@/app/model/faculties-majors';
 import { getAllData } from '@/app/lib/api-service';
-import { CreateFacultyMajor, CreateRequestTranscript } from '../buttons/buttons';
+import {
+  CreateFacultyMajor,
+  CreateRequestTranscript,
+} from '../buttons/buttons';
 
 export default function SettingTab() {
   const router = useRouter();
@@ -93,7 +96,7 @@ export default function SettingTab() {
         )}
         {activeTab === 'faculty-major' && (
           <>
-            <div className="flex items-center justify-start gap-2 mb-4">
+            <div className="mb-4 flex items-center justify-start gap-2">
               <CreateFacultyMajor />
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">

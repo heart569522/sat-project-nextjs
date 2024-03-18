@@ -15,23 +15,27 @@ const iconMap = {
 };
 
 export default async function CardWrapper() {
-  const {
-    totalCountPN10,
-    totalCountUsers,
-    totalCountPN01,
-    totalCountPN11,
-  } = await fetchCardData();
+  const { totalCountPN10, totalCountUsers, totalCountPN01, totalCountPN11 } =
+    await fetchCardData();
 
   return (
     <>
-      <Card title="โครงการ/กิจกรรมทั้งหมด (พน.01)" value={totalCountPN01} type="pn01" />
-      <Card title="บันทึกการเข้าร่วมกิจกรรมทั้งหมด (พน.10)" value={totalCountPN10} type="pn10" />
-      <Card title="คำร้องขอระเบียนกิจกรรมทั้งหมด (พน.11)" value={totalCountPN11} type="pn11" />
       <Card
-        title="บัญชีสมาชิกทั้งหมด"
-        value={totalCountUsers}
-        type="users"
+        title="โครงการ/กิจกรรมทั้งหมด (พน.01)"
+        value={totalCountPN01}
+        type="pn01"
       />
+      <Card
+        title="บันทึกการเข้าร่วมกิจกรรมทั้งหมด (พน.10)"
+        value={totalCountPN10}
+        type="pn10"
+      />
+      <Card
+        title="คำร้องขอระเบียนกิจกรรมทั้งหมด (พน.11)"
+        value={totalCountPN11}
+        type="pn11"
+      />
+      <Card title="บัญชีสมาชิกทั้งหมด" value={totalCountUsers} type="users" />
     </>
   );
 }
@@ -49,17 +53,16 @@ export function Card({
 
   return (
     <div className="rounded-xl bg-blue-50 p-2 shadow-sm">
-      <div className="flex  p-4 items-center">
+      <div className="flex  items-center p-4">
         {/* {Icon ? <Icon className="h-5 w-5 text-gray-700" /> : null} */}
         <h3 className="text-md font-semibold">{title}</h3>
       </div>
       <p
         className={`${notoThai.className}
-          truncate rounded-xl font-semibold bg-white px-4 py-8 text-center text-2xl`}
+          truncate rounded-xl bg-white px-4 py-8 text-center text-2xl font-semibold`}
       >
         {value}
       </p>
     </div>
   );
 }
- 

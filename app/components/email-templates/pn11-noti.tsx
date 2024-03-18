@@ -40,18 +40,20 @@ export default function PN11NotificationEmail(props: any) {
             <Section style={content}>
               <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
               <Text style={paragraph}>
-                คุณได้ยืนยันคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)
-                เมื่อวันที่{' '}
+                คุณได้ยืนยันคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ
+                (พน.11) เมื่อวันที่{' '}
                 {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
-                คลิกลิ้งค์นี้เพื่อไปยังหน้าเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) <br />
+                คลิกลิ้งค์นี้เพื่อไปยังหน้าเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ
+                (พน.11) <br />
                 <Link href={props.documentLink} style={link}>
                   {props.documentLink}
                 </Link>
               </Text>
               <Text style={paragraph}>
-                โปรดพิมพ์และส่งเอกสารฉบับนี้พร้อมลายเซ็นต์ที่สำนักพัฒนานักศึกษา มหาวิทยาลัยพายัพ
+                โปรดพิมพ์และส่งเอกสารฉบับนี้พร้อมลายเซ็นต์ที่สำนักพัฒนานักศึกษา
+                มหาวิทยาลัยพายัพ
               </Text>
               <Text style={paragraph}>
                 ขอบคุณ,

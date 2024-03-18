@@ -42,12 +42,14 @@ export default function VerifyEmail(props: any) {
             <Section style={content}>
               <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
               <Text style={paragraph}>
-                คุณได้ส่งคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) เมื่อวันที่{' '}
+                คุณได้ส่งคำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)
+                เมื่อวันที่{' '}
                 {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
                 กรุณาคลิกปุ่มยืนยัน
-                เพื่อให้คำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11) ของคุณเสร็จสมบูรณ์
+                เพื่อให้คำร้องขอเอกสารคำร้องขอหลักฐานการเข้าร่วมโครงการ (พน.11)
+                ของคุณเสร็จสมบูรณ์
               </Text>
               <Row>
                 <Column style={containerCenter}>

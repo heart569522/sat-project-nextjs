@@ -77,7 +77,7 @@ export default async function InvoicesTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white justify-center text-center">
+            <tbody className="justify-center bg-white text-center">
               {invoices?.map((invoice) => (
                 <tr
                   key={invoice.id}
@@ -108,7 +108,7 @@ export default async function InvoicesTable({
                     <InvoiceStatus status={invoice.status} />
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
-                    <div className="flex gap-2 justify-center">
+                    <div className="flex justify-center gap-2">
                       <UpdateInvoice id={invoice.id} />
                       <DeleteInvoice id={invoice.id} />
                     </div>

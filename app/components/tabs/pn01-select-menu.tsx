@@ -43,7 +43,9 @@ export default function PN01SelectMenu() {
           <p className="text-lg font-semibold text-gray-800">
             {menuItem.title}
           </p>
-          <div className={`rounded-md border p-2 bg-gray-100 hover:bg-gray-200`}>
+          <div
+            className={`rounded-md border bg-gray-100 p-2 hover:bg-gray-200`}
+          >
             <Link href={menuItem.path}>
               <PencilIcon className="w-5" />
             </Link>

@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         </div>
       </div>
       <div className="mt-4 w-full">
-        <PN10EditForm editData={data} isAdminManage={true}/>
+        <PN10EditForm editData={data} isAdminManage={true} />
       </div>
     </main>
   );

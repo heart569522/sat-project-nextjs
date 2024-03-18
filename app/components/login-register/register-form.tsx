@@ -546,7 +546,7 @@ export default function RegisterForm() {
                     error={Boolean(validationError.password)}
                     placeholder="จำนวน 6 ตัวอักษรขึ้นไป"
                     autoComplete="off"
-                    size='small'
+                    size="small"
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -586,7 +586,7 @@ export default function RegisterForm() {
                     error={Boolean(validationError.confirmPassword)}
                     placeholder=""
                     autoComplete="off"
-                    size='small'
+                    size="small"
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton

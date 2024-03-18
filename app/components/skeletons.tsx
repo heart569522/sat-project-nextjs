@@ -107,7 +107,7 @@ export default function DashboardSkeleton() {
         <CardSkeleton />
         <CardSkeleton />
       </div>
-      <div className="mt-6 grid gap-3 grid-cols-1 lg:grid-cols-8 xl:grid-cols-12">
+      <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-8 xl:grid-cols-12">
         {/* <RevenueChartSkeleton /> */}
         <LatestDataSkeleton />
         <LatestDataSkeleton />

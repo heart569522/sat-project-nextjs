@@ -32,7 +32,7 @@ export default async function StrategicPlanKPI() {
         <div className="flex text-xl md:text-2xl">{TITLE}</div>
       </div>
       <div className="mt-4 w-full">
-        <PN01SelectForm data={data} pageTitle={TITLE}/>
+        <PN01SelectForm data={data} pageTitle={TITLE} />
       </div>
     </main>
   );

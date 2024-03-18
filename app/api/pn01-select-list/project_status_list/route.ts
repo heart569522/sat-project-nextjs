@@ -4,7 +4,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { project_status_list } from '@/app/model/pn01-select-list';
 
 export async function GET() {
-    noStore();
+  noStore();
 
   try {
     const res = await pool.query<project_status_list>(

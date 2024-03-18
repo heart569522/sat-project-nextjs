@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
   const data = await getDataById('users', id);
-  console.log("🚀 ~ Page ~ data:", data)
+  console.log('🚀 ~ Page ~ data:', data);
 
   if (data.error || !id) {
     notFound();
@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <div className="flex text-xl md:text-2xl">แก้ไขข้อมูลผู้ใช้</div>
       </div>
       <div className="mt-4 w-full">
-        <UserForm editData={data} isEditing={true} isAdminTable={true}/>
+        <UserForm editData={data} isEditing={true} isAdminTable={true} />
       </div>
     </main>
   );

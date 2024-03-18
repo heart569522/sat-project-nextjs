@@ -7,13 +7,13 @@ import { convertISOStringToDateTimeText } from '@/app/lib/services';
 import Link from 'next/link';
 
 export default async function LatestSignUp() {
-  const latestSignUp = await getLastRequestData(
-    'users/get-latest',
-  );
+  const latestSignUp = await getLastRequestData('users/get-latest');
 
   return (
     <div className="flex w-full flex-col md:col-span-4">
-      <h2 className={`${notoThai.className} mb-4 text-lg lg:text-xl xl:text-2xl font-semibold`}>
+      <h2
+        className={`${notoThai.className} mb-4 text-lg font-semibold lg:text-xl xl:text-2xl`}
+      >
         รายการสมัครสมาชิกล่าสุด
       </h2>
       <div className="flex grow flex-col justify-between rounded-xl bg-blue-50 p-4">

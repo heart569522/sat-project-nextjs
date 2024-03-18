@@ -17,10 +17,10 @@ export default function SearchHistory() {
   const handleReset = () => {
     const params = new URLSearchParams(searchParams);
 
-    setSearchValue('')
+    setSearchValue('');
     params.delete('query');
     replace(`${pathname}?${params.toString()}`);
-  }
+  };
 
   const handleSearch = () => {
     console.log(`Searching... ${searchValue}`);
@@ -37,7 +37,7 @@ export default function SearchHistory() {
 
   return (
     <div className="relative">
-      <h3 className="mb-3 block text-center text-2xl max-sm:text-lg font-semibold text-blue-900">
+      <h3 className="mb-3 block text-center text-2xl font-semibold text-blue-900 max-sm:text-lg">
         ค้นหาประวัติการเข้าร่วมโครงการ/กิจกรรม
       </h3>
       <div className="flex flex-1 flex-shrink-0">

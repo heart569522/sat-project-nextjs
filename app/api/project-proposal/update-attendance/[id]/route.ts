@@ -22,7 +22,7 @@ export async function PATCH(
       { status: 200 },
     );
   } catch (error) {
-    console.log("🚀 ~ error:", error)
+    console.log('🚀 ~ error:', error);
     return NextResponse.json(
       {
         message: 'Can not update data!!',

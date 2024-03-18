@@ -42,7 +42,7 @@ export default function ForgotPasswordEmail(props: any) {
                 {convertISOStringToDateTimeText(new Date().toISOString())}
               </Text>
               <Text style={paragraph}>
-                คลิกปุ่มยืนยัน เพื่อไปยังหน้าแก้ไขรหัสผ่านของคุณ <br /> 
+                คลิกปุ่มยืนยัน เพื่อไปยังหน้าแก้ไขรหัสผ่านของคุณ <br />
                 ลิ้งค์จะหมดอายุภายใน 1 ชั่วโมงหลังจากได้รับอีเมลฉบับนี้
               </Text>
               <Row>

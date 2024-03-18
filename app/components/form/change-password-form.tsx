@@ -145,15 +145,15 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
 
     if (isFormValid) {
       const formData = {
-        currentPassword : formInput.password,
-        newPassword : formInput.newPassword
-      }
+        currentPassword: formInput.password,
+        newPassword: formInput.newPassword,
+      };
       try {
         const checkCurrentPasswordResponse = await updateData(
           'auth/change-password',
           formData,
           userId,
-          true
+          true,
         );
 
         if (
@@ -216,7 +216,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
                 error={Boolean(validationError.password)}
                 placeholder=""
                 autoComplete="off"
-                size='small'
+                size="small"
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -254,7 +254,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
                 error={Boolean(validationError.newPassword)}
                 placeholder=""
                 autoComplete="off"
-                size='small'
+                size="small"
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -292,7 +292,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
                 error={Boolean(validationError.confirmNewPassword)}
                 placeholder=""
                 autoComplete="off"
-                size='small'
+                size="small"
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton

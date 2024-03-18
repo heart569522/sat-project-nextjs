@@ -38,7 +38,7 @@ export default async function FacultyMajor({
         <div className="flex text-xl md:text-2xl">{TITLE}</div>
       </div>
       <div className="mt-4 w-full">
-        <FacultyMajorForm data={data[0]} pageTitle={TITLE} isEditing={true}/>
+        <FacultyMajorForm data={data[0]} pageTitle={TITLE} isEditing={true} />
       </div>
     </main>
   );

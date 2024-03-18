@@ -28,7 +28,7 @@ export function ButtonDialog({
   formData,
   disabled,
 }: {
-  className?: string,
+  className?: string;
   id: string | number;
   apiPath: string;
   action: string;
@@ -149,8 +149,8 @@ export function ButtonDialog({
         action === 'sendEmail'
           ? 'ส่งอีเมลแจ้งเตือนสำเร็จ'
           : action === 'delete'
-          ? 'ลบข้อมูลสำเร็จ'
-          : '',
+            ? 'ลบข้อมูลสำเร็จ'
+            : '',
       );
       setOpenResponseModal(true);
 
@@ -189,7 +189,7 @@ export function ButtonDialog({
           disabled
             ? 'cursor-not-allowed bg-gray-100 text-gray-500'
             : 'hover:bg-gray-100',
-          className
+          className,
         )}
         disabled={disabled}
       >

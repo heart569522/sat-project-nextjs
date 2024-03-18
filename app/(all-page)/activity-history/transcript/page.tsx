@@ -24,7 +24,9 @@ export default async function Page({}: {}) {
             },
           ]}
         />
-        <div className='flex text-xl md:text-2xl'>ร้องขอเอกสารระเบียนกิจกรรม</div>
+        <div className="flex text-xl md:text-2xl">
+          ร้องขอเอกสารระเบียนกิจกรรม
+        </div>
       </div>
       <div className="mt-4 w-full">
         <PN11Form />

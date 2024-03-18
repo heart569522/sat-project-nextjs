@@ -17,11 +17,15 @@ export default async function Page({
     page?: string;
   };
 }) {
-  
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchPages('project-proposal/fetch-page', query, undefined, 'isAdminTable');
+  const totalPages = await fetchPages(
+    'project-proposal/fetch-page',
+    query,
+    undefined,
+    'isAdminTable',
+  );
 
   return (
     <div className="w-full">
@@ -31,10 +35,14 @@ export default async function Page({
         </h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <CreateRequestProjectProposal buttonText='เพิ่มโครงการ/กิจกรรม'/>
+        <CreateRequestProjectProposal buttonText="เพิ่มโครงการ/กิจกรรม" />
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
-      <ProjectProposalTable query={query} currentPage={currentPage} isAdminTable={true}/>
+      <ProjectProposalTable
+        query={query}
+        currentPage={currentPage}
+        isAdminTable={true}
+      />
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>

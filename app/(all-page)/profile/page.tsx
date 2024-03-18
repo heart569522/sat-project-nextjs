@@ -2,17 +2,16 @@ import UserProfile from '@/app/components/user-profile';
 import { getDataById, getUserLoginData } from '@/app/lib/api-service';
 import { auth } from '@/auth';
 import { Metadata } from 'next';
-import React from 'react'
+import React from 'react';
 
 export const metadata: Metadata = {
   title: 'ข้อมูลโปรไฟล์',
 };
 
 export default async function Profile() {
-  
   const authResult = (await auth()) as any;
   const { id } = authResult?.user || null;
-  const userData = await getUserLoginData(id)
+  const userData = await getUserLoginData(id);
 
   return (
     <div className="">
@@ -21,5 +20,5 @@ export default async function Profile() {
         <UserProfile data={userData} />
       </div>
     </div>
-  )
+  );
 }

@@ -9,10 +9,9 @@ export async function GET(
   const { id } = context.params;
 
   try {
-    const res = await pool.query<Users>(
-      `SELECT * FROM users WHERE id = $1`,
-      [id],
-    );
+    const res = await pool.query<Users>(`SELECT * FROM users WHERE id = $1`, [
+      id,
+    ]);
 
     return NextResponse.json(res.rows[0], { status: 200 });
   } catch (error) {
@@ -25,4 +24,3 @@ export async function GET(
     );
   }
 }
-

@@ -28,7 +28,7 @@ export default async function Page({
         <h1 className={`text-2xl`}>จัดการคำร้องขอระเบียนกิจกรรม พน.11</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <CreateRequestTranscript buttonText='เพิ่มคำร้องขอระเบียนกิจกรรม'/>
+        <CreateRequestTranscript buttonText="เพิ่มคำร้องขอระเบียนกิจกรรม" />
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
       <ActivityTranscriptTable query={query} currentPage={currentPage} />

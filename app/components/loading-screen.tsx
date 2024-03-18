@@ -30,8 +30,10 @@ export function OverlayLoading({ showLoading }: { showLoading: boolean }) {
       {showLoading && (
         <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-50">
           <div className="flex items-center">
-            <CircularProgress color='info'/>
-            <span className="ml-4 text-lg font-medium text-white">Loading...</span>
+            <CircularProgress color="info" />
+            <span className="ml-4 text-lg font-medium text-white">
+              Loading...
+            </span>
           </div>
         </div>
       )}

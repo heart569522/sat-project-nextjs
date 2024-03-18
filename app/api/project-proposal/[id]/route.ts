@@ -120,7 +120,7 @@ export async function PUT(
       { status: 200 },
     );
   } catch (error) {
-    console.log("🚀 ~ error:", error)
+    console.log('🚀 ~ error:', error);
     return NextResponse.json(
       {
         message: `Server error please try again later`,

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const htmlEmail = ConvertReactToEmail({
       EmailComponent: PN11NotificationEmail,
       recipientName: `${firstname} ${lastname}`,
-      documentLink: documentLink
+      documentLink: documentLink,
     });
 
     const transporter = nodemailer.createTransport({

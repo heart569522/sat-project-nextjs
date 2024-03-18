@@ -21,8 +21,8 @@ export default async function SideNav() {
           userData?.is_verify && userData?.role === 'admin'
             ? '/dashboard'
             : userData?.is_verify && userData?.role === 'teacher'
-            ? '/project-proposal'
-            : '/'
+              ? '/project-proposal'
+              : '/'
         }
       >
         <div className="w-full text-white">
@@ -30,7 +30,7 @@ export default async function SideNav() {
         </div>
       </Link>
       <NavHamberger userData={userData} />
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 overflow-y-auto">
+      <div className="flex grow flex-row justify-between space-x-2 overflow-y-auto md:flex-col md:space-x-0 md:space-y-2">
         <NavLinks userData={userData} />
         <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
         {user && (

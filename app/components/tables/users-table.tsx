@@ -309,8 +309,8 @@ export default function UsersTable({
                             {row.role == 'teacher'
                               ? 'อาจารย์'
                               : row.role == 'admin'
-                              ? 'เจ้าหน้าที่'
-                              : '' || '-'}
+                                ? 'เจ้าหน้าที่'
+                                : '' || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <div className="flex items-center justify-evenly gap-1">

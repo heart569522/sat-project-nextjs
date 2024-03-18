@@ -5,7 +5,7 @@ import {
   HomeIcon,
   DocumentDuplicateIcon,
   ChartPieIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import ContactPageOutlinedIcon from '@mui/icons-material/ContactPageOutlined';

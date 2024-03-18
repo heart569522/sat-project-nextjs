@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const googleSheetsInsertAttendance =
     process.env.APP_SCRIPT_INSERT_ATTENDANCE_SHEET;
 
-  let dataToJSON : any
+  let dataToJSON: any;
 
   try {
     await client.query('BEGIN');
@@ -41,14 +41,14 @@ export async function POST(req: NextRequest) {
             Std: students[index],
             ProjectName: projectName,
             AcademicYear: projectYear,
-            remark: ''
+            remark: '',
           };
         },
       );
-      console.log("🚀 ~ POST ~ googleSheetsDataArray:", googleSheetsDataArray)
+      console.log('🚀 ~ POST ~ googleSheetsDataArray:', googleSheetsDataArray);
 
       dataToJSON = JSON.stringify(googleSheetsDataArray);
-      console.log("🚀 ~ POST ~ dataToJSON:", dataToJSON)
+      console.log('🚀 ~ POST ~ dataToJSON:', dataToJSON);
 
       try {
         const response = await axios.post(

@@ -120,7 +120,7 @@ export default function Form() {
   };
 
   return (
-    <div className='bg-gray-50' style={{ width: '100%' }}>
+    <div className="bg-gray-50" style={{ width: '100%' }}>
       <div style={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
@@ -129,7 +129,11 @@ export default function Form() {
           variant="fullWidth"
           centered
         >
-          <Tab className='p-4 bg-orange-500' label="เข้าสู่ระบบ" {...a11yProps(0)} />
+          <Tab
+            className="bg-orange-500 p-4"
+            label="เข้าสู่ระบบ"
+            {...a11yProps(0)}
+          />
           <Tab label="สมัครสมาชิก" {...a11yProps(1)} />
         </Tabs>
       </div>

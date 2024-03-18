@@ -58,13 +58,13 @@ export async function POST(req: NextRequest) {
       if (existingRow.rows.length === 0) {
         await pool.query(insertQuery, [id, name]);
       } else {
-        await pool.query(
-          'UPDATE objective_list SET name = $1 WHERE id = $2',
-          [name, id],
-        );
+        await pool.query('UPDATE objective_list SET name = $1 WHERE id = $2', [
+          name,
+          id,
+        ]);
       }
     }
-    
+
     return NextResponse.json(
       {
         message: 'Update data success',

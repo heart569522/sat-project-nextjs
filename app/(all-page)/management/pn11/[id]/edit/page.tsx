@@ -43,10 +43,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         </div>
       </div>
       <div className="mt-4 w-full">
-        <PN11Form
-          editData={data}
-          isEditing={user.role === 'admin'}
-        />
+        <PN11Form editData={data} isEditing={user.role === 'admin'} />
       </div>
     </main>
   );

@@ -12,7 +12,7 @@ export interface PN10 {
 }
 
 export interface StudentList {
-  id: number
+  id: number;
   Std?: string;
   Name?: string;
   AcademicYear?: string;

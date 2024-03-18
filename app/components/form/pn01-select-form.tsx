@@ -136,11 +136,10 @@ export default function PN01SelectForm({
   };
 
   const handleDataChange = (id: number, field: string, value: string) => {
-    setDataRows(
-      (prevRows) =>
-        prevRows?.map((row) =>
-          row.id === id ? { ...row, [field]: value } : row,
-        ),
+    setDataRows((prevRows) =>
+      prevRows?.map((row) =>
+        row.id === id ? { ...row, [field]: value } : row,
+      ),
     );
 
     setValidationArrayError((prevErrors) => {

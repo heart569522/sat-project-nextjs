@@ -1,5 +1,5 @@
 export interface OriginalDataHistory {
-  data: OriginalHistory[]
+  data: OriginalHistory[];
 }
 
 export interface OriginalHistory {
@@ -11,7 +11,7 @@ export interface OriginalHistory {
 }
 
 export interface HistoryActivity {
-  name: string
+  name: string;
   studentId: string;
   history: Project[];
 }

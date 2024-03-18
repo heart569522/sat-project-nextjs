@@ -11,7 +11,7 @@ import { Alert, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { OverlayLoading } from '@/app/components/loading-screen';
-import { uuidv7 } from "uuidv7";
+import { uuidv7 } from 'uuidv7';
 
 export default function ForgetPassForm() {
   const [loading, setLoading] = useState(false);

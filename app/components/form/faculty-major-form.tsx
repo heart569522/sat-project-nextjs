@@ -4,7 +4,12 @@ import { Button } from '@/app/components/buttons/button';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
-import { createData, getAllData, updateAllData, updateData } from '@/app/lib/api-service';
+import {
+  createData,
+  getAllData,
+  updateAllData,
+  updateData,
+} from '@/app/lib/api-service';
 import { Faculties, Majors } from '@/app/model/faculties-majors';
 import { pn01SelectList } from '@/app/model/pn01-select-list';
 import {
@@ -293,8 +298,8 @@ export default function FacultyMajorForm({
     console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
     try {
-      let response : any;
-      
+      let response: any;
+
       if (isEditing) {
         response = await updateData(
           'faculties/faculty-major',
@@ -303,10 +308,7 @@ export default function FacultyMajorForm({
           true,
         );
       } else {
-        response = await createData(
-          'faculties/faculty-major',
-          formData,
-        );
+        response = await createData('faculties/faculty-major', formData);
       }
 
       if (response && (response.status === 201 || response.status === 200)) {

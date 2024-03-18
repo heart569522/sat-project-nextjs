@@ -22,7 +22,7 @@ export default async function Page({
 }) {
   const authResult = (await auth()) as any;
   const { id } = authResult?.user || null;
-  const userData = await getUserLoginData(id)
+  const userData = await getUserLoginData(id);
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;

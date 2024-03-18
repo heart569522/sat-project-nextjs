@@ -1,4 +1,3 @@
-
 import { Alert } from '@mui/material';
 import {
   HistoryActivity,
@@ -91,9 +90,7 @@ export default async function HistoryActivityTable({
                   <div className="mb-2 grid grid-cols-2 max-md:grid-cols-1">
                     <div className="flex justify-start gap-x-1 py-1">
                       <label className="font-semibold">ชื่อ :</label>
-                      <p className="whitespace-nowrap">
-                        {data.name}
-                      </p>
+                      <p className="whitespace-nowrap">{data.name}</p>
                     </div>
                     <div className="flex justify-start gap-x-1 py-1">
                       <label className="font-semibold">รหัสประจำตัว :</label>
@@ -123,7 +120,9 @@ export default async function HistoryActivityTable({
                             <div className="flex w-full items-center justify-between border-b py-3">
                               <div className="flex w-1/2 flex-col">
                                 <p className="text-xs">ปีการศึกษา</p>
-                                <p className="font-medium">{row.academicYear}</p>
+                                <p className="font-medium">
+                                  {row.academicYear}
+                                </p>
                               </div>
                               <div className="flex w-1/2 flex-col">
                                 <p className="text-xs">จำนวนชั่วโมง</p>
@@ -184,7 +183,7 @@ export default async function HistoryActivityTable({
                               <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-base text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                                 {row.id}
                               </td>
-                              <td className="whitespace-nowrap bg-white px-4 py-5 text-base text-left">
+                              <td className="whitespace-nowrap bg-white px-4 py-5 text-left text-base">
                                 {row.projectName}
                               </td>
                               <td className="whitespace-nowrap bg-white px-4 py-5 text-base">

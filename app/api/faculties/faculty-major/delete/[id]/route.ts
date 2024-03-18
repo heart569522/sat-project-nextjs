@@ -13,9 +13,11 @@ export async function PATCH(
     await client.query('BEGIN');
 
     const { id } = context.params;
-    console.log("🚀 ~ id:", id)
+    console.log('🚀 ~ id:', id);
 
-    await client.query('UPDATE faculties SET is_delete = true WHERE id = $1', [id]);
+    await client.query('UPDATE faculties SET is_delete = true WHERE id = $1', [
+      id,
+    ]);
 
     const findMajor = await client.query(
       'SELECT id FROM majors WHERE faculty_id = $1',

@@ -18,7 +18,7 @@ export const authConfig = {
         '/management',
         '/dashboard',
         '/profile',
-        '/setting'
+        '/setting',
       ].some((path) => nextUrl.pathname.startsWith(path));
 
       if (

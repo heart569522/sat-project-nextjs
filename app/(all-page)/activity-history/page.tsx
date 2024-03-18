@@ -22,7 +22,9 @@ export default async function Page({
 
   return (
     <div className="w-full">
-      <div className='flex text-xl md:text-2xl'>ประวัติการเข้าร่วมโครงการ/กิจกรรม</div>
+      <div className="flex text-xl md:text-2xl">
+        ประวัติการเข้าร่วมโครงการ/กิจกรรม
+      </div>
       <div className="mt-4">
         <div className="flex items-center justify-start gap-2 md:mt-8">
           <CreateRequestTranscript />
@@ -32,7 +34,7 @@ export default async function Page({
         </div>
         {query && (
           <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
-            <Suspense key={query} fallback={<ActivityHistoryLoading/>}>
+            <Suspense key={query} fallback={<ActivityHistoryLoading />}>
               <Table query={query} />
             </Suspense>
           </div>

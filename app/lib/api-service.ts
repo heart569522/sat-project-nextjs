@@ -272,10 +272,7 @@ export async function updateData(
   }
 }
 
-export async function updateAllData(
-  apiPath: string,
-  formData: any,
-) {
+export async function updateAllData(apiPath: string, formData: any) {
   try {
     const response = await axios.post(
       `${process.env.API_URL}/api/${apiPath}`,

@@ -72,7 +72,7 @@ export default function ModalResponse({
           {isError && (
             <ErrorOutlineOutlinedIcon
               sx={{ width: '3.5rem', height: '3.5rem' }}
-              className="text-red-500 h-"
+              className="h- text-red-500"
             />
           )}
         </div>

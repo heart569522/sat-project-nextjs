@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ exists: false }, { status: 200 });
     }
   } catch (error) {
-    console.error("Error checking username existence:", error);
+    console.error('Error checking username existence:', error);
     return NextResponse.json(
       {
         message: 'Error checking username existence',

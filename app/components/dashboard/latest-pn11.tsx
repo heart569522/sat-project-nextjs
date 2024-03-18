@@ -11,7 +11,9 @@ export default async function LatestPN11() {
 
   return (
     <div className="flex w-full flex-col md:col-span-4">
-      <h2 className={`${notoThai.className} mb-4 text-lg lg:text-xl xl:text-2xl font-semibold`}>
+      <h2
+        className={`${notoThai.className} mb-4 text-lg font-semibold lg:text-xl xl:text-2xl`}
+      >
         คำร้องขอระเบียนกิจกรรมล่าสุด
       </h2>
       <div className="flex grow flex-col justify-between rounded-xl bg-blue-50 p-4">

@@ -16,7 +16,7 @@ export async function GET(
 
     return NextResponse.json(res.rows[0], { status: 200 });
   } catch (error) {
-    console.log("🚀 ~ error:", error)
+    console.log('🚀 ~ error:', error);
     return NextResponse.json(
       {
         message: 'Can not get data!!',

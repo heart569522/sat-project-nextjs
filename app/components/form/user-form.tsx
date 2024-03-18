@@ -261,8 +261,8 @@ export default function UserForm({
             isAdminTable && !isCreating
               ? 'แก้ไขข้อมูลผู้ใช้สำเร็จ'
               : isCreating
-              ? 'เพิ่มผู้ใช้สำเร็จ'
-              : 'แก้ไขข้อมูลโปรไฟล์สำเร็จ',
+                ? 'เพิ่มผู้ใช้สำเร็จ'
+                : 'แก้ไขข้อมูลโปรไฟล์สำเร็จ',
           );
           setButtonLink(
             isAdminTable || isCreating ? '/management/users' : '/profile',
@@ -298,12 +298,12 @@ export default function UserForm({
       isAdminTable && isEditing
         ? { role: formInput.role, is_verify: formInput.verify }
         : isCreating
-        ? {
-            password: formInput.password,
-            role: formInput.role,
-            is_verify: formInput.verify,
-          }
-        : {};
+          ? {
+              password: formInput.password,
+              role: formInput.role,
+              is_verify: formInput.verify,
+            }
+          : {};
 
     const finalFormData = {
       ...commonFields,
@@ -670,8 +670,8 @@ export default function UserForm({
                 isAdminTable || isCreating
                   ? '/management/users'
                   : isAdminEditing
-                  ? '/profile'
-                  : '/profile'
+                    ? '/profile'
+                    : '/profile'
               }
               className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >

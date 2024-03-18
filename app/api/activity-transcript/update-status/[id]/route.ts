@@ -7,7 +7,7 @@ export async function PATCH(
 ) {
   const { id } = context.params;
   const formData = await req.json();
-  console.log("🚀 ~ formData:", formData)
+  console.log('🚀 ~ formData:', formData);
 
   try {
     const res = await pool.query(

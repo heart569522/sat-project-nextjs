@@ -33,7 +33,7 @@ export default async function ChangePassword({
       </div>
       <div className="flex text-xl md:text-2xl">เปลี่ยนรหัสผ่าน</div>
       <div className="mt-4">
-        <ChangePasswordForm userId={userId}/>
+        <ChangePasswordForm userId={userId} />
       </div>
     </>
   );

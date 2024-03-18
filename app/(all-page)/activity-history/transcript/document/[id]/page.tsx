@@ -17,7 +17,7 @@ export default async function Page(context: { params: { id: string } }) {
 
   return (
     <main>
-      <div className='mb-6 print:hidden'>
+      <div className="mb-6 print:hidden">
         <Breadcrumbs
           breadcrumbs={[
             {

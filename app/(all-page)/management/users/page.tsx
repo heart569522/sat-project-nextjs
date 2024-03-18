@@ -36,7 +36,11 @@ export default async function Page({
         <CreateUser />
         <SearchAuto placeholder="ค้นหาข้อมูลในตาราง" />
       </div>
-      <UsersTable query={query} currentPage={currentPage} userId={userData.id}/>
+      <UsersTable
+        query={query}
+        currentPage={currentPage}
+        userId={userData.id}
+      />
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>

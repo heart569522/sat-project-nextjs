@@ -435,8 +435,8 @@ export default function PN10Form({
                   activeStep === 0
                     ? handleCheckProjectCode
                     : activeStep === 1
-                    ? handleSummaryRecord
-                    : handleSubmit
+                      ? handleSummaryRecord
+                      : handleSubmit
                 }
                 disabled={handleDisableNextButton()}
                 className={`${
@@ -448,8 +448,8 @@ export default function PN10Form({
                 {activeStep === 0
                   ? 'ถัดไป'
                   : activeStep === 1
-                  ? 'สรุปผล'
-                  : 'ยืนยัน'}
+                    ? 'สรุปผล'
+                    : 'ยืนยัน'}
               </button>
             </div>
           </>

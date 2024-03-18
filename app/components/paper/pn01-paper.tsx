@@ -129,7 +129,7 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
             </article>
             <article id="part" className="part">
               <div className="flex gap-x-3 py-2 text-sm">
-                <label className={`font-semibold whitespace-nowrap`}>
+                <label className={`whitespace-nowrap font-semibold`}>
                   1.&nbsp;&nbsp;&nbsp;ชื่อคณะ/วิทยาลัย/หน่วยงาน:
                 </label>
                 <p>{data.faculty}</p>
@@ -137,7 +137,7 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
             </article>
             <article id="part" className="part">
               <div className="flex gap-x-3 py-2 text-sm">
-                <label className={`font-semibold whitespace-nowrap`}>
+                <label className={`whitespace-nowrap font-semibold`}>
                   2.&nbsp;&nbsp;&nbsp;ชื่อโครงการ:
                 </label>
                 <p>{data.project_name}</p>

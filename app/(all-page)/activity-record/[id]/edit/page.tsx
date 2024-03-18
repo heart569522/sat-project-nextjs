@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
   const data = await getDataById('attendance', id);
-  console.log("🚀 ~ Page ~ data:", data)
+  console.log('🚀 ~ Page ~ data:', data);
   // console.log("is_draft", data.is_draft)
   // console.log("is_edit", data.is_edit)
 

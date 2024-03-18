@@ -46,9 +46,9 @@ export default function ProjectProposalTable({
 }) {
   // console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
-  console.log("🚀 ~ data:", data)
+  console.log('🚀 ~ data:', data);
   const [pn01StatusData, setPN01StatusData] = useState([]);
-  console.log("🚀 ~ pn01StatusData:", pn01StatusData)
+  console.log('🚀 ~ pn01StatusData:', pn01StatusData);
   const [loading, setLoading] = useState(true);
   const [showRemark, setShowRemark] = useState<string | null>(null);
 
@@ -407,8 +407,8 @@ export default function ProjectProposalTable({
                                   Boolean(row.status_remark) && !isAdminTable
                                     ? 'text-red-700'
                                     : isAdminTable
-                                    ? 'text-gray-500'
-                                    : 'text-gray-400'
+                                      ? 'text-gray-500'
+                                      : 'text-gray-400'
                                 } h-6 w-6 `}
                               />
                             </IconButton>

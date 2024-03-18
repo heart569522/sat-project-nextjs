@@ -4,8 +4,8 @@ import CheckBoxOutlineBlankSharpIcon from '@mui/icons-material/CheckBoxOutlineBl
 import CheckBoxSharpIcon from '@mui/icons-material/CheckBoxSharp';
 
 export default async function PN11Paper({ data }: { data: any }) {
-  console.log("🚀 ~ PN11Paper ~ data:", data)
-  
+  console.log('🚀 ~ PN11Paper ~ data:', data);
+
   const DotsPlaceholder = ({
     numOfDots,
     text,

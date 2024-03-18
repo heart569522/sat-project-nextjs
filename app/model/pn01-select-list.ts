@@ -3,6 +3,7 @@ export type pn01SelectList = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };
 
 export type strategic_issue_list = {
@@ -10,6 +11,7 @@ export type strategic_issue_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };
 
 export type objective_list = {
@@ -17,6 +19,8 @@ export type objective_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
+  strategic_issue_id: number;
 };
 
 export type university_strategic_list = {
@@ -24,6 +28,8 @@ export type university_strategic_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
+  objective_id: number;
 };
 
 export type strategic_plan_kpi_list = {
@@ -31,6 +37,7 @@ export type strategic_plan_kpi_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };
 
 export type operational_plan_kpi_list = {
@@ -38,6 +45,7 @@ export type operational_plan_kpi_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };
 
 export type project_kpi_list = {
@@ -45,6 +53,7 @@ export type project_kpi_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };
 
 export type project_status_list = {
@@ -52,4 +61,5 @@ export type project_status_list = {
   name: string;
   created_at: string;
   updated_at: string;
+  is_delete: boolean;
 };

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export default async function Page() {
   const authResult = (await auth()) as any;
   const { id } = authResult?.user || null;
-  const userData = await getUserLoginData(id)
-  
+  const userData = await getUserLoginData(id);
+
   return (
     <>
       <div>
@@ -35,7 +35,7 @@ export default async function Page() {
         </div>
       </div>
       <div className="mt-4 w-full">
-        <PN01Form userId={userData.id}/>
+        <PN01Form userId={userData.id} />
       </div>
     </>
   );

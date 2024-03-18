@@ -80,8 +80,8 @@ export async function PUT(
         recipientName,
         recipientAddress,
         recipientPhone,
-        id
-      ]
+        id,
+      ],
     );
 
     return NextResponse.json(
@@ -91,7 +91,7 @@ export async function PUT(
       { status: 200 },
     );
   } catch (error) {
-    console.log("🚀 ~ error:", error)
+    console.log('🚀 ~ error:', error);
     return NextResponse.json(
       { message: `Server error, please try again later` },
       { status: 500 },
@@ -127,4 +127,3 @@ export async function PATCH(
     );
   }
 }
-

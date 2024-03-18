@@ -38,11 +38,11 @@ export default function NotificationEmail(props: any) {
               </Row>
             </Section>
             <Section style={content}>
-              <Text style={paragraph} className='text-xl font-bold text-center'>{props.title}</Text>
-              <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
-              <Text style={paragraph}>
-                {props.detail}
+              <Text style={paragraph} className="text-center text-xl font-bold">
+                {props.title}
               </Text>
+              <Text style={paragraph}>สวัสดี คุณ{props.recipientName},</Text>
+              <Text style={paragraph}>{props.detail}</Text>
               <Text style={paragraph}>
                 ขอบคุณ,
                 <br />

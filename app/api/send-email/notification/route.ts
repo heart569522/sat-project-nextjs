@@ -6,15 +6,15 @@ import ConvertReactToEmail from '@/app/lib/email-convert';
 const sendingEmail = process.env.SENDING_EMAIL;
 
 export async function POST(req: NextRequest) {
-    const formData = await req.json();
-    const { email, name, title, detail } = formData
+  const formData = await req.json();
+  const { email, name, title, detail } = formData;
 
   try {
     const htmlEmail = ConvertReactToEmail({
       EmailComponent: NotificationEmail,
       recipientName: name,
       title: title,
-      detail: detail
+      detail: detail,
     });
 
     const transporter = nodemailer.createTransport({

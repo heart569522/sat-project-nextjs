@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     const offset = (Number(page) - 1) * ITEMS_PER_PAGE;
 
     let searchConditions = `project_proposal_pn01.is_delete = false`;
-    
+
     if (search) {
       console.log('search');
       searchConditions += ` AND (${searchColumns

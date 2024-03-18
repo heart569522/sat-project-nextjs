@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       {
         message: 'Create request activity transcript success',
         id: response.rows[0].id,
-        data: response.rows[0]
+        data: response.rows[0],
       },
       { status: 201 },
     );
