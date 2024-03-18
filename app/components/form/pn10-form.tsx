@@ -25,8 +25,7 @@ import Link from 'next/link';
 import Papa from 'papaparse';
 
 const steps = ['รหัสโครงการ', 'บันทึกรายการนักศึกษา', 'สรุปผล'];
-const acceptableCSVFileTypes =
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv';
+const acceptableCSVFileTypes = 'application/vnd.ms-excel, .csv';
 
 export default function PN10Form({
   userID,
@@ -43,6 +42,7 @@ export default function PN10Form({
   console.log('🚀 ~ studentIdList:', studentIdList);
   const [dateRecord, setDateRecord] = useState('');
   const [alertError, setAlertError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
@@ -91,10 +91,9 @@ export default function PN10Form({
       if (!studentIdList.includes(studentId)) {
         setStudentIdList((prevList) => [...prevList, studentId]);
         setStudentId('');
+        setErrorMessage('');
       } else {
-        // Handle the case where the studentId already exists
-        // You can show an error message or take other actions
-        console.log(`Student ID: ${studentId} already exists in the list.`);
+        setErrorMessage(`มีรหัสนักศึกษา: ${studentId} อยู่แล้ว`);
       }
     }
   };
@@ -115,10 +114,8 @@ export default function PN10Form({
 
   const handleDisableNextButton = () => {
     if (activeStep === 0 && !searchValue) {
-      console.log(`Not have value in project coode.`);
       return true;
     } else if (activeStep === 1 && studentIdList.length < 1) {
-      console.log(`Not have Student ID in the list.`);
       return true;
     } else {
       return false;
@@ -193,14 +190,31 @@ export default function PN10Form({
   const handleUploadFile = (event: any) => {
     const csvFile = event.target.files[0];
 
-    Papa.parse(csvFile, {
-      skipEmptyLines: true,
-      header: true,
-      complete: function (results) {
-        const studentIds = results.data.map((row: any) => row.studentId);
-        setStudentIdList((prevList) => [...prevList, ...studentIds]);
-      },
-    });
+    if (csvFile) {
+      Papa.parse(csvFile, {
+        skipEmptyLines: true,
+        header: true,
+        complete: function (results) {
+          const uniqueStudentIds: { [id: string]: boolean } = {};
+
+          results.data.forEach((row: any) => {
+            const studentId = row.studentId;
+
+            if (!uniqueStudentIds[studentId]) {
+              uniqueStudentIds[studentId] = true;
+              if (!studentIdList.includes(studentId)) {
+                setStudentIdList((prevList) => [...prevList, studentId]);
+              }
+            } else {
+              setErrorMessage(
+                'มีรหัสนักศึกษาซ้ำกันในไฟล์ CSV, ระบบจะเลือกรหัสนักศึกษา 1 หมายเลข จากข้อมูลที่ซ้ำกัน',
+              );
+              console.log('errrr');
+            }
+          });
+        },
+      });
+    }
   };
 
   return (
@@ -364,10 +378,10 @@ export default function PN10Form({
                           >
                             บันทึก
                           </button>
-                          <Tooltip title='อัพโหลดรายการนักศึกษาผ่านไฟล์ CSV'>
+                          <Tooltip title="อัพโหลดรายการนักศึกษาผ่านไฟล์ CSV">
                             <label
                               htmlFor="uploadFile"
-                              className="block cursor-pointer rounded-md border border-blue-500 px-2 text-blue-500 hover:bg-blue-50"
+                              className="block cursor-pointer rounded-md border border-blue-500 px-2 text-blue-500 hover:bg-blue-50 active:bg-blue-100"
                             >
                               <p className="text-center">Import CSV</p>
                               <input
@@ -380,6 +394,11 @@ export default function PN10Form({
                             </label>
                           </Tooltip>
                         </div>
+                        {errorMessage && (
+                          <p className="mt-1 text-sm font-semibold text-red-600">
+                            {errorMessage}
+                          </p>
+                        )}
                       </form>
                     </div>
                     <div className="block">
