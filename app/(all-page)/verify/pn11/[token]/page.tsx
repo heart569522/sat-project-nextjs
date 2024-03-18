@@ -78,7 +78,10 @@ export default function Verify({ params }: { params: { token: string } }) {
           {verifiedError && (
             <>
               <div className="mb-2 flex flex-col items-center justify-center gap-3">
-                <ErrorOutlineOutlinedIcon className="h-14 w-14 text-red-500" />
+                <ErrorOutlineOutlinedIcon
+                  sx={{ width: '3.5rem', height: '3.5rem' }}
+                  className=" text-red-500"
+                />
                 <p className="text-2xl">ผิดพลาด</p>
               </div>
               <p className="text-lg">โปรดตรวจสอบข้อมูลแล้วลองอีกครั้ง</p>
@@ -88,7 +91,10 @@ export default function Verify({ params }: { params: { token: string } }) {
           {verified && (
             <>
               <div className="mb-2 flex flex-col items-center justify-center gap-3">
-                <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
+                <CheckCircleOutlinedIcon
+                  sx={{ width: '3.5rem', height: '3.5rem' }}
+                  className=" text-green-500"
+                />
                 <p className="text-2xl">ยืนยันสำเร็จ</p>
               </div>
               <p className="mb-2 text-lg">

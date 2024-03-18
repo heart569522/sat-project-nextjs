@@ -23,7 +23,9 @@ export default async function Page({
   const { id } = authResult?.user || null;
   const userData = await getUserLoginData(id);
 
-  if (userData !== 'admin' && userData.is_verify) {
+  const isAdmin = userData.role === 'admin' && userData.is_verify;
+
+  if (!isAdmin) {
     notFound();
   }
 

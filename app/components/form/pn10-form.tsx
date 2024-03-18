@@ -251,7 +251,10 @@ export default function PN10Form({
               <>
                 <div className="mt-4 flex items-center justify-center bg-gray-50 py-10">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <CheckCircleOutlinedIcon className="h-14 w-14 text-green-500" />
+                    <CheckCircleOutlinedIcon
+                      sx={{ width: '3.5rem', height: '3.5rem' }}
+                      className=" text-green-500"
+                    />
                     <span className="text-lg font-semibold">
                       บันทึกข้อมูลเรียบร้อยแล้ว
                     </span>
@@ -279,7 +282,10 @@ export default function PN10Form({
               <>
                 <div className="mt-4 flex items-center justify-center bg-gray-50 py-10">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <ErrorOutlineOutlinedIcon className="h-14 w-14 text-red-500" />
+                    <ErrorOutlineOutlinedIcon
+                      sx={{ width: '3.5rem', height: '3.5rem' }}
+                      className=" text-red-500"
+                    />
                     <span className="text-lg font-semibold">ผิดพลาด</span>
                   </div>
                 </div>
