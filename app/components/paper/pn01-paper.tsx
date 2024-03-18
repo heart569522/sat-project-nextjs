@@ -8,6 +8,7 @@ import {
   convertToLocaleString,
 } from '@/app/lib/services';
 import { useEffect, useRef } from 'react';
+import ShowRichText from '../form/rich-text-input';
 
 export default function PN01Paper({ data }: { data: PaperPN01 }) {
   console.log(data);
@@ -547,6 +548,8 @@ export default function PN01Paper({ data }: { data: PaperPN01 }) {
               <div className="pl-6">
                 <div className="flex gap-x-3 py-1 text-sm">
                   <p className="whitespace-normal">{data.principle_reason}</p>
+                  {/* <ShowRichText text={data.principle_reason}/> */}
+                  {/* <div dangerouslySetInnerHTML={{__html:data.principle_reason as string}} /> */}
                 </div>
               </div>
             </article>

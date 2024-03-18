@@ -4,8 +4,10 @@ import { DocumentLoading } from '@/app/components/loading-screen';
 import PN01Paper from '@/app/components/paper/pn01-paper';
 import ToolBox from '@/app/components/paper/tool-box';
 import { getDataById } from '@/app/lib/api-service';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 import pn01Data from '@/app/model/pn01Data.json';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -13,6 +15,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Page(context: { params: { id: string } }) {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+  
   const { id } = context.params;
   const pn01Data = await getDataById('project-proposal', id);
 

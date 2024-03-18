@@ -5,19 +5,22 @@ import PN01Form from '@/app/components/form/pn01-form';
 import { getDataById } from '@/app/lib/api-service';
 import { auth } from '@/auth';
 import PN11Form from '@/app/components/form/pn11-form';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 
 export const metadata: Metadata = {
   title: 'แก้ไขคำร้องขอระเบียนกิจกรรม (พน.11)',
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
+  const isAdmin = await IsAdminAuthen();
+  
   const id = params.id;
   const data = await getDataById('activity-transcript', id);
 
   const authResult = (await auth()) as any;
   const { user } = authResult;
 
-  if (data.error || !id) {
+  if (data.error || !id || !isAdmin) {
     notFound();
   }
 

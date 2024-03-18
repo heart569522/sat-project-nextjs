@@ -2,7 +2,9 @@ import Breadcrumbs from '@/app/components/breadcrumbs';
 import FacultyMajorForm from '@/app/components/form/faculty-major-form';
 import PN01SelectForm from '@/app/components/form/pn01-select-form';
 import { getDataById } from '@/app/lib/api-service';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 const TITLE = 'แก้ไขคณะ/วิทยาลัย - สาขา';
 
@@ -15,6 +17,11 @@ export default async function FacultyMajor({
 }: {
   params: { id: string };
 }) {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+
   const id = params.id;
   const data = await getDataById('faculties', id);
 

@@ -3,16 +3,19 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getDataById } from '@/app/lib/api-service';
 import PN10EditForm from '@/app/components/form/pn10-edit-form';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 
 export const metadata: Metadata = {
   title: 'แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม',
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
+  const isAdmin = await IsAdminAuthen();
+  
   const id = params.id;
   const data = await getDataById('attendance', id);
 
-  if (data.error || !id) {
+  if (data.error || !id || !isAdmin) {
     notFound();
   }
 

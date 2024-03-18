@@ -5,6 +5,8 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { fetchPages } from '@/app/lib/api-service';
 import ActivityRecordTable from '@/app/components/tables/activity-record-table';
+import IsAdminAuthen from '@/app/lib/isAuthen';
+import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'จัดการบันทึกการเข้าร่วมโครงการ/กิจกรรม',
@@ -18,6 +20,11 @@ export default async function Page({
     page?: string;
   };
 }) {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+  
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 

@@ -1,12 +1,19 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import UserForm from '@/app/components/form/user-form';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'เพิ่มผู้ใช้',
 };
 
 export default async function Page() {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+  
   return (
     <main>
       <div>

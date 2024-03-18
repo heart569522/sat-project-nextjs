@@ -43,6 +43,10 @@ import ModalQuestion from '@/app/components/modal/modal-question';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { notFound, useRouter } from 'next/navigation';
 import { OverlayLoading } from '@/app/components/loading-screen';
+import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface ValidationError {
   id: number;
@@ -594,6 +598,15 @@ export default function PN01Form({
       ...prevErrors,
       [name]: '',
     }));
+  };
+
+  const handleRichTextChange = (value: any) => {
+    setFormInput((prevTypes) => ({
+      ...prevTypes,
+      principleReason: value,
+    }));
+
+    console.log(formInput.principleReason);
   };
 
   const handleSelectChange = (event: any) => {
@@ -2655,6 +2668,27 @@ export default function PN01Form({
                 value={formInput.principleReason}
                 onChange={handleInputChange}
               />
+
+              {/* <ReactQuill
+                value={formInput.principleReason}
+                onChange={handleRichTextChange}
+                placeholder="เพิ่มข้อความที่นี่"
+                className="w-full"
+                modules={{
+                  toolbar: [
+                    [{ header: '1' }, { header: '2' }],
+                    [{ size: [] }],
+                    ['bold', 'italic', 'underline', 'blockquote'],
+                    [
+                      { list: 'ordered' },
+                      { list: 'bullet' },
+                      { indent: '-1' },
+                      { indent: '+1' },
+                    ],
+                  ],
+                }}
+              />
+              <p className="text-red-600 text-xs pl-3 mt-5">{validationError.principleReason}</p> */}
             </div>
           </div>
 

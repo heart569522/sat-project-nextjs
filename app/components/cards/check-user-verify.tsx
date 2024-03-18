@@ -14,10 +14,10 @@ export default function CheckUserVerifyCard({ userData }: { userData: Users }) {
   const redirect = () => {
     if (isVerified) {
       if (userData.role === 'teacher') {
-        router.push('/project-proposal');
+        router.replace('/project-proposal');
         setLoading(false);
       } else if (userData.role === 'admin') {
-        router.push('/dashboard');
+        router.replace('/dashboard');
         setLoading(false);
       }
     } else {

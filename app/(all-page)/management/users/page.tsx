@@ -5,6 +5,7 @@ import { fetchPages, getUserLoginData } from '@/app/lib/api-service';
 import UsersTable from '@/app/components/tables/users-table';
 import { auth } from '@/auth';
 import { CreateInvoice, CreateUser } from '@/app/components/buttons/buttons';
+import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'จัดการข้อมูลผู้ใช้งานระบบ',
@@ -21,6 +22,10 @@ export default async function Page({
   const authResult = (await auth()) as any;
   const { id } = authResult?.user || null;
   const userData = await getUserLoginData(id);
+
+  if (userData !== 'admin' && userData.is_verify) {
+    notFound();
+  }
 
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;

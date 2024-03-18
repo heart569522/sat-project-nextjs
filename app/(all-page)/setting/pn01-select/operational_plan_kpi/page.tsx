@@ -1,7 +1,9 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import PN01SelectForm from '@/app/components/form/pn01-select-form';
 import { getAllData } from '@/app/lib/api-service';
+import IsAdminAuthen from '@/app/lib/isAuthen';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 const TITLE = 'แก้ไขตัวชี้วัดแผนปฏิบัติการ';
 
@@ -10,6 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function OperationalPlanKPI() {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+  
   const data = await getAllData('pn01-select-list/operational_plan_kpi_list');
 
   return (

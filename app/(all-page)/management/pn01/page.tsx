@@ -4,6 +4,8 @@ import { Metadata } from 'next';
 import { fetchPages } from '@/app/lib/api-service';
 import ProjectProposalTable from '@/app/components/tables/project-proposal-table';
 import { CreateRequestProjectProposal } from '@/app/components/buttons/buttons';
+import IsAdminAuthen from '@/app/lib/isAuthen';
+import { notFound } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'จัดการคำร้องขอเสนอโครงการ/กิจกรรม พน.01',
@@ -17,6 +19,11 @@ export default async function Page({
     page?: string;
   };
 }) {
+  const isAdmin = await IsAdminAuthen();
+  if (!isAdmin) {
+    notFound();
+  }
+
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
