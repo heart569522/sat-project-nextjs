@@ -160,34 +160,34 @@ export default function ActivityTranscriptTable({
                             <p className="font-semibold">{i + 1}</p>
                           </div>
                           <div className="flex flex-col items-start justify-center gap-y-1">
-                            <p className="text-sm font-medium">
-                              โครงการ/กิจกรรม
-                            </p>
+                            <p className="text-sm font-medium">ชื่อ - สกุล</p>
                             <p className="text-lg font-semibold">
-                              {row.project_name || '-'}
+                              {row.firstname + ' ' + row.lastname || '-'}
                             </p>
                           </div>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
-                          <p className="text-sm font-medium">รหัสเอกสาร</p>
+                          <p className="text-sm font-medium">รหัสนักศึกษา</p>
                           <p className="text-lg font-semibold">
-                            {row.project_code || '-'}
+                            {row.student_id || '-'}
                           </p>
                         </div>
                       </div>
                       <div className="flex w-full items-center justify-between border-b py-5">
                         <div className="flex flex-col items-start justify-center gap-y-1">
-                          <p className="text-sm font-medium">
-                            ผู้รับผิดชอบโครงการ
-                          </p>
+                          <p className="text-sm font-medium">รูปแบบการรับ</p>
                           <p className="text-base font-semibold">
-                            {row.project_head || '-'}
+                            {row.delivery_method == 'receive'
+                              ? 'รับด้วยตนเอง'
+                              : row.delivery_method == 'send'
+                                ? 'จัดส่งไปรษณีย์'
+                                : '-' || '-'}
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
                           <p className="text-sm font-medium">เบอร์โทรศัพท์</p>
                           <p className="text-base font-semibold">
-                            {row.project_head_phone || '-'}
+                            {row.phone || '-'}
                           </p>
                         </div>
                       </div>
@@ -230,6 +230,17 @@ export default function ActivityTranscriptTable({
                         <DetailButton
                           id={row.id}
                           path="activity-transcript/document"
+                        />
+                        <ButtonDialog
+                          id={row.id}
+                          apiPath="send-email/notification"
+                          action="sendEmail"
+                          title="ส่งการแจ้งเตือน"
+                          detail={`ระบบจะทำการส่งการแจ้งเตือนไปยังอีเมล : ${row.email}`}
+                          formData={{
+                            email: row.email,
+                            name: row.firstname + ' ' + row.lastname,
+                          }}
                         />
                         <EditButton
                           id={row.id}

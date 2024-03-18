@@ -152,7 +152,7 @@ export default function UsersTable({
               <div className="md:hidden">
                 {loading ? (
                   <>
-                    <TableRowMobileSkeleton countColumn={3} />
+                    <TableRowMobileSkeleton countColumn={4} />
                   </>
                 ) : data.length === 0 ? (
                   <TableRowMobileNotFound />
@@ -168,46 +168,71 @@ export default function UsersTable({
                             <p className="font-semibold">{i + 1}</p>
                           </div>
                           <div className="flex flex-col items-start justify-center gap-y-1">
-                            <p className="text-sm font-medium">
-                              โครงการ/กิจกรรม
-                            </p>
+                            <p className="text-sm font-medium">ชื่อ - สกุล</p>
                             <p className="text-lg font-semibold">
-                              {row.project_name || '-'}
+                              {row.firstname + ' ' + row.lastname || '-'}
                             </p>
                           </div>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
-                          <p className="text-sm font-medium">รหัสเอกสาร</p>
+                          <p className="text-sm font-medium">ชื่อผู้ใช้</p>
                           <p className="text-lg font-semibold">
-                            {row.project_code || '-'}
+                            {row.username || '-'}
                           </p>
                         </div>
                       </div>
                       <div className="flex w-full items-center justify-between border-b py-5">
                         <div className="flex flex-col items-start justify-center gap-y-1">
-                          <p className="text-sm font-medium">
-                            ผู้รับผิดชอบโครงการ
-                          </p>
+                          <p className="text-sm font-medium">คณะ/วิทยาลัย</p>
                           <p className="text-base font-semibold">
-                            {row.project_head || '-'}
+                            {row.faculty_name || '-'}
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
-                          <p className="text-sm font-medium">เบอร์โทรศัพท์</p>
+                          <p className="text-sm font-medium">สาขาวิชา</p>
                           <p className="text-base font-semibold">
-                            {row.project_head_phone || '-'}
+                            {row.major_name || '-'}
                           </p>
                         </div>
                       </div>
                       <div className="flex w-full items-center justify-between border-b py-5">
                         <div className="flex flex-col items-start justify-center gap-y-2">
-                          <p className="text-sm font-medium">วันที่</p>
+                          <p className="text-sm font-medium">เบอร์โทรศัพท์</p>
                           <p className="text-base font-semibold">
-                            {convertISOStringToDateText(row.created_at)}
+                            {row.phone || '-'}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end justify-center gap-y-2">
+                          <p className="text-sm font-medium">อีเมล</p>
+                          <p className="text-base font-semibold">
+                            {row.email || '-'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex w-full items-center justify-between border-b py-5">
+                        <div className="flex flex-col items-start justify-center gap-y-2">
+                          <p className="text-sm font-medium">ตำแหน่ง</p>
+                          <p className="text-base font-semibold">
+                            {row.role == 'teacher'
+                              ? 'อาจารย์'
+                              : row.role == 'admin'
+                                ? 'เจ้าหน้าที่'
+                                : '' || '-'}
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
                           <p className="text-sm font-medium">สถานะ</p>
+                          <div className="flex items-center justify-evenly gap-1">
+                            {/* <p className="text-base">ปิด</p> */}
+                            <Switch
+                              checked={toggleVerify?.[row.id] ?? row.is_verify}
+                              onClick={() => handleToggle(row.id)}
+                              color="success"
+                            />
+                            <p className="text-base font-semibold">
+                              {row.is_verify ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยีน'}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center justify-center gap-2 pt-4">
@@ -255,7 +280,7 @@ export default function UsersTable({
                       อีเมล
                     </th>
                     <th scope="col" className="w-[5%] px-3 py-5">
-                      สิทธ์
+                      ตำแหน่ง
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
                       สถานะ

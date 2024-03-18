@@ -16,7 +16,7 @@ export default async function LatestPN01() {
       >
         คำร้องเสนอโครงการ/กิจกรรมล่าสุด
       </h2>
-      <div className="flex grow flex-col justify-between rounded-xl bg-blue-50 p-4">
+      <div className="flex grow flex-col justify-between rounded-xl bg-gray-100 border border-blue-300 hover:border-blue-400 p-4">
         <div className="">
           {latestPN01.map((row: any, i: any) => (
             <Link

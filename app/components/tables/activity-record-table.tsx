@@ -163,7 +163,7 @@ export default function ActivityRecordTable({
                         <div className="flex flex-col items-start justify-center gap-y-2">
                           <p className="text-sm font-medium">จำนวนชั่วโมง</p>
                           <p className="text-base font-semibold">
-                            {row.project_hour || '-'}&nbsp;ชั่วโมง
+                            {row.project_hour || '0'}&nbsp;ชั่วโมง
                           </p>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-2">
@@ -210,7 +210,12 @@ export default function ActivityRecordTable({
                     <th scope="col" className="w-[10%] px-3 py-5">
                       รหัสเอกสาร
                     </th>
-                    <th scope="col" className="px-3 py-5">
+                    <th
+                      scope="col"
+                      className={`${
+                        isAdminTable ? 'w-[30%]' : 'w-[40%]'
+                      } px-3 py-5`}
+                    >
                       โครงการ/กิจกรรม
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
@@ -262,7 +267,10 @@ export default function ActivityRecordTable({
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {row.project_code || '-'}
                           </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                          <td
+                            title={row.project_name || '-'}
+                            className="max-w-[200px] truncate bg-white px-4 py-5 text-sm"
+                          >
                             {row.project_name || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">

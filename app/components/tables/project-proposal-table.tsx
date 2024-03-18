@@ -193,7 +193,7 @@ export default function ProjectProposalTable({
                           </p>
                         </div>
                       </div>
-                      <div className="flex w-full items-center justify-between border-b py-5">
+                      <div className="flex w-full items-center justify-between gap-2 border-b py-5">
                         <div className="flex flex-col items-start justify-center gap-y-1">
                           <p className="text-sm font-medium">
                             ผู้รับผิดชอบโครงการ
@@ -209,7 +209,7 @@ export default function ProjectProposalTable({
                           </p>
                         </div>
                       </div>
-                      <div className="flex w-full items-center justify-between border-b py-5">
+                      <div className="flex w-full items-center justify-between gap-2 border-b py-5">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                           <p className="text-sm font-medium">วันที่</p>
                           <p className="text-base font-semibold">
@@ -291,7 +291,7 @@ export default function ProjectProposalTable({
                     <th scope="col" className="w-[5%] px-3 py-5">
                       รหัสเอกสาร
                     </th>
-                    <th scope="col" className="px-3 py-5">
+                    <th scope="col" className="w-[45%] px-3 py-5">
                       โครงการ/กิจกรรม
                     </th>
                     <th scope="col" className="w-[10%] px-3 py-5">
@@ -346,7 +346,10 @@ export default function ProjectProposalTable({
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             {row.project_code || '-'}
                           </td>
-                          <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
+                          <td
+                            className="max-w-[200px] truncate bg-white px-4 py-5 text-sm"
+                            title={row.project_name || '-'}
+                          >
                             {row.project_name || '-'}
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
