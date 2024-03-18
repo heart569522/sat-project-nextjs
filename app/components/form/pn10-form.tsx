@@ -3,7 +3,13 @@ import React, { useState } from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import { notoThai } from '@/app/components/fonts';
-import { Alert, CircularProgress, IconButton, StepLabel } from '@mui/material';
+import {
+  Alert,
+  CircularProgress,
+  IconButton,
+  StepLabel,
+  Tooltip,
+} from '@mui/material';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import ClearIcon from '@mui/icons-material/Clear';
 import { convertISOStringToDateTimeText } from '@/app/lib/services';
@@ -16,8 +22,11 @@ import { PaperPN01 } from '@/app/model/pn01';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import Link from 'next/link';
+import Papa from 'papaparse';
 
 const steps = ['รหัสโครงการ', 'บันทึกรายการนักศึกษา', 'สรุปผล'];
+const acceptableCSVFileTypes =
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv';
 
 export default function PN10Form({
   userID,
@@ -31,6 +40,7 @@ export default function PN10Form({
   const [searchValue, setSearchValue] = useState('');
   const [studentId, setStudentId] = useState('');
   const [studentIdList, setStudentIdList] = useState<string[]>([]);
+  console.log('🚀 ~ studentIdList:', studentIdList);
   const [dateRecord, setDateRecord] = useState('');
   const [alertError, setAlertError] = useState(false);
 
@@ -143,6 +153,7 @@ export default function PN10Form({
 
     try {
       const formData = await setFormData();
+      console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
       const response = await createData('attendance', formData);
 
@@ -177,6 +188,19 @@ export default function PN10Form({
     setSearchValue('');
     setStudentIdList([]);
     setPN01Data({});
+  };
+
+  const handleUploadFile = (event: any) => {
+    const csvFile = event.target.files[0];
+
+    Papa.parse(csvFile, {
+      skipEmptyLines: true,
+      header: true,
+      complete: function (results) {
+        const studentIds = results.data.map((row: any) => row.studentId);
+        setStudentIdList((prevList) => [...prevList, ...studentIds]);
+      },
+    });
   };
 
   return (
@@ -336,10 +360,25 @@ export default function PN10Form({
                           />
                           <button
                             type="submit"
-                            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400"
+                            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-400 active:bg-blue-600"
                           >
                             บันทึก
                           </button>
+                          <Tooltip title='อัพโหลดรายการนักศึกษาผ่านไฟล์ CSV'>
+                            <label
+                              htmlFor="uploadFile"
+                              className="block cursor-pointer rounded-md border border-blue-500 px-2 text-blue-500 hover:bg-blue-50"
+                            >
+                              <p className="text-center">Import CSV</p>
+                              <input
+                                type="file"
+                                id="uploadFile"
+                                className="hidden"
+                                accept={acceptableCSVFileTypes}
+                                onChange={handleUploadFile}
+                              />
+                            </label>
+                          </Tooltip>
                         </div>
                       </form>
                     </div>

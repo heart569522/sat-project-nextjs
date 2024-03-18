@@ -31,7 +31,7 @@ export default function CheckUserVerifyCard({ userData }: { userData: Users }) {
 
   return (
     <>
-      {loading ? (
+      {loading && isVerified ? (
         <div className="flex h-screen items-center justify-center">
           <CircularProgress />
           <span className="ml-4 text-lg font-medium">Loading...</span>

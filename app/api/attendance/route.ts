@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 async function fetchStudentDetails(studentId: string) {
   const studentDetailsUrl = `${process.env.APP_SCRIPT_STUDENT_SHEET}?studentId=${studentId}`;
   const studentDetailsResponse = await axios.get(studentDetailsUrl);
+  console.log("🚀 ~ fetchStudentDetails ~ studentDetailsResponse:", studentDetailsResponse.data)
   return studentDetailsResponse.data;
 }
 
