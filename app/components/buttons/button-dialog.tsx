@@ -183,7 +183,12 @@ export function ButtonDialog({
 
   return (
     <React.Fragment>
-      <Tooltip title="ลบ" arrow>
+      <Tooltip
+        title={
+          action == 'delete' ? 'ลบ' : action == 'sendEmail' ? 'ส่งอีเมล' : ''
+        }
+        arrow
+      >
         <button
           onClick={handleDialogOpen}
           className={clsx(

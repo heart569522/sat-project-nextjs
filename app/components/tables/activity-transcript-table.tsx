@@ -383,17 +383,19 @@ export default function ActivityTranscriptTable({
                             </FormControl>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                            <IconButton
-                              onClick={() => handleOpenRemark(row.id)}
-                            >
-                              <FeedbackOutlinedIcon
-                                className={`${
-                                  Boolean(row.status_remark)
-                                    ? 'text-red-700'
-                                    : 'text-gray-500'
-                                } h-6 w-6 `}
-                              />
-                            </IconButton>
+                            <Tooltip title="ดูหมายเหตุ" arrow>
+                              <IconButton
+                                onClick={() => handleOpenRemark(row.id)}
+                              >
+                                <FeedbackOutlinedIcon
+                                  className={`${
+                                    Boolean(row.status_remark)
+                                      ? 'text-red-700'
+                                      : 'text-gray-500'
+                                  } h-6 w-6 `}
+                                />
+                              </IconButton>
+                            </Tooltip>
                           </td>
                           <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                             <div className="flex justify-center gap-2">

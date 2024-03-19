@@ -228,6 +228,7 @@ export default function UsersTable({
                               checked={toggleVerify?.[row.id] ?? row.is_verify}
                               onClick={() => handleToggle(row.id)}
                               color="success"
+                              disabled={row.id === userId}
                             />
                             <p className="text-base font-semibold">
                               {row.is_verify ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยีน'}
@@ -346,6 +347,7 @@ export default function UsersTable({
                                 }
                                 onClick={() => handleToggle(row.id)}
                                 color="success"
+                                disabled={row.id === userId}
                               />
                               <p className="text-base">
                                 {row.is_verify ? 'ยืนยันแล้ว' : 'ยังไม่ยืนยีน'}
