@@ -6,9 +6,11 @@ import {
 } from '@heroicons/react/24/outline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import Link from 'next/link';
 import { deleteInvoice } from '@/app/lib/actions';
 import { deleteData } from '@/app/lib/api-service';
+import { Tooltip } from '@mui/material';
 
 export function CreateRequestProjectProposal({
   buttonText,
@@ -117,12 +119,14 @@ export function DeleteInvoice({ id }: { id: string }) {
 
 export function DetailButton({ id, path }: { id?: string; path?: string }) {
   return (
-    <Link
-      href={`/${path}/${id}`}
-      className="rounded-md border p-2 hover:bg-gray-100"
-    >
-      <EyeIcon className="w-5" />
-    </Link>
+    <Tooltip title="ดูเอกสาร/รายละเอียด" arrow>
+      <Link
+        href={`/${path}/${id}`}
+        className="rounded-md border p-2 hover:bg-gray-100"
+      >
+        <ArticleOutlinedIcon className="w-5" />
+      </Link>
+    </Tooltip>
   );
 }
 
@@ -136,23 +140,25 @@ export function EditButton({
   disabled?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-md border p-2 ${
-        disabled
-          ? 'cursor-not-allowed bg-gray-100 text-gray-500'
-          : 'hover:bg-gray-100'
-      }`}
-    >
-      {disabled ? (
-        <span className="w-5">
-          <PencilIcon className="w-5" />
-        </span>
-      ) : (
-        <Link href={id ? `/${path}/${id}/edit` : '#'}>
-          <PencilIcon className="w-5" />
-        </Link>
-      )}
-    </div>
+    <Tooltip title="แก้ไข" arrow>
+      <div
+        className={`rounded-md border p-2 ${
+          disabled
+            ? 'cursor-not-allowed bg-gray-100 text-gray-500'
+            : 'hover:bg-gray-100'
+        }`}
+      >
+        {disabled ? (
+          <span className="w-5">
+            <PencilIcon className="w-5" />
+          </span>
+        ) : (
+          <Link href={id ? `/${path}/${id}/edit` : '#'}>
+            <PencilIcon className="w-5" />
+          </Link>
+        )}
+      </div>
+    </Tooltip>
   );
 }
 
@@ -161,23 +167,27 @@ export function DeleteButton({ id, apiPath }: { id: string; apiPath: string }) {
     await deleteData(apiPath, id);
   };
   return (
-    <button
-      onClick={handleDelete}
-      className="rounded-md border p-2 hover:bg-gray-100"
-    >
-      <span className="sr-only">Delete</span>
-      <TrashIcon className="w-5" />
-    </button>
+    <Tooltip title="ลบ" arrow>
+      <button
+        onClick={handleDelete}
+        className="rounded-md border p-2 hover:bg-gray-100"
+      >
+        <span className="sr-only">Delete</span>
+        <TrashIcon className="w-5" />
+      </button>
+    </Tooltip>
   );
 }
 
 export function EditProfile({ id }: { id: string | undefined }) {
   return (
-    <Link href={`/profile/${id}/edit`}>
-      <button className="ms-3 h-10 w-full items-center rounded-md bg-yellow-400 px-4 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900">
-        แก้ไขข้อมูลโปรไฟล์
-      </button>
-    </Link>
+    // <Tooltip title="แก้ไข" arrow>
+      <Link href={`/profile/${id}/edit`}>
+        <button className="ms-3 h-10 w-full items-center rounded-md bg-yellow-400 px-4 text-base font-medium text-white hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900">
+          แก้ไขข้อมูลโปรไฟล์
+        </button>
+      </Link>
+    // </Tooltip>
   );
 }
 

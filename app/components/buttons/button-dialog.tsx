@@ -9,6 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { notoThai } from '@/app/components/fonts';
@@ -182,21 +183,23 @@ export function ButtonDialog({
 
   return (
     <React.Fragment>
-      <button
-        onClick={handleDialogOpen}
-        className={clsx(
-          'rounded-md border p-2',
-          disabled
-            ? 'cursor-not-allowed bg-gray-100 text-gray-500'
-            : 'hover:bg-gray-100',
-          className,
-        )}
-        disabled={disabled}
-      >
-        <span className="sr-only">{action}</span>
-        {action == 'delete' && <TrashIcon className="w-5" />}
-        {action == 'sendEmail' && <EnvelopeIcon className="w-5" />}
-      </button>
+      <Tooltip title="ลบ" arrow>
+        <button
+          onClick={handleDialogOpen}
+          className={clsx(
+            'rounded-md border p-2',
+            disabled
+              ? 'cursor-not-allowed bg-gray-100 text-gray-500'
+              : 'hover:bg-gray-100',
+            className,
+          )}
+          disabled={disabled}
+        >
+          <span className="sr-only">{action}</span>
+          {action == 'delete' && <TrashIcon className="w-5" />}
+          {action == 'sendEmail' && <EnvelopeIcon className="w-5" />}
+        </button>
+      </Tooltip>
       <Dialog
         open={openDialog}
         onClose={handleDialogClose}

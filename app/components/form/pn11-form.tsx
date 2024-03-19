@@ -401,7 +401,7 @@ export default function PN11Form({
                   validationError.firstname ? 'text-red-600' : 'text-gray-900'
                 }`}
               >
-                ชื่อจริง
+                ชื่อ
               </label>
               <TextField
                 size="small"

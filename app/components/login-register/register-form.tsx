@@ -33,7 +33,7 @@ export default function RegisterForm() {
   const [buttonText, setButtonText] = useState('');
   const [nextTab, setNextTab] = useState(false);
 
-  const [formInput, setFormInput] = useState({
+  const initialFormState = {
     firstname: '',
     lastname: '',
     email: '',
@@ -43,7 +43,8 @@ export default function RegisterForm() {
     username: '',
     password: '',
     confirmPassword: '',
-  });
+  };
+  const [formInput, setFormInput] = useState(initialFormState);
 
   const [existEmail, setExistEmail] = useState(null);
   const [existUsername, setExistUsername] = useState(null);
@@ -296,9 +297,19 @@ export default function RegisterForm() {
     setOpenResponseModal(false);
   };
 
+  const handleResetForm = () => {
+    setFormInput(initialFormState);
+    setExistEmail(null);
+    setExistUsername(null);
+  };
+
   return (
     <React.Fragment>
-      <form action={handleSubmit} className="space-y-3">
+      <form
+        action={handleSubmit}
+        onReset={handleResetForm}
+        className="space-y-3"
+      >
         <div className="flex-1 rounded-lg px-6 pb-4 pt-8">
           <h1
             className={`mb-3 text-center text-2xl font-semibold text-gray-800`}
@@ -612,7 +623,10 @@ export default function RegisterForm() {
           </div>
         </div>
         <div className="mb-2 mt-6 flex justify-center gap-2">
-          <button className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200">
+          <button
+            type="reset"
+            className="flex h-10 items-center rounded-md bg-gray-100 px-4 text-base font-medium text-gray-600 transition-colors hover:bg-gray-200"
+          >
             ยกเลิก
           </button>
           <button

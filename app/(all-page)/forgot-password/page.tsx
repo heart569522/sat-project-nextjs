@@ -7,7 +7,7 @@ import {
 } from '@/app/lib/api-service';
 import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
-import { Alert, TextField } from '@mui/material';
+import { Alert, CircularProgress, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import ModalResponse from '@/app/components/modal/modal-response';
 import { OverlayLoading } from '@/app/components/loading-screen';
@@ -206,17 +206,20 @@ export default function ForgetPassForm() {
                 formInput.email
                   ? 'bg-blue-500 text-white hover:bg-blue-400 focus-visible:outline-blue-500 active:bg-blue-600'
                   : 'bg-gray-300 text-gray-500'
-              } flex h-10 items-center rounded-md  px-4 text-base font-medium  transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
+              } flex h-14 items-center rounded-md p-2 px-4 text-base font-medium  transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  aria-disabled:cursor-not-allowed aria-disabled:opacity-50`}
               type="submit"
-              disabled={!formInput.email}
+              disabled={!formInput.email || loading}
             >
-              ยืนยันอีเมล
+              <div className="flex items-center justify-center gap-2">
+                {loading && <CircularProgress className="h-2 w-2 text-white" />}
+                <p>ยืนยันอีเมล</p>
+              </div>
             </button>
           </div>
         </form>
       </div>
 
-      <OverlayLoading showLoading={loading} />
+      {/* <OverlayLoading showLoading={loading} /> */}
 
       <ModalResponse
         openModal={openResponseModal}
