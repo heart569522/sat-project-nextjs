@@ -17,7 +17,6 @@ export default function ShowRichText({ text }: { text: any }) {
       theme="snow"
       modules={modules}
       className={`${sarabun.className}`}
-      style={{ border: 'none' }}
     />
   );
 }

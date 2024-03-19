@@ -45,6 +45,7 @@ import { notFound, useRouter } from 'next/navigation';
 import { OverlayLoading } from '@/app/components/loading-screen';
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
+import { sarabun } from '../fonts';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
@@ -2650,7 +2651,7 @@ export default function PN01Form({
             7.หลักการและเหตุผล *
           </h3>
           <div className="mb-6">
-            <div className="grid gap-6 md:grid-cols-1">
+            <div className="grid items-center justify-center gap-6 md:grid-cols-1">
               <TextField
                 size="small"
                 name="principleReason"
@@ -2673,11 +2674,12 @@ export default function PN01Form({
                 value={formInput.principleReason}
                 onChange={handleRichTextChange}
                 placeholder="เพิ่มข้อความที่นี่"
-                className="w-full"
+                className="center w-[794px]"
+                theme="snow"
                 modules={{
                   toolbar: [
                     [{ header: '1' }, { header: '2' }],
-                    [{ size: [] }],
+                    // [{ size: [] }],
                     ['bold', 'italic', 'underline', 'blockquote'],
                     [
                       { list: 'ordered' },
@@ -2688,7 +2690,11 @@ export default function PN01Form({
                   ],
                 }}
               />
-              <p className="text-red-600 text-xs pl-3 mt-5">{validationError.principleReason}</p> */}
+              {validationError.principleReason && (
+                <p className="mt-5 pl-3 text-xs text-red-600">
+                  {validationError.principleReason}
+                </p>
+              )} */}
             </div>
           </div>
 

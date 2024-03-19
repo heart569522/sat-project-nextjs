@@ -9,6 +9,8 @@ import {
 } from '@/app/lib/services';
 import { useEffect, useRef } from 'react';
 import ShowRichText from '../form/rich-text-input';
+import 'react-quill/dist/quill.snow.css';
+import { sarabun } from '../fonts';
 
 export default function PN01Paper({ data }: { data: PaperPN01 }) {
   console.log(data);
