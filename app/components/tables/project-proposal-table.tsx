@@ -187,7 +187,7 @@ export default function ProjectProposalTable({
                           </div>
                         </div>
                         <div className="flex flex-col items-end justify-center gap-y-1">
-                          <p className="text-sm font-medium">รหัสเอกสาร</p>
+                          <p className="text-sm font-medium">รหัสโครงการ</p>
                           <p className="text-lg font-semibold">
                             {row.project_code || '-'}
                           </p>
@@ -289,7 +289,7 @@ export default function ProjectProposalTable({
                       ลำดับ
                     </th>
                     <th scope="col" className="w-[5%] px-3 py-5">
-                      รหัสเอกสาร
+                      รหัสโครงการ
                     </th>
                     <th scope="col" className="w-[45%] px-3 py-5">
                       โครงการ/กิจกรรม

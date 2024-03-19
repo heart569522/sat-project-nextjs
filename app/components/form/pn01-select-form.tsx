@@ -97,6 +97,7 @@ export default function PN01SelectForm({
         name: '',
         created_at: '',
         updated_at: '',
+        is_delete: false
       },
     ]);
   };
