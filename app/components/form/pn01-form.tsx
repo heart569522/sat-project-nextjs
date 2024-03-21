@@ -1745,7 +1745,7 @@ export default function PN01Form({
                         <div className={`grid grid-cols-1 gap-6`}>
                           <TextField
                             size="small"
-                            type="text"
+                            type="number"
                             name="work"
                             className="flex w-full "
                             placeholder=""
