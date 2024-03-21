@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import SearchHistory from '@/app/components/search-box/search-history';
 import { CreateRequestTranscript } from '@/app/components/buttons/buttons';
 import Pagination from '@/app/components/pagination';
-import Table from '@/app/components/history-activity/table';
+import HistoryActivityTable from '@/app/components/tables/history-activity-table';
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import { Suspense } from 'react';
 import { ActivityHistoryLoading } from '@/app/components/loading-screen';
@@ -35,7 +35,7 @@ export default async function Page({
         {query && (
           <div className="my-6 rounded-md border-2 border-gray-100 p-4 md:p-6">
             <Suspense key={query} fallback={<ActivityHistoryLoading />}>
-              <Table query={query} />
+              <HistoryActivityTable query={query} />
             </Suspense>
           </div>
         )}

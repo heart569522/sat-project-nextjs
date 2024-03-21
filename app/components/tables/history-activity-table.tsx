@@ -127,7 +127,7 @@ export default async function HistoryActivityTable({
                               <div className="flex w-1/2 flex-col">
                                 <p className="text-xs">จำนวนชั่วโมง</p>
                                 <p className="font-medium">
-                                  {row.serviceHour}&nbsp;ชั่วโมง
+                                  {row.serviceHour || '0'}&nbsp;ชั่วโมง
                                 </p>
                               </div>
                             </div>
@@ -190,7 +190,7 @@ export default async function HistoryActivityTable({
                                 {row.academicYear}
                               </td>
                               <td className="whitespace-nowrap bg-white px-4 py-5 text-base group-first-of-type:rounded-md group-last-of-type:rounded-md">
-                                {row.serviceHour}
+                                {row.serviceHour || '0'}
                               </td>
                             </tr>
                           ))
