@@ -64,7 +64,7 @@ export function CreateFacultyMajor() {
       href="/setting/faculty-major"
       className="flex h-10 items-center rounded-lg bg-blue-600 px-4 text-base font-medium text-white transition-colors hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:bg-blue-700"
     >
-      <span className="hidden md:block">เพิ่มคณะ/วิทยาลัย - สาขา</span>{' '}
+      <span className="block">เพิ่มคณะ/วิทยาลัย - สาขา</span>{' '}
       {/* <PersonAddAltOutlinedIcon className="h-5 md:ml-4" /> */}
     </Link>
   );
