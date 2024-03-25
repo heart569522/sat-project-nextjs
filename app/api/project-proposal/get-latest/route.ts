@@ -1,7 +1,9 @@
 import { pool } from '@/app/lib/db';
 import { NextResponse } from 'next/server';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET() {
+  noStore();
   try {
     const res = await pool.query(`
         SELECT id, project_name, project_code, date, time, created_at FROM project_proposal_pn01 

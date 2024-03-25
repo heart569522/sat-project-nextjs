@@ -56,6 +56,8 @@ export async function fetchLatestInvoices() {
 }
 
 export async function fetchCardData() {
+  noStore();
+  
   const [totalCountUsers, totalCountPN01, totalCountPN10, totalCountPN11] =
     await Promise.all([
       getCountData('users/get-count/all'),
