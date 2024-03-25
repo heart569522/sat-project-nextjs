@@ -4,11 +4,13 @@ import {
   OriginalDataHistory,
   OriginalHistory,
 } from '@/app/model/history-activity';
+import { unstable_noStore as noStore } from 'next/cache';
 
 const fetchHistoryActivity = async (
   query: string,
 ): Promise<HistoryActivity[]> => {
   try {
+    noStore();
     const res = await fetch(
       `${process.env.APP_SCRIPT_ACTIVITY_SHEET}?studentId=${query}`,
     );
