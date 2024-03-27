@@ -1,5 +1,4 @@
 import CardWrapper from '@/app/components/dashboard/cards';
-import RevenueChart from '@/app/components/dashboard/revenue-chart';
 import { Suspense } from 'react';
 import {
   RevenueChartSkeleton,

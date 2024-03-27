@@ -23,7 +23,8 @@ export const authConfig = {
 
       if (
         nextUrl.pathname.startsWith('/activity-history') ||
-        nextUrl.pathname.startsWith('/verify')
+        nextUrl.pathname.startsWith('/verify') ||
+        nextUrl.pathname.startsWith('/dev')
       ) {
         return true;
       }

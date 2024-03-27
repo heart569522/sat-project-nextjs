@@ -1,4 +1,3 @@
-import { auth } from '@/auth';
 import moment from 'moment-timezone';
 import { ThaiBaht } from 'thai-baht-text-ts';
 

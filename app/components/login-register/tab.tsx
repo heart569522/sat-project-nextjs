@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import LoginForm from './login-form';
-import RegisterForm from './register-form';
+import LoginForm from '@/app/components/login-register/login-form';
+import RegisterForm from '@/app/components/login-register/register-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 

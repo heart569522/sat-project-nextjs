@@ -8,7 +8,6 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import Link from 'next/link';
-import { deleteInvoice } from '@/app/lib/actions';
 import { deleteData } from '@/app/lib/api-service';
 import { Tooltip } from '@mui/material';
 
@@ -101,19 +100,6 @@ export function UpdateInvoice({ id }: { id: string }) {
     >
       <PencilIcon className="w-5" />
     </Link>
-  );
-}
-
-export function DeleteInvoice({ id }: { id: string }) {
-  const deleteInvoiceWithId = deleteInvoice.bind(null, id);
-
-  return (
-    <form action={deleteInvoiceWithId}>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </form>
   );
 }
 

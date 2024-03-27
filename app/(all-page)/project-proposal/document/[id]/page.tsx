@@ -4,7 +4,6 @@ import { DocumentLoading } from '@/app/components/loading-screen';
 import PN01Paper from '@/app/components/paper/pn01-paper';
 import ToolBox from '@/app/components/paper/tool-box';
 import { getDataById } from '@/app/lib/api-service';
-import pn01Data from '@/app/model/pn01Data.json';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 

@@ -1,5 +1,3 @@
-import { PN01Status } from '@/app/model/pn01-status';
-import { PN11Status } from '@/app/model/pn11-status';
 import React from 'react';
 
 interface Props {
