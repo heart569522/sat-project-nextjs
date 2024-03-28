@@ -1,5 +1,14 @@
-import React from 'react';
+import { LampPage } from '@/app/components/dev/lamp';
+import { Metadata } from 'next';
 
-export default function page() {
-  return <div>page</div>;
+export const metadata: Metadata = {
+  title: 'Developers',
+};
+
+export default async function Dev() {
+  return (
+    <>
+      <LampPage />
+    </>
+  );
 }
