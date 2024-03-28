@@ -1,4 +1,3 @@
-const million = require('million/compiler');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -9,6 +8,12 @@ const nextConfig = {
     APP_SCRIPT_INSERT_ATTENDANCE_SHEET:
       process.env.URL_SCRIPT_INSERT_ATTENDANCE,
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
-module.exports = million.next(nextConfig, { auto: { rsc: true } });
+
+module.exports = nextConfig
