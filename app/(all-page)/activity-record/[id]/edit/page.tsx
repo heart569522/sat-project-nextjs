@@ -11,9 +11,6 @@ export const metadata: Metadata = {
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
   const data = await getDataById('attendance', id);
-  console.log('🚀 ~ Page ~ data:', data);
-  // console.log("is_draft", data.is_draft)
-  // console.log("is_edit", data.is_edit)
 
   if (data.error || !id) {
     notFound();
@@ -40,7 +37,6 @@ export default async function Page({ params }: { params: { id: string } }) {
           แก้ไขบันทึกการเข้าร่วมโครงการ/กิจกรรม
         </div>
       </div>
-      {/* <Form invoice={invoice} customers={customers} /> */}
       <div className="mt-4 w-full">
         <PN10EditForm editData={data} />
       </div>
