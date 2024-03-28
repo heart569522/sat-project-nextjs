@@ -1,5 +1,6 @@
 import { SparklesCore } from '@/app/components/dev/sparkles';
 import { inter, lusitana, notoThai, rajdhani } from '@/app/components/fonts';
+import { DevBackButton } from '@/app/components/navigation/nav-links';
 import { Suspense } from 'react';
 
 export default async function Layout({

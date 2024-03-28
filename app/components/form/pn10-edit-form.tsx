@@ -549,6 +549,7 @@ export default function PN10EditForm({
                               aria-label="delete_row"
                               size="small"
                               onClick={() => deleteStudentRow(row.id)}
+                              className='text-red-500'
                             >
                               <XCircleIcon className="h-9 w-9" />
                             </IconButton>

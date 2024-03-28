@@ -1786,6 +1786,7 @@ export default function PN01Form({
                               aria-label="delete_row"
                               size="small"
                               onClick={() => deleteResponsibleRow(row.id)}
+                              className='text-red-500'
                             >
                               <XCircleIcon className="h-9 w-9" />
                             </IconButton>
@@ -2856,6 +2857,7 @@ export default function PN01Form({
                                 aria-label="delete_row"
                                 size="small"
                                 onClick={() => deleteOIVTRow(row.id)}
+                                className='text-red-500'
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
@@ -2924,6 +2926,7 @@ export default function PN01Form({
                                 aria-label="delete_row"
                                 size="small"
                                 onClick={() => deleteExpectedResultRow(row.id)}
+                                className='text-red-500'
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
@@ -2997,6 +3000,7 @@ export default function PN01Form({
                                 onClick={() =>
                                   deleteOperationDurationRow(row.id)
                                 }
+                                className='text-red-500'
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
@@ -3193,6 +3197,7 @@ export default function PN01Form({
                                         onClick={() =>
                                           deleteProjectScheduleRow(row.id)
                                         }
+                                        className='text-red-500'
                                       >
                                         <XCircleIcon className="h-9 w-9" />
                                       </IconButton>
@@ -3329,6 +3334,7 @@ export default function PN01Form({
                                 aria-label="delete_row"
                                 size="small"
                                 onClick={() => deleteTargetRow(row.id)}
+                                className='text-red-500'
                               >
                                 <XCircleIcon className="h-9 w-9" />
                               </IconButton>
@@ -3535,6 +3541,7 @@ export default function PN01Form({
                                   aria-label="delete_row"
                                   size="small"
                                   onClick={() => deleteBudgetIncomeRow(row.id)}
+                                  className='text-red-500'
                                 >
                                   <XCircleIcon className="h-9 w-9" />
                                 </IconButton>
@@ -3708,6 +3715,7 @@ export default function PN01Form({
                                   aria-label="delete_row"
                                   size="small"
                                   onClick={() => deleteBudgetExpenseRow(row.id)}
+                                  className='text-red-500'
                                 >
                                   <XCircleIcon className="h-9 w-9" />
                                 </IconButton>

@@ -20,6 +20,7 @@ import {
 import { TextField, Tooltip, IconButton } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { TableRowFullSkeleton } from '../skeletons';
 
 interface ValidationError {
   id: number;
@@ -41,10 +42,10 @@ export default function FacultyMajorForm({
   data,
   isEditing,
 }: FacultyMajorFormProps) {
-  // console.log('🚀 ~ data:', data);
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [rowLoading, setRowLoading] = useState(true);
 
   const [openQuestionModal, setOpenQuestionModal] = useState(false);
   const [openResponseModal, setOpenResponseModal] = useState(false);
@@ -73,7 +74,6 @@ export default function FacultyMajorForm({
   const [majorRows, setMajorRows] = useState<Majors[]>(
     isEditing ? [] : initialMajorState,
   );
-  console.log('🚀 ~ majorRows:', majorRows);
 
   useEffect(() => {
     if (isEditing) {
@@ -89,14 +89,14 @@ export default function FacultyMajorForm({
       );
 
       setMajorRows(filteredMajors);
+      setRowLoading(false);
     } catch (error) {
+      setRowLoading(false);
       console.error(error);
     }
   };
 
   const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
-    console.log('handleOpenModal');
-
     if (isCancel) {
       setTitleModal(isEditing ? 'ยกเลิกการแก้ไข' : 'ยกเลิก');
       setDetailModal(`คุณยืนยันที่จะยกเลิกการ${pageTitle}`);
@@ -295,7 +295,6 @@ export default function FacultyMajorForm({
     resetResponseModal();
 
     const formData = setFinalFormData();
-    console.log('🚀 ~ handleSubmit ~ formData:', formData);
 
     try {
       let response: any;
@@ -328,8 +327,6 @@ export default function FacultyMajorForm({
   };
 
   const setFinalFormData = () => {
-    console.log('--set form--');
-
     const finalFormData = {
       facultyName: formInput.facultyName,
       majorData: majorRows,
@@ -389,63 +386,74 @@ export default function FacultyMajorForm({
                   </tr>
                 </thead>
                 <tbody>
-                  {majorRows?.map((row, i) => (
-                    <tr className="border-b bg-white" key={i}>
-                      <th
-                        scope="row"
-                        className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
-                      >
-                        {i + 1}
-                      </th>
-                      <td className="px-6 py-4">
-                        <div className={`grid grid-cols-1 gap-6`}>
-                          <TextField
-                            type="text"
-                            name="name"
-                            className="flex w-full"
-                            placeholder=""
-                            value={row.name}
-                            size="small"
-                            onChange={(e) =>
-                              handleMajorChange(row.id, 'name', e.target.value)
-                            }
-                            error={Boolean(
-                              validationArrayError['major_name']?.some(
-                                (item) => item.id === row.id,
-                              ),
-                            )}
-                            helperText={
-                              validationArrayError['major_name']?.find(
-                                (item) => item.id === row.id,
-                              )?.error || ''
-                            }
-                          />
-                        </div>
-                      </td>
-                      <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
-                        <Tooltip title="เพิ่มแถว">
-                          <IconButton
-                            aria-label="add_row"
-                            size="small"
-                            onClick={addMajorRow}
-                          >
-                            <PlusCircleIcon className="h-9 w-9" />
-                          </IconButton>
-                        </Tooltip>
-                        {majorRows.length > 1 && (
-                          <Tooltip title="ลบแถว">
-                            <IconButton
-                              aria-label="delete_row"
+                  {rowLoading ? (
+                    <>
+                      <TableRowFullSkeleton countColumn={3} />
+                    </>
+                  ) : (
+                    majorRows?.map((row, i) => (
+                      <tr className="border-b bg-white" key={i}>
+                        <th
+                          scope="row"
+                          className="bg-gray-50 px-6 py-4 text-center text-lg font-medium"
+                        >
+                          {i + 1}
+                        </th>
+                        <td className="px-6 py-4">
+                          <div className={`grid grid-cols-1 gap-6`}>
+                            <TextField
+                              type="text"
+                              name="name"
+                              className="flex w-full"
+                              placeholder=""
+                              value={row.name}
                               size="small"
-                              onClick={() => deleteMajorRow(row.id)}
+                              onChange={(e) =>
+                                handleMajorChange(
+                                  row.id,
+                                  'name',
+                                  e.target.value,
+                                )
+                              }
+                              error={Boolean(
+                                validationArrayError['major_name']?.some(
+                                  (item) => item.id === row.id,
+                                ),
+                              )}
+                              helperText={
+                                validationArrayError['major_name']?.find(
+                                  (item) => item.id === row.id,
+                                )?.error || ''
+                              }
+                            />
+                          </div>
+                        </td>
+                        <td className="flex items-center justify-center bg-gray-50 px-6 py-4">
+                          <Tooltip title="เพิ่มแถว">
+                            <IconButton
+                              aria-label="add_row"
+                              size="small"
+                              onClick={addMajorRow}
                             >
-                              <XCircleIcon className="h-9 w-9" />
+                              <PlusCircleIcon className="h-9 w-9" />
                             </IconButton>
                           </Tooltip>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          {majorRows.length > 1 && (
+                            <Tooltip title="ลบแถว">
+                              <IconButton
+                                aria-label="delete_row"
+                                size="small"
+                                onClick={() => deleteMajorRow(row.id)}
+                                className="text-red-500"
+                              >
+                                <XCircleIcon className="h-9 w-9" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

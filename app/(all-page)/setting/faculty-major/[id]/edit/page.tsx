@@ -1,6 +1,5 @@
 import Breadcrumbs from '@/app/components/breadcrumbs';
 import FacultyMajorForm from '@/app/components/form/faculty-major-form';
-import PN01SelectForm from '@/app/components/form/pn01-select-form';
 import { getDataById } from '@/app/lib/api-service';
 import IsAdminAuthen from '@/app/lib/isAuthen';
 import { Metadata } from 'next';

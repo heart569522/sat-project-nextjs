@@ -41,7 +41,7 @@ export default async function Page({
       <ActivityTranscriptTable query={query} currentPage={currentPage} />
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
-      </div>
+      </div>  
     </div>
   );
 }

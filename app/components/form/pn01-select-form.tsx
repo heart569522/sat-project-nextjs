@@ -47,7 +47,6 @@ export default function PN01SelectForm({
   const [dataRows, setDataRows] = useState(data);
 
   const handleOpenModal = (isCancel?: boolean, isSubmit?: boolean) => {
-    console.log('handleOpenModal');
 
     if (isCancel) {
       setTitleModal('ยกเลิกการแก้ไข');
@@ -191,8 +190,6 @@ export default function PN01SelectForm({
   const validateForm = () => {
     let isValid = true;
 
-    console.log('--validateForm--');
-
     // Validate Table arrays
     const dataFields = ['name'];
     const isDataValid = validateArray(dataRows, dataFields, 'data');
@@ -314,6 +311,7 @@ export default function PN01SelectForm({
                               aria-label="delete_row"
                               size="small"
                               onClick={() => deleteRow(row.id)}
+                              className='text-red-500'
                             >
                               <XCircleIcon className="h-9 w-9" />
                             </IconButton>

@@ -29,7 +29,7 @@ export default async function Page(context: { params: { id: string } }) {
           breadcrumbs={[
             {
               label: 'จัดการคำร้องขอระเบียนกิจกรรม',
-              href: '/mangement/pn11',
+              href: '/management/pn11',
               active: false,
             },
             {

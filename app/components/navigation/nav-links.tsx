@@ -14,7 +14,7 @@ import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlin
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import React from 'react';
 // import { ButtonLogoutMoblie } from '../buttons/button-logout';
@@ -341,6 +341,32 @@ export function NavLinksMobile({
         </div>
       )}
     </>
+  );
+}
+
+export function DevButton() {
+  const router = useRouter();
+
+  return (
+    <button
+      type="button"
+      onClick={() => router.replace('/dev')}
+      className="text-center text-sm text-blue-500 underline hover:text-blue-400 active:text-blue-600"
+    >
+      นักพัฒนา
+    </button>
+  );
+}
+
+export function DevBackButton({ className }: { className: string }) {
+  return (
+    <div className={`${className} `}>
+      <a type="button" href="/">
+        <div className="flex items-center justify-center rounded-lg  border-2 border-amber-100 p-3 text-center text-sm text-amber-100 transition hover:border-amber-300 hover:text-amber-100 active:text-amber-300">
+          BACK
+        </div>
+      </a>
+    </div>
   );
 }
 
