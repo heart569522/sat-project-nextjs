@@ -1,7 +1,6 @@
 import CardWrapper from '@/app/components/dashboard/cards';
 import { Suspense } from 'react';
 import {
-  RevenueChartSkeleton,
   LatestDataSkeleton,
   CardsSkeleton,
 } from '@/app/components/skeletons';
@@ -31,9 +30,6 @@ export default async function Page() {
         </Suspense>
       </div>
       <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-8 xl:grid-cols-12">
-        {/* <Suspense fallback={<RevenueChartSkeleton />}>
-          <RevenueChart />
-        </Suspense> */}
         <Suspense fallback={<LatestDataSkeleton />}>
           <LatestPN01 />
         </Suspense>

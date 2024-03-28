@@ -44,11 +44,8 @@ export default function ProjectProposalTable({
   currentPage?: number;
   isAdminTable?: boolean;
 }) {
-  // console.log('🚀 ~ isAdminTable:', isAdminTable);
   const [data, setData] = useState([]);
-  console.log('🚀 ~ data:', data);
   const [pn01StatusData, setPN01StatusData] = useState([]);
-  console.log('🚀 ~ pn01StatusData:', pn01StatusData);
   const [loading, setLoading] = useState(true);
   const [showRemark, setShowRemark] = useState<string | null>(null);
 
@@ -138,12 +135,10 @@ export default function ProjectProposalTable({
   };
 
   const handleSaveData = async (apiPath: string, rowId: string, data: any) => {
-    console.log('🚀 ~ handleSaveData ~ data:', data);
     try {
       const response = await updateData(apiPath, data, rowId, true);
 
       if (response && (response.status === 201 || response.status === 200)) {
-        console.log('update row success');
         setRemark('');
         // setToggleCanEdit({});
         fetchData();

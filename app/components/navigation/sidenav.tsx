@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import NavLinks, { ProfileButton } from '@/app/components/navigation/nav-links';
+import NavLinks, {
+  DevButton,
+  ProfileButton,
+} from '@/app/components/navigation/nav-links';
 import BannerLogo from '@/app/components/banner-logo';
 import { auth, signOut } from '@/auth';
 import { getUserLoginData } from '@/app/lib/api-service';
@@ -50,6 +53,11 @@ export default async function SideNav() {
           </>
         )}
       </div>
+      {!user && (
+        <div className="mt-2 flex items-center justify-center">
+          <DevButton />
+        </div>
+      )}
     </div>
   );
 }

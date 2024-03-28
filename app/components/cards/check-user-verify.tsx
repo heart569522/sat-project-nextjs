@@ -59,13 +59,13 @@ export default function CheckUserVerifyCard({ userData }: { userData: Users }) {
                   ยืนยันแล้ว
                 </div>
               ) : (
-                <div className="rounded-md bg-gray-300 px-3 py-2 font-semibold text-gray-800">
-                  ไม่ยืนยัน
+                <div className="rounded-md bg-red-500 px-3 py-2 font-semibold text-white">
+                  รอการยืนยัน
                 </div>
               )}
             </div>
             {!userData.is_verify && (
-              <p className="text-base text-red-500">
+              <p className="text-base text-red-500 underline">
                 **รอการยืนยันจากเจ้าหน้าที่
               </p>
             )}

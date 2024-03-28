@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/app/lib/cn';
 import { TextGenerateEffect } from './text-generate-effect';
 import { SparklesCore } from './sparkles';
+import { DevBackButton } from '../navigation/nav-links';
 
 export function LampPage() {
   const [showText1, setShowText1] = useState(false);
@@ -60,7 +61,7 @@ export function LampPage() {
           }}
           className="mt-0 bg-gradient-to-br from-slate-100 to-amber-200 bg-clip-text py-4 text-center text-4xl font-semibold tracking-tight text-transparent xl:text-7xl"
         >
-          Developers
+          Team
         </motion.h1>
         {showText1 && (
           <TextGenerateEffect words={`6401260021 Wirunrom Wankasemsan`} />
@@ -71,11 +72,11 @@ export function LampPage() {
           </div>
         )}
         {showText2 && (
-          <TextGenerateEffect words={`6401260069 Chayanont Saimonkol`} />
+          <TextGenerateEffect words={`6401260069 Chayanont Saymongkon`} />
         )}
         {showMockText2 && (
           <div className="invisible pt-2 leading-normal tracking-wide text-white transition sm:text-xl md:text-2xl xl:text-4xl">
-            <p>6401260069 Chayanont Saimonkol</p>
+            <p>6401260069 Chayanont Saymongkon</p>
           </div>
         )}
         {showText3 && <TextGenerateEffect words={`Software Engineering`} />}
@@ -109,6 +110,9 @@ export default function LampContainer({
         className,
       )}
     >
+      <div className="flex items-start justify-start">
+        <DevBackButton className="absolute left-0 top-0 z-50 p-4" />
+      </div>
       <div className="relative isolate z-0 flex w-full flex-1 scale-y-125 items-center justify-center ">
         <motion.div
           initial={{ opacity: 0, width: '15rem' }}
