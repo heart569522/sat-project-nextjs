@@ -19,7 +19,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${notoThai.className} antialiased`}>
         <div className="flex min-h-screen flex-col md:flex-row md:overflow-hidden">
           <nav className="w-full flex-none border-r-2 print:hidden md:w-80 md:shadow-xl">
