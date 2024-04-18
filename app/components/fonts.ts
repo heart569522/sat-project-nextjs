@@ -21,6 +21,8 @@ export const lusitana = Lusitana({
 export const notoThai = Noto_Sans_Thai_Looped({
   subsets: ['thai'],
   weight: ['400', '600', '700'],
+  display: 'swap',
+  adjustFontFallback: false,
 });
 
 export const sarabun = Sarabun({
